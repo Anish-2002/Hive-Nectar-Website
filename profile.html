@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo-area">
+      <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
+      <span class="brand-title">HIVE NECTAR</span>
+    </div>
+    <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="pollenpop.html">PollenPop</a>
+        <a href="join.html">Join</a>
+        <a href="profile.html" class="active">Profile</a>
+    </nav>
+    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+  </header>
+
+  <main class="wrap">
+    <div class="grid-container">
+      
+      <aside class="side-column">
+        <section class="card profile-card-compact">
+          <div class="profile-avatar">
+            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=bee" alt="Avatar">
+          </div>
+          <h2 id="userNameDisplay">Busy Bee</h2>
+          <p class="tiny muted">bee@hivenectar.com</p>
+          <a href="index.html" class="btn logout-btn-small">Logout</a>
+        </section>
+
+        <section class="card">
+          <h3 class="tiny-title">Stats</h3>
+          <div class="stat-row">
+            <div class="stat-icon"><i class="fas fa-thin fa-honey-pot" style="color:#f59e0b"></i></div>
+            <div class="stat-content">
+              <span class="tiny muted">Points Earned</span>
+              <p><strong>1,250</strong> <span class="tiny">pts</span></p>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-icon"><i class="fas fa-check-double" style="color:var(--success)"></i></div>
+            <div class="stat-content">
+              <span class="tiny muted">Tasks Completed</span>
+              <p><strong>45</strong></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card quote-card">
+            <h3 class="tiny-title">Daily Motivation</h3>
+            <p class="tiny italic">"The journey of a thousand miles begins with a single step. Keep going!"</p>
+        </section>
+      </aside>
+
+      <div class="main-content">
+        
+        <section class="card">
+          <div class="section-header">
+            <h3 class="section-title">Daily Hive Habits</h3>
+            <div class="filter-pills">
+                <span class="pill active">This Week</span>
+                <span class="pill">Today</span>
+            </div>
+          </div>
+
+          <div class="habit-cards-row">
+            <div class="habit-mini-card">
+                <h4>Monday</h4>
+                <p class="tiny"><i class="fas fa-droplet"></i> Water intake</p>
+                <div class="progress-bar-small"><div class="fill" style="width: 70%;"></div></div>
+            </div>
+            <div class="habit-mini-card">
+                <h4>Tuesday</h4>
+                <p class="tiny"><i class="fas fa-dumbbell"></i> 30 Min Exercise</p>
+                <div class="progress-bar-small"><div class="fill" style="width: 40%;"></div></div>
+            </div>
+            <div class="habit-mini-card muted-card">
+                <h4>Wednesday</h4>
+                <p class="tiny">Read 10 Pages</p>
+                <div class="progress-bar-small"><div class="fill" style="width: 0%;"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="dashboard-inner-grid">
+            <section class="card">
+                <h3 class="section-title"><i class="fas fa-chart-line"></i> Weekly Progress</h3>
+                <div class="progress-item">
+                    <span class="tiny">This Week</span>
+                    <div class="progress-bar-large"><div class="fill" style="width: 65%;"></div></div>
+                </div>
+                <div class="progress-item">
+                    <span class="tiny">Month (30%)</span>
+                    <div class="progress-bar-large"><div class="fill" style="width: 30%;"></div></div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div class="action-chips">
+                    <span class="chip"><i class="fas fa-bed"></i> 6-7 Hr Sleep</span>
+                    <span class="chip"><i class="fas fa-utensils"></i> Eat Healthy</span>
+                    <span class="chip"><i class="fas fa-book"></i> Read</span>
+                </div>
+            </section>
+        </div>
+
+        <section class="card icon-toolbar">
+            <div class="tool-item">
+                <div class="tool-icon"><i class="fas fa-utensils"></i></div>
+                <span class="tiny">Log Food</span>
+            </div>
+            <div class="tool-item">
+                <div class="tool-icon"><i class="fas fa-tasks"></i></div>
+                <span class="tiny">New Task</span>
+            </div>
+            <div class="tool-item">
+                <div class="tool-icon active"><i class="fas fa-pen"></i></div>
+                <span class="tiny">Journal</span>
+            </div>
+            <div class="tool-item">
+                <div class="tool-icon"><i class="fas fa-users"></i></div>
+                <span class="tiny">Connect</span>
+            </div>
+        </section>
+
+      </div> </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-links">
+        <a href="profile.html">My Profile</a> | <a href="board.html">Communication Board</a>
+    </div>
+    <p class="tiny" style="margin-top:10px;">&copy; 2025 Hive Nectar</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
