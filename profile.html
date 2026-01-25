@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="Logo" style="height:40px;"></div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </div>
+  <nav class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="wrap">
+    <div class="dashboard-container">
+        
+        <aside class="profile-sidebar">
+            <div class="card glass-card main-profile">
+                <div class="profile-header">
+                    <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Avatar" class="avatar-large">
+                </div>
+                
+                <div class="profile-info">
+                    <h3 style="margin-top:20px; font-size: 1.2rem;">My profile</h3>
+                    <p class="last-login">Last Login: 25 Jan 2026, 18:50</p>
+                    
+                    <div class="info-field">
+                        <span class="label">Name</span>
+                        <span class="value">Busy Bee</span>
+                    </div>
+                    <div class="info-field">
+                        <span class="label">Email</span>
+                        <span class="value">bee@hivenectar.com</span>
+                    </div>
+                    
+                    <div class="sms-toggle">
+                        <span>SMS alerts activation</span>
+                        <div class="toggle-switch active"></div>
+                    </div>
+                    
+                    <button class="btn btn-gradient">Save Changes</button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="dashboard-content">
+            
+            <section class="card glass-card">
+                <div class="card-header">
+                    <h3 style="font-size: 1rem;">My Nectar status</h3>
+                    <i class="fas fa-search muted" style="font-size: 0.9rem;"></i>
+                </div>
+                <div class="account-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <span class="label tiny muted">Active Nectar Balance</span>
+                        <p style="font-size: 1.2rem; margin: 5px 0;"><strong>1,250 ml</strong></p>
+                    </div>
+                    <button class="mission-status complete" style="border:none; cursor:pointer; font-weight:700;">View Vault</button>
+                </div>
+            </section>
+
+            <section class="card glass-card">
+                <div class="card-header">
+                    <h3 style="font-size: 1rem;">Daily Missions</h3>
+                    <span class="tiny muted">Filter by <i class="fas fa-chevron-down"></i></span>
+                </div>
+                
+                <div class="mission-row">
+                    <div class="mission-name">
+                        <div class="dot green"></div> <span>Drink 2L of Water</span>
+                    </div>
+                    <span class="mission-status complete">Mission done</span>
+                </div>
+                
+                <div class="mission-row">
+                    <div class="mission-name">
+                        <div class="dot red"></div> <span>30 Minute Hive Walk</span>
+                    </div>
+                    <span class="mission-status pending">Not done</span>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="#" class="tiny muted" style="text-decoration:none; font-size: 0.75rem;"><i class="fas fa-calendar-alt"></i> View Mission History</a>
+                </div>
+            </section>
+
+            <section class="card glass-card" style="padding: 20px !important;">
+                <div class="progress-header" style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span class="tiny bold">Rank Progress</span>
+                    <span class="tiny bold">65%</span>
+                </div>
+                <div class="honey-progress-bg">
+                    <div class="honey-fill" style="width: 65%;"></div>
+                </div>
+            </section>
+
+            <div class="share-card-modern" onclick="openSharePopup()">
+                 <p style="margin:0; font-weight: 600;">Share your Hive Growth</p>
+                 <div class="share-icon-circle"><i class="fas fa-share-alt"></i></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="modal-overlay" id="shareModal">
+    <div class="share-popup">
+        <button class="close-btn" onclick="closeSharePopup()" style="position:absolute; right:20px; top:10px; background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+        <div class="share-preview" style="background: var(--header-bg); color:white; padding:30px; border-radius:15px;">
+            <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" style="width:80px; border-radius:50%; border:3px solid var(--primary); margin-bottom:10px;">
+            <h3>Busy Bee</h3>
+            <p>Honey Level: 1,250 ml</p>
+            <div class="honey-progress-bg" style="height:10px; margin-top:15px;"><div class="honey-fill" style="width:65%;"></div></div>
+        </div>
+        <button class="btn" style="margin-top:20px; width:100%;">Download Achievement</button>
+    </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> | <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+<script>
+    function openSharePopup() { document.getElementById('shareModal').style.display = 'grid'; }
+    function closeSharePopup() { document.getElementById('shareModal').style.display = 'none'; }
+</script>
+
+</body>
+</html>
