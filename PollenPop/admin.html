@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tester Link Generator</title>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .row { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        #qrcode { margin-top: 20px; padding: 10px; border: 1px solid #eee; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Tester URL/QR Generator</h1>
+    <p>Use this page to generate shareable links for testers.</p>
+
+    <div class="row">
+        <label for="testerId">Tester ID (e.g., T-001):</label>
+        <input id="testerId" type="text" placeholder="T-XXX" oninput="generateLink()" value="T-001" />
+    </div>
+    
+    <div class="row">
+        <label for="urlOutput">Generated URL (Index Page):</label>
+        <input id="urlOutput" type="text" readonly />
+    </div>
+
+    <div id="qrcode"></div>
+    <p style="margin-top: 10px; font-size: 0.9em;">QR Code displays the link above.</p>
+
+    <script>
+        // Use the base URL of the index page for the link
+        const BASE_URL = window.location.origin + window.location.pathname.replace('admin.html', 'index.html').replace(/\/$/, '') || '/index.html';
+
+        function generateLink() {
+            const testerId = document.getElementById('testerId').value.trim();
+            const urlOutput = document.getElementById('urlOutput');
+            const qrContainer = document.getElementById('qrcode');
+            
+            qrContainer.innerHTML = ''; // Clear existing QR
+            
+            if (testerId) {
+                // Generate the shareable link with the tester_id parameter
+                const shareUrl = `${BASE_URL}?tester_id=${encodeURIComponent(testerId)}`;
+                
+                urlOutput.value = shareUrl;
+                
+                // Auto-generate QR code
+                if (window.QRCode) {
+                    new QRCode(qrContainer, {
+                        text: shareUrl,
+                        width: 128,
+                        height: 128
+                    });
+                }
+            } else {
+                urlOutput.value = '';
+            }
+        }
+        // Initial run on load
+        window.onload = generateLink;
+    </script>
+</body>
+</html>

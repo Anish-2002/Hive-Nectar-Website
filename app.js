@@ -75,3 +75,10 @@ if (window.location.pathname.includes('profile.html')) {
         window.location.href = 'login.html'; // Redirect to login if not authenticated
     }
 }
+
+function openSharePopup() {
+    document.getElementById('shareModal').style.display = 'grid';
+}
+function closeSharePopup() {
+    document.getElementById('shareModal').style.display = 'none';
+}

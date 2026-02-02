@@ -26,16 +26,45 @@
 </header>
 
   <main class="wrap">
-    <h1>Communication Board</h1>
-    <div class="card">
-      <div class="placeholder-box">
-        <i class="fas fa-bullhorn" style="font-size: 2rem; color: var(--cta);"></i>
-        <h3>[Placeholder: Future Updates Feed]</h3>
-        <p>This container will house future community updates, messaging, and feeds in later phases.</p>
-      </div>
-      <p class="muted" style="text-align: center; font-size: 0.8rem;">Strictly static placeholder. No messaging logic implemented.</p>
+    <div class="filter-navigation">
+        <button class="pill active">All Buzz</button>
+        <button class="pill">Announcements</button>
+        <button class="pill">Community</button>
+        <button class="pill">System Updates</button>
     </div>
-  </main>
+
+    <div class="board-container-full">
+        <section class="card glass-card announcement-hero">
+            <div class="announcement-content">
+                <div class="badge-row">
+                    <span class="status-btn complete">Early Access</span>
+                    <span class="tiny muted">Available Now</span>
+                </div>
+                <h2>PollenPop is available for early access! 🚀</h2>
+                <p>Be the first to experience our new physical product line. Early hive members get a 20% discount on their first harvest. Use code <strong>BEE20</strong> at checkout.</p>
+                
+                <div class="announcement-actions">
+                    <a href="pollenpop.html" class="btn btn-gradient" style="width: auto; padding: 12px 40px;">Claim Discount</a>
+                    <button class="reaction-btn"><i class="fas fa-heart"></i> 128 Bees like this</button>
+                </div>
+            </div>
+            <div class="announcement-visual">
+                <i class="fas fa-box-open fa-5x" style="color: var(--primary); opacity: 0.5;"></i>
+            </div>
+        </section>
+
+        <section class="card glass-card rectangular-update">
+            <div class="update-header-row">
+                <div class="update-title">
+                    <div class="dot green"></div>
+                    <h3 style="margin:0; font-size: 1.1rem;">Hive Pulse: System Integration</h3>
+                </div>
+                <span class="tiny muted">2 hours ago</span>
+            </div>
+            <p class="muted">We are migrating the Hive Nectar database to Firebase for real-time mission tracking. Expect a smoother experience by Friday!</p>
+        </section>
+    </div>
+</main>
   <script src="app.js"></script>
 </body>
 
