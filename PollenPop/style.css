@@ -13,8 +13,6 @@
 }
 
 *{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif}
 
 .wrap{max-width:1100px;margin:0 auto;padding:20px}
 
@@ -42,18 +40,32 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .leftCol{min-width:0}
 .rightCol{min-width:0}
 
-@media (max-width: 1000px){
-  .row{grid-template-columns:1fr;gap:20px}
-}
-@media (max-width: 600px){
-  .wrap{padding:12px}
-  .card{padding:15px;border-radius:12px}
-  .filter-bar{grid-template-columns: 1fr;} 
-  /* NEW RULE: Limit image height on small screens */
-  .trial-info-image img {
-    max-height: 50vh; /* Limits image height to 50% of viewport height */
-    width: auto; /* Ensures aspect ratio is maintained */
-  }
+/* --- UNIFIED MOBILE NAV FIX --- */
+@media (max-width: 768px) {
+    /* Sync with main style to prevent flickering */
+    .nav-links {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #1e293b !important;
+        z-index: 2000000 !important;
+        padding-top: 100px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-links.active {
+        display: flex !important;
+    }
+    
+    /* Ensure the row/grid doesn't push the menu aside */
+    .row {
+        display: flex !important;
+        flex-direction: column !important;
+    }
 }
 
 
@@ -566,4 +578,39 @@ button:disabled{opacity:.6;cursor:not-allowed}
     margin-bottom: 5px;
     color: var(--muted);
 }
-/* --- END NEW: Modal/Popup Styles --- */
+/* --- END NEW: Modal/Popup Styles --- */@media (max-width: 768px) {
+    /* 1. Reset the nav container */
+    .nav-links {
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        
+        /* 2. Position it relative to the SCREEN, not the header */
+        position: fixed; 
+        top: 60px; /* Adjust this to match your header height exactly */
+        left: 0;
+        width: 100vw; /* Full width of screen */
+        height: calc(100vh - 60px); /* Full height of screen minus header */
+        
+        /* 3. Appearance */
+        background: #1e293b !important; /* Force the dark hive color */
+        padding: 40px 20px;
+        z-index: 999999; /* Set extremely high to stay above Hero/Cards */
+    }
+
+    /* 4. This is the class the JavaScript adds */
+    .nav-links.active {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* 5. Make the links big and white so you can see them */
+    .nav-links a {
+        color: white !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 25px;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+}

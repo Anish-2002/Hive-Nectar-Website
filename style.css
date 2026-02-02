@@ -29,16 +29,14 @@ body {
 
 /* --- NAVIGATION & HEADER --- */
 .header {
-    height: 10vh; /* Exactly 10% of screen height */
-    min-height: 60px; /* Safety for small screens */
-    flex-shrink: 0;
+    height: 10vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 5%;
     background: var(--header-bg);
-    border-bottom: 3px solid var(--primary);
-    z-index: 1000;
+    position: relative; /* Add this if it's missing */
+    overflow: visible;   /* IMPORTANT: Must be visible for menu to drop down */
 }
 /* --- THE FLEXIBLE LOGO SYSTEM --- */
 .logo-area {
@@ -952,8 +950,55 @@ body {
 .preview-item:last-child .preview-divider {
     display: none; /* Removes the line after the last post */
 }
-html, body {
-    height: 100vh; /* Lock height to the screen size */
-    margin: 0;
-    overflow: hidden; /* Prevent the whole page from scrolling */
+
+/* --- OVERRIDE: FULL SCREEN MOBILE MENU --- */
+/* --- UNIFIED MOBILE NAV FIX --- */
+@media (max-width: 768px) {
+    /* Force the toggle button to the front */
+    .menu-toggle {
+        display: block !important;
+        position: relative !important;
+        z-index: 2000001 !important; 
+    }
+
+    .nav-links {
+        display: none; 
+        flex-direction: column;
+        
+        /* THE FIX: Fixed position ignores parent overflow containers */
+        position: fixed !important; 
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        
+        background: #1e293b !important; /* Dark Hive Slate */
+        padding: 100px 20px 40px 20px !important;
+        z-index: 2000000 !important; 
+        
+        justify-content: flex-start;
+        align-items: center;
+        overflow-y: auto; /* Allows scrolling if you have many links */
+    }
+
+    .nav-links.active {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .nav-links a {
+        color: #facc15 !important; /* Gold */
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        margin-bottom: 30px !important;
+        text-decoration: none !important;
+        display: block !important;
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Add this to allow the menu to show even if body is locked */
+body.menu-open {
+    overflow: hidden;
 }

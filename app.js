@@ -1,40 +1,56 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Mobile Menu Toggle
+    
+    // 1. MOBILE MENU LOGIC (Unified)
     const menuToggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
 
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
             navLinks.classList.toggle('active');
+            
+            // Toggle the Icon between Hamburger (fa-bars) and X (fa-xmark)
+            const icon = menuToggle.querySelector('i');
+            if (icon) {
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-xmark');
+                } else {
+                    icon.classList.remove('fa-xmark');
+                    icon.classList.add('fa-bars');
+                }
+            }
+        });
+
+        // Close menu if user clicks a link (important for single-page jumps)
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                const icon = menuToggle.querySelector('i');
+                if (icon) {
+                    icon.classList.replace('fa-xmark', 'fa-bars');
+                }
+            });
         });
     }
 
-    // 2. Phase 1 Form Logic (Static Persistence)
+    // 2. FORM PERSISTENCE LOGIC
     const forms = ['joinForm', 'contactForm'];
     forms.forEach(id => {
         const f = document.getElementById(id);
         if (f) {
             f.addEventListener('submit', (e) => {
                 e.preventDefault();
-                // Basic Phase 1 behavior: Hide form, show confirmation placeholder
                 f.classList.add('hide');
                 const feedback = document.getElementById(id + 'Feedback');
                 if (feedback) feedback.classList.remove('hide');
             });
         }
     });
-});
 
-// Add this to your existing DOMContentLoaded listener in app.js
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Existing code for menu and contact forms...
-
-    // 3. Login Validation Logic
+    // 3. LOGIN VALIDATION LOGIC
     const loginForm = document.getElementById('loginForm');
     const loginError = document.getElementById('loginError');
-
-    // Simulated JSON data
     const users = [
         { email: "bee@hivenectar.com", password: "password123", name: "Busy Bee" },
         { email: "test@user.com", password: "hivepassword", name: "Test User" }
@@ -45,8 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPassword').value;
-
-            // Find user
             const user = users.find(u => u.email === email);
 
             if (!user) {
@@ -56,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginError.textContent = "Incorrect password.";
                 loginError.style.display = "block";
             } else {
-                // Success: Save user session to localStorage and redirect
                 localStorage.setItem('hive_user_session', JSON.stringify({
                     email: user.email,
                     name: user.name,
@@ -68,17 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Simple route guard for the Profile page
+// 4. ROUTE GUARD & POPUPS
 if (window.location.pathname.includes('profile.html')) {
     const session = JSON.parse(localStorage.getItem('hive_user_session'));
     if (!session || !session.loggedIn) {
-        window.location.href = 'login.html'; // Redirect to login if not authenticated
+        window.location.href = 'login.html';
     }
 }
 
 function openSharePopup() {
-    document.getElementById('shareModal').style.display = 'grid';
+    const modal = document.getElementById('shareModal');
+    if(modal) modal.style.display = 'grid';
 }
+
 function closeSharePopup() {
-    document.getElementById('shareModal').style.display = 'none';
+    const modal = document.getElementById('shareModal');
+    if(modal) modal.style.display = 'none';
 }
