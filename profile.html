@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile | Hive Nectar</title>
+  
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="TESTPollenPop-Apply-Filter-Added/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <style>
+
+    /* --- THEME SYSTEM VARIABLES --- */
+
+    body[data-theme="classic"] {
+
+      --bg: #fdfdfb; --card: #ffffff; --fg: #1e293b; --border: #e2e8f0; --primary: #facc15;
+
+      --hero-bg: linear-gradient(135deg, #facc15 0%, #eab308 100%); --hero-text: #713f12;
+
+    }
+
+    body[data-theme="gold"] {
+
+      --bg: #fefce8; --card: #fef9c3; --fg: #713f12; --border: #fde047; --primary: #eab308;
+
+      --hero-bg: linear-gradient(135deg, #eab308 0%, #92400e 100%); --hero-text: #ffffff;
+
+    }
+
+    body[data-theme="dark"] {
+
+      --bg: #0f172a; --card: #1e293b; --fg: #f8fafc; --border: #334155; --primary: #facc15;
+
+      --hero-bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); --hero-text: #facc15;
+
+    }
+
+
+
+    /* --- LAYOUT STYLING --- */
+
+    .profile-hero { padding: 30px; margin-bottom: 25px; border-radius: 20px; background: var(--hero-bg); color: var(--hero-text); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+    .hero-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+
+    .hero-user { display: flex; align-items: center; gap: 20px; }
+
+    .avatar-wrapper { position: relative; }
+
+    .avatar-large { width: 90px; height: 90px; border-radius: 24px; background: white; border: 4px solid rgba(255,255,255,0.4); object-fit: cover; }
+
+    .badge-icon { position: absolute; bottom: -5px; right: -5px; background: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--primary); }
+
+    .hero-text h2 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+
+    .rank-tag { background: rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-top: 5px; }
+
+    .hero-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(255,255,255,0.15); border-radius: 18px; padding: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+
+    .h-stat { text-align: center; border-right: 1px solid rgba(255,255,255,0.2); }
+
+    .h-stat:last-child { border-right: none; }
+
+    .h-label { display: block; font-size: 0.65rem; text-transform: uppercase; font-weight: bold; opacity: 0.9; margin-bottom: 4px;}
+
+    .h-value { font-size: 1.3rem; font-weight: 900; }
+
+
+
+    .profile-layout-grid { display: grid; grid-template-columns: 260px 1fr 260px; gap: 20px; align-items: start; }
+
+    .sub-nav { display: flex; flex-direction: column; gap: 5px; }
+
+    .sub-link { padding: 12px 15px; border-radius: 12px; text-decoration: none; color: var(--fg); font-size: 0.9rem; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+
+    .sub-link:hover { background: rgba(0,0,0,0.05); color: var(--cta); }
+
+    .sub-link.active { background: var(--primary); color: #000; font-weight: bold; }
+
+
+
+    .theme-btn-group { display: flex; gap: 10px; margin-top: 10px;}
+
+    .theme-btn { flex: 1; height: 45px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+
+    .theme-btn.active { border-color: var(--cta); transform: scale(1.05); }
+
+
+
+    /* --- TASK UI INTEGRATION (CARBON COPY FROM INDEX.HTML) --- */
+
+    .filter-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+
+    .dropdown-container { position: relative; }
+
+    .dropdown-header {
+
+      background: var(--card); border: 1px solid var(--border); padding: 10px;
+
+      border-radius: 10px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+
+    }
+
+    .dropdown-list {
+
+      display: none; position: absolute; top: 110%; left: 0; width: 100%;
+
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+
+      z-index: 100; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    }
+
+    .dropdown-container.open .dropdown-list { display: block; }
+
+    .filter-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 0.75rem; cursor: pointer; }
+
+    .filter-item:hover { background: rgba(0,0,0,0.05); }
+
+
+
+    .progressWrap { margin: 15px 0 25px; }
+
+    progress { width: 100%; height: 10px; border-radius: 10px; accent-color: var(--primary); }
+
+
+
+    /* Matches app.js Task Rendering */
+
+    .task { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start; }
+
+    .taskTitle { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; }
+
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+
+    .pill { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; border: 1px solid var(--border); }
+
+    .core-pill { background: rgba(250, 204, 21, 0.1); color: var(--primary); border-color: var(--primary); }
+
+    .impact-line { font-size: 0.75rem; color: #64748b; line-height: 1.4; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; }
+
+    .votes { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+
+    .btn.ghost { background: none; border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; }
+
+    .btn.ghost.active { background: var(--primary); border-color: var(--primary); color: #000; }
+
+
+
+    @media (max-width: 1000px) { .profile-layout-grid { grid-template-columns: 1fr; } }
+
+  </style>
+</head>
+<body data-theme="classic">
+
+
+
+<header class="header">
+
+  <div class="logo-area">
+
+    <div class="brandmark"><img src="newlogo.webp" alt="Logo" style="height:32px;"></div>
+
+    <span class="brand-title">HIVE NECTAR</span>
+
+  </div>
+
+  <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+
+  <nav class="nav-links" id="navLinks">
+
+    <a href="index.html">Home</a>
+
+    <a href="pollenpop.html">PollenPop</a>
+
+    <a href="join.html">Join the Hive</a>
+
+    <a href="about.html">About</a>
+
+    <a href="faq.html">FAQ</a>
+
+    <a href="contact.html">Contact</a>
+
+  </nav>
+
+</header>
+
+
+
+<main class="wrap">
+
+  <section class="profile-hero">
+
+    <div class="hero-flex">
+
+      <div class="hero-user">
+
+        <div class="avatar-wrapper">
+
+          <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="User" class="avatar-large" id="profileAvatar">
+
+          <div class="badge-icon" id="rankBadge"><i class="fas fa-certificate"></i></div>
+
+        </div>
+
+        <div class="hero-text">
+
+          <h2 id="userNameDisplay">Busy Bee</h2>
+
+          <span class="rank-tag" id="rankNameDisplay">Hive Novice</span>
+
+        </div>
+
+      </div>
+
+      <div class="hero-actions">
+
+        <button class="btn" style="background:white; color:black; border:none;" onclick="shareStats()">
+
+          <i class="fas fa-share-nodes"></i> Share Progress
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="hero-stats-row">
+
+      <div class="h-stat">
+
+        <span class="h-label">Total Nectar</span>
+
+        <span class="h-value" id="pointsVal">0</span>
+
+      </div>
+
+      <div class="h-stat">
+
+        <span class="h-label">Status</span>
+
+        <span class="h-value">Active</span>
+
+      </div>
+
+      <div class="h-stat">
+
+        <span class="h-label">Hive Rank</span>
+
+        <span class="h-value" id="rankLevel">#--</span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <div class="profile-layout-grid">
+
+    <aside class="left-column">
+
+      <div class="card">
+
+        <nav class="sub-nav">
+
+          <a href="#" class="sub-link active"><i class="fas fa-rocket"></i> Go to Missions</a>
+
+          <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Hive Buzz</a>
+
+          <a href="#" class="sub-link"><i class="fas fa-award"></i> Achievements</a>
+
+          <hr style="border:0; border-top: 1px solid var(--border); margin: 10px 0;">
+
+          <a href="#" class="sub-link" style="color:#ef4444;" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+
+        </nav>
+
+      </div>
+
+    </aside>
+
+    <section class="middle-column">
+      <div class="card">
+        <h3 style="margin-bottom:20px;">Mission Dashboard</h3>
+        
+        <div class="filter-row">
+          <div class="dropdown-container" id="coreFilterDropdown">
+            <div class="dropdown-header"><span id="coreFilterSummary">Themes</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="coreFilterList"></div>
+          </div>
+          <div class="dropdown-container" id="stageFilterDropdown">
+            <div class="dropdown-header"><span id="stageFilterSummary">Stages</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="stageFilterList"></div>
+          </div>
+          <div class="dropdown-container" id="tagFilterDropdown">
+            <div class="dropdown-header"><span id="tagFilterSummary">Tags</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="tagFilterList"></div>
+          </div>
+        </div>
+
+        <div class="progressWrap" style="margin:20px 0;">
+          <progress id="progressBar" value="0" max="100" style="width:100%; height:12px;"></progress>
+          <div style="text-align:right; margin-top:5px;"><span id="progressPct" class="tiny bold">0%</span></div>
+        </div>
+
+        <div id="tasks" class="tasks">
+          <p class="tiny muted">Fetching missions from the hive...</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="right-column">
+      <div class="card">
+        <h4 style="font-size:0.7rem; color:var(--muted); margin-bottom:10px; text-transform:uppercase;">Visual Theme</h4>
+        <div style="display:flex; gap:10px;">
+          <button onclick="changeTheme('classic')" style="flex:1; height:45px; background:#facc15; border:2px solid var(--border); border-radius:10px; cursor:pointer;"></button>
+          <button onclick="changeTheme('gold')" style="flex:1; height:45px; background:#eab308; border:2px solid var(--border); border-radius:10px; cursor:pointer;"></button>
+          <button onclick="changeTheme('dark')" style="flex:1; height:45px; background:#1e293b; border:2px solid var(--border); border-radius:10px; cursor:pointer;"></button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+<script src="TESTPollenPop-Apply-Filter-Added/app.js"></script>
+
+<script>
+  // 1. GATEKEEPER & LOGOUT
+  function handleLogout() {
+    localStorage.removeItem('hive_user_session');
+    window.location.replace('index.html');
+  }
+
+  // 2. THEME & SYNC
+  function changeTheme(theme) {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('hive-theme', theme);
+  }
+
+  function syncProfile(user) {
+    document.getElementById('userNameDisplay').innerText = user.name;
+    document.getElementById('pointsVal').innerText = user.points || 0;
+    
+    const p = user.points || 0;
+    let rank = "Hive Novice";
+    if(p >= 100) rank = "Worker Bee";
+    if(p >= 500) rank = "Elite Guard";
+    if(p >= 1000) rank = "Royal Guardian";
+    document.getElementById('rankNameDisplay').innerText = rank;
+  }
+
+  // 3. INITIALIZE
+  document.addEventListener('DOMContentLoaded', () => {
+    const session = JSON.parse(localStorage.getItem('hive_user_session'));
+    
+    if (!session || !session.name || session.name === "Guest") {
+      window.location.replace('index.html');
+      return;
+    }
+
+    syncProfile(session);
+    changeTheme(localStorage.getItem('hive-theme') || 'classic');
+
+    if (typeof start === 'function') {
+      start(session.name);
+    }
+  });
+
+  async function shareStats() {
+    const session = JSON.parse(localStorage.getItem('hive_user_session'));
+    const text = `I've collected ${session.points} Nectar points! 🐝 #HiveNectar`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Hive Nectar', text: text, url: window.location.href }); } catch (err) {}
+    } else {
+      navigator.clipboard.writeText(text);
+      alert("Copied!");
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+[
+  {
+    "tester_id": "T-001",
+    "allocated_task_ids": [
+      "NAT-001",
+      "NAT-005"
+    ],
+    "preferred_cores": [
+      "connectingbelonging"
+    ],
+    "preferred_categories": [
+      "natureimmerse"
+    ]
+  },
+  {
+    "tester_id": "T-002",
+    "allocated_task_ids": [
+      "NAT-002",
+      "NAT-007",
+      "NAT-012"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": []
+  },
+  {
+    "tester_id": "T-003",
+    "allocated_task_ids": [
+      "NAT-003",
+      "NAT-009"
+    ],
+    "preferred_cores": [
+      "actingmotivating"
+    ],
+    "preferred_categories": [
+      "compostingsystems"
+    ]
+  },
+  {
+    "tester_id": "T-004",
+    "allocated_task_ids": [
+      "NAT-006",
+      "NAT-013",
+      "NAT-017",
+      "NAT-019"
+    ],
+    "preferred_cores": [
+      "creatingcircularity"
+    ],
+    "preferred_categories": [
+      "communitygarden"
+    ]
+  },
+  {
+    "tester_id": "T-005",
+    "allocated_task_ids": [
+      "NAT-002",
+      "NAT-006",
+      "NAT-011",
+      "NAT-018"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": []
+  },
+  {
+    "tester_id": "T-006",
+    "allocated_task_ids": [
+      "NAT-003",
+      "NAT-005",
+      "NAT-006",
+      "NAT-018"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": [
+      "localart"
+    ]
+  },
+  {
+    "tester_id": "T-007",
+    "allocated_task_ids": [
+      "NAT-004",
+      "NAT-008",
+      "NAT-012"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": [
+      "naturetrail"
+    ]
+  },
+  {
+    "tester_id": "T-008",
+    "allocated_task_ids": [
+      "NAT-003",
+      "NAT-005",
+      "NAT-010",
+      "NAT-011",
+      "NAT-020"
+    ],
+    "preferred_cores": [
+      "connectingbelonging"
+    ],
+    "preferred_categories": [
+      "communitygarden"
+    ]
+  },
+  {
+    "tester_id": "T-009",
+    "allocated_task_ids": [
+      "NAT-011",
+      "NAT-012",
+      "NAT-017"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": []
+  },
+  {
+    "tester_id": "T-010",
+    "allocated_task_ids": [
+      "NAT-003",
+      "NAT-005",
+      "NAT-006",
+      "NAT-017"
+    ],
+    "preferred_cores": [
+      "connectingbelonging"
+    ],
+    "preferred_categories": [
+      "localart"
+    ]
+  },
+  {
+    "tester_id": "T-011",
+    "allocated_task_ids": [
+      "NAT-003",
+      "NAT-011",
+      "NAT-018"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": [
+      "wasteaudit"
+    ]
+  },
+  {
+    "tester_id": "T-012",
+    "allocated_task_ids": [
+      "NAT-001",
+      "NAT-007",
+      "NAT-008",
+      "NAT-011"
+    ],
+    "preferred_cores": [
+      "actingmotivating"
+    ],
+    "preferred_categories": [
+      "mindfulwalk"
+    ]
+  },
+  {
+    "tester_id": "T-013",
+    "allocated_task_ids": [
+      "NAT-006",
+      "NAT-012"
+    ],
+    "preferred_cores": [
+      "reflectinglearning"
+    ],
+    "preferred_categories": []
+  },
+  {
+    "tester_id": "T-014",
+    "allocated_task_ids": [
+      "NAT-001",
+      "NAT-009",
+      "NAT-010",
+      "NAT-012",
+      "NAT-016"
+    ],
+    "preferred_cores": [
+      "reflectinglearning"
+    ],
+    "preferred_categories": [
+      "mindfulwalk"
+    ]
+  },
+  {
+    "tester_id": "T-015",
+    "allocated_task_ids": [
+      "NAT-008",
+      "NAT-011",
+      "NAT-014",
+      "NAT-020"
+    ],
+    "preferred_cores": [],
+    "preferred_categories": [
+      "naturetrail"
+    ]
+  }
+]

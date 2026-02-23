@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+
+  <header class="header">
+  <div class="logo-area">
+    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+  <main class="wrap">
+    <div style="max-width: 400px; margin: 40px auto;">
+        <section class="card">
+          <h2 class="section-title">Welcome Back</h2>
+          <form id="loginForm">
+            <div style="margin-bottom: 15px;">
+              <label class="tiny" style="display:block; margin-bottom:5px;">Email Address</label>
+              <input type="email" name="email" id="loginEmail" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label class="tiny" style="display:block; margin-bottom:5px;">Password</label>
+              <input type="password" name="password" id="loginPassword" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+            </div>
+            
+            <p id="loginError" class="tiny" style="color: #ef4444; margin-bottom: 15px; display: none;"></p>
+
+            <button type="submit" class="btn" style="width:100%; background: var(--cta); color:white; border:none; padding:12px; cursor:pointer; border-radius:8px;">Login</button>
+          </form>
+          <p class="tiny" style="margin-top: 20px; text-align: center;">
+            Don't have an account? <a href="join.html" class="text-link">Sign up</a>
+          </p>
+        </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
