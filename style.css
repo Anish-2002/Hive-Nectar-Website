@@ -1002,4 +1002,42 @@ body {
 body.menu-open {
     overflow: hidden;
 }
+/* --- FOOTER & OVERLAP FIX --- */
 
+/* 1. Ensure the body can grow as long as the tasks need */
+html, body {
+    height: auto !important;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. Fix the main container overlap */
+.wrap {
+    flex: 1 0 auto; /* Pushes the footer to the bottom */
+    height: auto !important; /* Removes the 80vh restriction */
+    min-height: 80vh;
+    padding-bottom: 50px; /* Space before footer starts */
+    overflow: visible !important; /* Allows tasks/dropdowns to render fully */
+    display: block !important; 
+}
+
+/* 3. Standardize the Footer */
+.footer {
+    flex-shrink: 0; /* Prevents footer from squishing */
+    width: 100%;
+    background: var(--header-bg); /* Matches your dark header */
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    position: relative !important; /* Ensures it sits AFTER content, not over it */
+    clear: both; /* Safety for any floated elements */
+    margin-top: auto; /* Final push to bottom */
+}
+
+/* 4. Fix Task Container */
+#tasks {
+    display: block;
+    width: 100%;
+    height: auto !important;
+}
