@@ -485,7 +485,7 @@ function updateFilterSummaries() {
         
         let summaryText;
         if (count === 0) {
-             summaryText = 'All';
+             summaryText = 'Select';
         } else if (count === total) {
              summaryText = 'All'; // Show 'All' if everything is selected
         } else {
@@ -797,3 +797,11 @@ const nameToStart = initialName || storedName;
 
 // Auto start is now async to wait for tasks to load
 if (nameToStart) setTimeout(() => start(nameToStart), 180);
+window.addEventListener('load', () => {
+    // Force a check on refresh to make sure the card isn't wider than the window
+    const card = document.querySelector('.card');
+    if (card && card.offsetWidth > window.innerWidth) {
+        card.style.maxWidth = (window.innerWidth - 20) + 'px';
+        card.style.overflowX = 'hidden';
+    }
+});
