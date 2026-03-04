@@ -3,7 +3,7 @@
  */
 export async function sendWelcomeEmail(userEmail, userName) {
     // Points to your local Node.js server
-    const url = 'http://localhost:5000/send-welcome-email';
+    const url = 'https://render.com/docs/node-version';
 
     try {
         const response = await fetch(url, {
@@ -27,4 +27,5 @@ export async function sendWelcomeEmail(userEmail, userName) {
     } catch (err) {
         console.error("Could not connect to the server. Did you run 'node server.js'?");
     }
+
 }     
