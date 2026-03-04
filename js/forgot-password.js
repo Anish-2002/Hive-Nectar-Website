@@ -30,7 +30,7 @@ form.addEventListener('submit', async (e) => {
 
         // 2. SUCCESS: Email found, now send the link
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/reset-password.html',
+            redirectTo: https://www.hivenectar.earth/reset-password.html,
         });
 
         if (resetError) {
@@ -48,4 +48,5 @@ form.addEventListener('submit', async (e) => {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
     }
+
 });
