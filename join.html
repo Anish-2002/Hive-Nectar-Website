@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Join the Hive | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    .hide { display: none !important; }
+    #addressSuggestions {
+        position:absolute; top:100%; left:0; right:0; 
+        background:white; border:1px solid var(--border); 
+        border-radius:8px; z-index:1000;
+        max-height: 150px; overflow-y: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    #addressSuggestions div { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+    #addressSuggestions div:hover { background-color: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+ <header class="header">
+  <div class="logo-area">
+    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+  <main class="wrap">
+    <div class="grid-container">
+      <div class="main-content">
+        <section class="card">
+          <h2 class="section-title" id="formTitle">Create Your Account</h2>
+          
+          <form id="signupForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label class="tiny">First Name</label>
+                    <input type="text" id="signupFirst" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                </div>
+                <div>
+                    <label class="tiny">Last Name</label>
+                    <input type="text" id="signupLast" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label class="tiny">Email Address</label>
+                <input type="email" id="signupEmail" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label class="tiny">Phone Number</label>
+                <input type="tel" id="signupPhone" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+            </div>
+
+            <div style="margin-bottom: 15px; position: relative;">
+                <label class="tiny">Address</label>
+                <input type="text" id="signupAddress" placeholder="Start typing address..." required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+                <div id="addressSuggestions"></div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label class="tiny">Create Password</label>
+                <input type="password" id="signupPass" required minlength="6" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
+            </div>
+
+            <button type="submit" class="btn" style="width:100%; background: var(--success); color:white; border:none; padding:12px; cursor:pointer; border-radius:8px;">Sign Up</button>
+          </form>
+
+          <div id="verificationSection" class="hide" style="text-align: center; padding: 20px;">
+              <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--cta); margin-bottom: 15px;"></i>
+              <h4>Verify Your Account</h4>
+              <p class="tiny">Enter the 6-digit code sent to your phone/email.</p>
+              
+              <input type="text" id="otpCode" placeholder="000000" maxlength="6" style="padding:10px; text-align:center; font-size:1.2rem; letter-spacing:5px; border:1px solid var(--border); border-radius:8px; width: 150px; margin-bottom: 15px;">
+              <br>
+              <button id="verifyBtn" class="btn" style="background: var(--cta); color:white; border:none; padding:10px 20px; cursor:pointer; border-radius:8px;">Verify</button>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="card" style="background: var(--bg); border: 2px dashed var(--border); text-align: center;">
+            <p class="tiny">Already a member?</p>
+            <a href="login.html" class="btn" style="background: var(--cta); color: white; margin-top: 10px; display: block; text-decoration: none;">Login here</a>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+ <footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+[
+  {
+    "id": "NAT-001",
+    "core_theme": "🌱 Connecting / Belonging",
+    "text": "Capture your most alive moment",
+    "stage": "🌱 Sprout",
+    "audience": "🌍 All",
+    "subcategory": "🌿 Nature immerse",
+    "impactValue": "Lowers stress, improves focus",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-002",
+    "core_theme": "🌱 Connecting / Belonging",
+    "text": "Nurture a plant",
+    "stage": "🌱 Sprout",
+    "audience": "🌍 All",
+    "subcategory": "🌿 Nature immerse",
+    "impactValue": "CO2e negligible per action.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-003",
+    "core_theme": "🌱 Connecting / Belonging",
+    "text": "Compost today’s waste appropriately",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "♻️ Composting systems",
+    "impactValue": "~0.15 kg CO2e per ~0.3 kg scraps",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-004",
+    "core_theme": "🌱 Connecting / Belonging",
+    "text": "Build a habit keeping this record and have mindful reflection on changes (normal vs abnormal)",
+    "stage": "🌸 Bloom",
+    "audience": "🌍 All",
+    "subcategory": "📔 Documentary",
+    "impactValue": "Awareness data-gathering; builds observation habit.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-005",
+    "core_theme": "🌱 Connecting / Belonging",
+    "text": "Have a short walk and feel surrounding for 5–15 minutes",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🌿 Nature immerse",
+    "impactValue": "Mental restoration; attention training.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-006",
+    "core_theme": "⚡ Acting / Motivating",
+    "text": "Fix or reuse 1 item",
+    "stage": "🌰 Seeds",
+    "audience": "👨‍👩‍👧 Family",
+    "subcategory": "🔧 Creative reuse",
+    "impactValue": "0.5 - 10+ kg CO2e",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-007",
+    "core_theme": "⚡ Acting / Motivating",
+    "text": "Cook dinner from leftovers",
+    "stage": "🌱 Sprout",
+    "audience": "👨‍👩‍👧 Family",
+    "subcategory": "🥣 Zero-waste making",
+    "impactValue": "~0.5 kg CO2e, ~0.2 kWh saved.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-008",
+    "core_theme": "⚡ Acting / Motivating",
+    "text": "Plan 1-week minimal waste with family and friends",
+    "stage": "🌸 Bloom",
+    "audience": "🌍 All",
+    "subcategory": "🛍️ Mindful consumption",
+    "impactValue": "Meta-habit setup; impact realized in downstream actions.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-009",
+    "core_theme": "⚡ Acting / Motivating",
+    "text": "Candlelight dinner / dark hour events with friends and family",
+    "stage": "🌱 Sprout",
+    "audience": "👨‍👩‍👧 Family",
+    "subcategory": "📵 Digital detox",
+    "impactValue": "0.1 kWh ≈ 0.08 kg CO2e (using 0.8 kg CO2e/kWh).",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-010",
+    "core_theme": "⚡ Acting / Motivating",
+    "text": "Support local shop / local market day",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🏘️ Local sourcing",
+    "impactValue": "Community resilience + shorter supply chains (qualitative).",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-011",
+    "core_theme": "🌙 Reflecting / Learning",
+    "text": "Take note of one thing you appreciate today",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🦋 Wildlife",
+    "impactValue": "Psychological safety & pro-social behavior",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-012",
+    "core_theme": "🌙 Reflecting / Learning",
+    "text": "Sort items to donate",
+    "stage": "🌱 Sprout",
+    "audience": "🌍 All",
+    "subcategory": "♻️ Recycled materials",
+    "impactValue": "Proxy 1.0 kg CO2e avoided",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-013",
+    "core_theme": "🌙 Reflecting / Learning",
+    "text": "Trace the life of 1 object",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🔍 Life cycle tracking",
+    "impactValue": "Systems literacy; leads to smarter choices later.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-014",
+    "core_theme": "🌙 Reflecting / Learning",
+    "text": "What grounded you today?",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "📔 Documentary",
+    "impactValue": "Attention training; stress reduction",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-015",
+    "core_theme": "🌙 Reflecting / Learning",
+    "text": "Write a thank-you note to nature",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🙏 Gratitude",
+    "impactValue": "Values reinforcement; community norm setting.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-016",
+    "core_theme": "✨ Creating / Circularity",
+    "text": "Make something silly from scrap",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "✂️ Scrap material crafts",
+    "impactValue": "Diverts small material (~50 g) from waste stream.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-017",
+    "core_theme": "✨ Creating / Circularity",
+    "text": "Write a 2-line micro story",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "📚 Storytelling",
+    "impactValue": "Communication skill; culture building.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-018",
+    "core_theme": "✨ Creating / Circularity",
+    "text": "Reimagine the second use for a broken item",
+    "stage": "🌰 Seeds",
+    "audience": "🌍 All",
+    "subcategory": "🔧 Creative reuse",
+    "impactValue": "Design intention; impact realized if fix is executed.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-019",
+    "core_theme": "✨ Creating / Circularity",
+    "text": "Create a creative gift for someone",
+    "stage": "🌰 Seeds",
+    "audience": "👨‍👩‍👧 Family",
+    "subcategory": "🎁 Handcraft",
+    "impactValue": "Proxy 0.2 kg CO2e.",
+    "source": "",
+    "confidence": ""
+  },
+  {
+    "id": "NAT-020",
+    "core_theme": "✨ Creating / Circularity",
+    "text": "Defend the opposite opinion mindset — practice throughout your day and reflect on what you learned",
+    "stage": "🌱 Sprout",
+    "audience": "🌍 All",
+    "subcategory": "🧘 Mindfulness",
+    "impactValue": "Empathy + perspective-taking; cultural impact.",
+    "source": "",
+    "confidence": ""
+  }
+]
