@@ -17,7 +17,7 @@ form.addEventListener('submit', async (e) => {
         // 1. Try to fetch user from 'profiles' table
         const { data: profile, error: profileError } = await supabase
             .from('profiles') 
-            .select('email, display_name') 
+            .select('email, first_name') 
             .eq('email', emailInput)
             .maybeSingle();
 
@@ -74,3 +74,4 @@ form.addEventListener('submit', async (e) => {
         btn.disabled = false;
     }
 });
+
