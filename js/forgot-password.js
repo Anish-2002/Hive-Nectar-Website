@@ -6,18 +6,24 @@ const btn = document.getElementById('sendLinkBtn');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('resetEmail').value;
+    const email = document.getElementById('resetEmail').value.trim(); // Added trim() to prevent space errors
     
     btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
-        // 1. Fetch both email and display_name from the profiles table
-        const { data } = await supabase
+        // 1. Fetch user data
+        // Double check if your column is 'display_name' or 'full_name' in Supabase
+        const { data, error: supabaseError } = await supabase
             .from('profiles') 
-            .select('email, display_name') // Added display_name to the selection
+            .select('email, display_name') 
             .eq('email', email)
             .maybeSingle();
+
+        // Log exactly what is happening to solve the "user not found" mystery
+        console.log("Input Email:", email);
+        console.log("Supabase Data:", data);
+        if (supabaseError) console.error("Supabase Query Error:", supabaseError);
 
         if (!data) {
             showToast("This email is not registered.", "error");
@@ -29,13 +35,13 @@ form.addEventListener('submit', async (e) => {
             ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
             : window.location.origin + '/reset-password.html';
 
-        // 2. Send the userEmail, redirectUrl, and the retrieved userName to your backend
+        // 2. Send to Backend
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                userEmail: email,
-                userName: data.display_name, // Pass the name fetched from Supabase
+                userEmail: data.email, // Use the email from the database
+                userName: data.display_name || "Valued Member", // Fallback if name is empty
                 redirectUrl: finalRedirectUrl
             })
         });
