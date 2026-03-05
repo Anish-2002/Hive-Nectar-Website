@@ -3,6 +3,11 @@ require("dotenv").config(); // MUST BE AT THE TOP
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const { createClient } = require('@supabase/supabase-js');
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL, 
+  process.env.SUPABASE_SERVICE_ROLE_KEY // Uses the secret key safely on the server
+);
 
 // Now this will correctly show if the key is loaded
 console.log("Your Key starts with:", process.env.BREVO_API_KEY ? process.env.BREVO_API_KEY.substring(0, 12) : "STILL UNDEFINED - Check .env file location");
@@ -62,15 +67,27 @@ app.post("/admin-reply", async (req, res) => {
 });
 // ROUTE 3: Password Reset Email
 app.post("/send-reset-email", async (req, res) => {
-  const { userEmail, resetLink } = req.body;
+  const { userEmail, redirectUrl } = req.body;
   
   try {
+    // 1. Generate the secure recovery link on the server
+    const { data, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'recovery',
+      email: userEmail,
+      options: { redirectTo: redirectUrl }
+    });
+
+    if (error) throw error;
+
+    const secureLink = data.properties.action_link;
+
+    // 2. Send that secure link via Brevo
     await axios.post("https://api.brevo.com/v3/smtp/email", {
       sender: { name: "Hive Nectar", email: "follydevs@gmail.com" },
       to: [{ email: userEmail }],
-      templateId: 2, // <--- CREATE A NEW TEMPLATE IN BREVO (ID 2)
+      templateId: 2, 
       params: { 
-          RESET_LINK: resetLink 
+          RESET_LINK: secureLink // This now contains the valid access token
       }
     }, {
       headers: { 
@@ -81,9 +98,11 @@ app.post("/send-reset-email", async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Brevo Reset Error:", error.response?.data || error.message);
-    res.status(500).json({ success: false });
+    console.error("Backend Reset Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
+
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => console.log(`Hive Server is buzzing on port ${PORT}`));
