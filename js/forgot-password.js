@@ -29,9 +29,21 @@ form.addEventListener('submit', async (e) => {
         }
 
         // 2. SUCCESS: Email found, now send the link
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/reset-password.html',
-        });
+       const isGitHub = window.location.hostname.includes('github.io');
+const repoName = '/Hive-Nectar-Website'; // Your GitHub repository name
+const resetPath = '/reset-password.html';
+
+// If on GitHub, use full path with repo name. Otherwise, use standard origin.
+const finalRedirectUrl = isGitHub 
+    ? `https://${window.location.hostname}${repoName}${resetPath}`
+    : window.location.origin + resetPath;
+
+console.log("Redirecting user to:", finalRedirectUrl);
+
+// 2. Send the reset link with the correct URL
+const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: finalRedirectUrl,
+});
 
         if (resetError) {
             showToast(resetError.message, "error");
@@ -50,3 +62,4 @@ form.addEventListener('submit', async (e) => {
     }
 
 });
+
