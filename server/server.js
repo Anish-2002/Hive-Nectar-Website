@@ -66,11 +66,12 @@ app.post("/admin-reply", async (req, res) => {
     }
 });
 // ROUTE 3: Password Reset Email
+// server.js - Updated Route 3
 app.post("/send-reset-email", async (req, res) => {
-  const { userEmail, redirectUrl } = req.body;
+  // 1. Receive userName from the frontend
+  const { userEmail, redirectUrl, userName } = req.body; 
   
   try {
-    // 1. Generate the secure recovery link on the server
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
       email: userEmail,
@@ -78,16 +79,15 @@ app.post("/send-reset-email", async (req, res) => {
     });
 
     if (error) throw error;
-
     const secureLink = data.properties.action_link;
 
-    // 2. Send that secure link via Brevo
     await axios.post("https://api.brevo.com/v3/smtp/email", {
       sender: { name: "Hive Nectar", email: "follydevs@gmail.com" },
       to: [{ email: userEmail }],
       templateId: 2, 
       params: { 
-          RESET_LINK: secureLink // This now contains the valid access token
+          RESET_LINK: secureLink,
+          NAME: userName // <--- 2. Send the name to Brevo
       }
     }, {
       headers: { 
@@ -106,3 +106,4 @@ app.post("/send-reset-email", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Hive Server is buzzing on port ${PORT}`));
+
