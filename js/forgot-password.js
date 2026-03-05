@@ -8,71 +8,50 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('resetEmail').value;
     
-    // UI Feedback: Start
-    btn.innerText = "Checking...";
+    btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
-        // 1. CHECK IF USER EXISTS IN DATABASE
-        const { data, error: fetchError } = await supabase
+        // 1. Check if user exists (using standard anon client)
+        const { data } = await supabase
             .from('profiles') 
             .select('email')
             .eq('email', email)
             .maybeSingle();
 
-        if (fetchError) throw fetchError;
-
         if (!data) {
-            showToast("This email is not registered with Hive Nectar.", "error");
+            showToast("This email is not registered.", "error");
             return;
         }
 
-        // 2. CONSTRUCT THE RESET PATH
+        // 2. Determine redirect URL
         const isGitHub = window.location.hostname.includes('github.io');
-        const repoName = '/Hive-Nectar-Website'; 
-        const resetPath = '/reset-password.html';
-
         const finalRedirectUrl = isGitHub 
-            ? `https://${window.location.hostname}${repoName}${resetPath}`
-            : window.location.origin + resetPath;
+            ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
+            : window.location.origin + '/reset-password.html';
 
-        // 3. GENERATE SECURE LINK (Requires Service Role Key in supabase-config.js)
-        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
-            type: 'recovery',
-            email: email,
-            options: { redirectTo: finalRedirectUrl }
-        });
-
-        if (linkError) {
-            console.error("Link Generation Error:", linkError.message);
-            throw new Error("Permission denied. Ensure you are using the Service Role Key.");
-        }
-
-        const secureLink = linkData.properties.action_link;
-
-        // 4. CALL RENDER BACKEND TO SEND BREVO EMAIL
+        // 3. Tell Render to handle the rest
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userEmail: email,
-                resetLink: secureLink // This now contains the required token
+                redirectUrl: finalRedirectUrl
             })
         });
 
         const result = await response.json();
 
         if (result.success) {
-            showToast("A reset link has flown to your inbox!", "success");
+            showToast("Check your inbox for the secure link!", "success");
             form.reset();
         } else {
-            showToast("Failed to send reset email. Please try again.", "error");
+            throw new Error(result.error);
         }
 
     } catch (err) {
-        console.error("Forgot Password Error:", err);
-        // This shows the specific error instead of just "unexpected error"
-        showToast(err.message || "An unexpected error occurred.", "error");
+        console.error("Reset Error:", err);
+        showToast("An error occurred. Please try again.", "error");
     } finally {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
