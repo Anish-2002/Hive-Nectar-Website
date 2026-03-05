@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. PAGE ROUTING LOGIC ---
     const path = window.location.pathname;
-    const page = path.split("/").pop();
+    
 
     // If on profile.html, initialize the dashboard data
     if (page === 'profile.html' || path.endsWith('profile')) {
@@ -102,4 +102,5 @@ export function showToast(message, type = 'success') {
         toast.style.animation = 'fadeOutUp 0.5s ease-in forwards';
         setTimeout(() => toast.remove(), 500);
     }, 4000);
+
 }
