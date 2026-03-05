@@ -13,7 +13,7 @@ form.addEventListener('submit', async (e) => {
     btn.disabled = true;
 
     try {
-        // 1. CHECK IF USER EXISTS
+        // 1. CHECK IF USER EXISTS IN DATABASE
         const { data, error: fetchError } = await supabase
             .from('profiles') 
             .select('email')
@@ -22,44 +22,48 @@ form.addEventListener('submit', async (e) => {
 
         if (!data) {
             showToast("This email is not registered with Hive Nectar.", "error");
-            // RESET BUTTON so user can fix typo
             btn.innerText = "Send Reset Link";
             btn.disabled = false;
             return;
         }
 
-        // 2. SUCCESS: Email found, now send the link
-       const isGitHub = window.location.hostname.includes('github.io');
-const repoName = '/Hive-Nectar-Website'; // Your GitHub repository name
-const resetPath = '/reset-password.html';
+        // 2. CONSTRUCT THE RESET LINK
+        // This creates a link to your reset-password.html page
+        const isGitHub = window.location.hostname.includes('github.io');
+        const repoName = '/Hive-Nectar-Website'; 
+        const resetPath = '/reset-password.html';
 
-// If on GitHub, use full path with repo name. Otherwise, use standard origin.
-const finalRedirectUrl = isGitHub 
-    ? `https://${window.location.hostname}${repoName}${resetPath}`
-    : window.location.origin + resetPath;
+        const finalRedirectUrl = isGitHub 
+            ? `https://${window.location.hostname}${repoName}${resetPath}`
+            : window.location.origin + resetPath;
 
-console.log("Redirecting user to:", finalRedirectUrl);
+        // 3. CALL RENDER BACKEND TO SEND BREVO EMAIL
+        // We send the email and the link to your server
+        const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userEmail: email,
+                resetLink: finalRedirectUrl
+            })
+        });
 
-// 2. Send the reset link with the correct URL
-const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: finalRedirectUrl,
-});
+        const result = await response.json();
 
-        if (resetError) {
-            showToast(resetError.message, "error");
-            btn.innerText = "Send Reset Link";
-            btn.disabled = false;
-        } else {
+        if (result.success) {
             showToast("A reset link has flown to your inbox!", "success");
             form.reset();
-            btn.innerText = "Send Reset Link";
-            btn.disabled = false;
+        } else {
+            showToast("Failed to send reset email. Please try again.", "error");
         }
+
     } catch (err) {
+        console.error("Forgot Password Error:", err);
         showToast("An unexpected error occurred.", "error");
+    } finally {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
     }
-
 });
-

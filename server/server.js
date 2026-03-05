@@ -60,6 +60,30 @@ app.post("/admin-reply", async (req, res) => {
       res.status(500).json({ success: false });
     }
 });
+// ROUTE 3: Password Reset Email
+app.post("/send-reset-email", async (req, res) => {
+  const { userEmail, resetLink } = req.body;
+  
+  try {
+    await axios.post("https://api.brevo.com/v3/smtp/email", {
+      sender: { name: "Hive Nectar", email: "follydevs@gmail.com" },
+      to: [{ email: userEmail }],
+      templateId: 2, // <--- CREATE A NEW TEMPLATE IN BREVO (ID 2)
+      params: { 
+          RESET_LINK: resetLink 
+      }
+    }, {
+      headers: { 
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json"
+      }
+    });
 
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Brevo Reset Error:", error.response?.data || error.message);
+    res.status(500).json({ success: false });
+  }
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Hive Server is buzzing on port ${PORT}`));
