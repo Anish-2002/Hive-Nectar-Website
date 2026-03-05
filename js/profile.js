@@ -13,8 +13,17 @@ let activeFilters = {
 };
 
 export async function initProfile() {
+      const getBaseURL = () => {
+    const { origin, pathname } = window.location;
+    // If we are on GitHub Pages, the pathname starts with the repo name
+    if (origin.includes('github.io')) {
+        return `${origin}/Hive-Nectar-Website/`;
+    }
+    // Otherwise (localhost), just use the origin
+    return `${origin}/`;
+};
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) { window.location.replace('login.html'); return; }
+    if (authError || !user) { window.location.replace(getBaseURL() + 'login.html'); return; }
 
     const [profileRes, tasksRes, userTasksRes, feedbackRes, commentsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', user.id).single(),
@@ -296,4 +305,5 @@ function setupLogout() {
         await supabase.auth.signOut();
         window.location.replace('index.html');
     });
+
 }
