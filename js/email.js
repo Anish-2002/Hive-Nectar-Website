@@ -3,7 +3,7 @@
  */
 export async function sendWelcomeEmail(userEmail, userName) {
     // Points to your local Node.js server
-    const url = 'https://hive-nectar-backend.onrender.com';
+    const url = 'https://hive-nectar-backend.onrender.com/send-welcome-email';
 
     try {
         const response = await fetch(url, {
@@ -29,5 +29,6 @@ export async function sendWelcomeEmail(userEmail, userName) {
     }
 
 }     
+
 
 
