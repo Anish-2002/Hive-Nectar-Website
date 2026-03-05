@@ -6,58 +6,69 @@ const btn = document.getElementById('sendLinkBtn');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('resetEmail').value.trim(); // Added trim() to prevent space errors
+    const emailInput = document.getElementById('resetEmail').value.trim();
     
     btn.innerText = "Processing...";
     btn.disabled = true;
 
     try {
-        // 1. Fetch user data
-        // Double check if your column is 'display_name' or 'full_name' in Supabase
-        const { data, error: supabaseError } = await supabase
+        console.log("Attempting to find user:", emailInput);
+
+        // 1. Try to fetch user from 'profiles' table
+        const { data: profile, error: profileError } = await supabase
             .from('profiles') 
             .select('email, display_name') 
-            .eq('email', email)
+            .eq('email', emailInput)
             .maybeSingle();
 
-        // Log exactly what is happening to solve the "user not found" mystery
-        console.log("Input Email:", email);
-        console.log("Supabase Data:", data);
-        if (supabaseError) console.error("Supabase Query Error:", supabaseError);
-
-        if (!data) {
-            showToast("This email is not registered.", "error");
-            return;
+        if (profileError) {
+            console.error("Supabase RLS/Query Error:", profileError.message);
         }
 
+        // 2. Fallback logic: If profile query fails or is empty, 
+        // we still want to try sending the email using the input email
+        const finalEmail = profile ? profile.email : emailInput;
+        const finalName = profile ? profile.display_name : "Valued Member";
+
+        // 3. Determine redirect URL for GitHub vs Localhost
         const isGitHub = window.location.hostname.includes('github.io');
         const finalRedirectUrl = isGitHub 
             ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
             : window.location.origin + '/reset-password.html';
 
-        // 2. Send to Backend
+        console.log("Sending request to backend for:", finalEmail);
+
+        // 4. Send to Render Backend
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                userEmail: data.email, // Use the email from the database
-                userName: data.display_name || "Valued Member", // Fallback if name is empty
+                userEmail: finalEmail,
+                userName: finalName,
                 redirectUrl: finalRedirectUrl
             })
         });
 
         const result = await response.json();
 
-        if (result.success) {
-            showToast("Check your inbox for the secure link!", "success");
+        if (response.ok && result.success) {
+            showToast("A reset link has flown to your inbox!", "success");
             form.reset();
         } else {
-            throw new Error(result.error || "Failed to send email");
+            // This captures the 400 error message from your server
+            const errorMsg = result.error || "Server rejected the request";
+            console.error("Backend 400/500 Error:", errorMsg);
+            
+            if (errorMsg.includes("User not found")) {
+                showToast("No account found with that email.", "error");
+            } else {
+                showToast(`Error: ${errorMsg}`, "error");
+            }
         }
 
     } catch (err) {
-        console.error("Reset Error:", err);
-        showToast("An error occurred. Please try again.", "error");
+        console.error("Frontend Reset Error:", err);
+        showToast("Connection error. Is the backend awake?", "error");
     } finally {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
