@@ -65,17 +65,17 @@ app.post("/admin-reply", async (req, res) => {
       res.status(500).json({ success: false });
     }
 });
-// ROUTE 3: Password Reset Email
+// ROUTE 3: Password Reset Email (Matched to Route 1 structure)
 app.post("/send-reset-email", async (req, res) => {
   const { userEmail, redirectUrl, userName } = req.body; 
   
-  // Debug: See what the server actually received
-  console.log("Backend received:", { userEmail, redirectUrl, userName });
+  // LOG THIS: Check your Render logs for this specific output
+  console.log("ROUTE 3 DEBUG - Name received:", userName);
 
   try {
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
-      email: userEmail.trim(), // Remove hidden spaces
+      email: userEmail.trim(),
       options: { redirectTo: redirectUrl }
     });
 
@@ -86,13 +86,14 @@ app.post("/send-reset-email", async (req, res) => {
 
     const secureLink = data.properties.action_link;
 
-    await axios.post("https://api.brevo.com/v3/smtp/email", {
+    // We use exactly the same axios structure as Route 1
+    const response = await axios.post("https://api.brevo.com/v3/smtp/email", {
       sender: { name: "Hive Nectar", email: "follydevs@gmail.com" },
-      to: [{ email: userEmail }],
+      to: [{ email: userEmail, name: userName || "Hiver" }], // Added name here like Route 1
       templateId: 2, 
       params: { 
-          RESET_LINK: secureLink,
-          NAME: userName || "Hiver" 
+          NAME: userName || "Hiver", // Match the key exactly
+          RESET_LINK: secureLink 
       }
     }, {
       headers: { 
@@ -101,15 +102,17 @@ app.post("/send-reset-email", async (req, res) => {
       }
     });
 
+    console.log("Reset Email sent successfully to:", userEmail);
     res.json({ success: true });
   } catch (error) {
-    console.error("Internal Server Crash:", error.message);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+    console.error("Route 3 Error Detail:", error.response?.data || error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Hive Server is buzzing on port ${PORT}`));
+
 
 
