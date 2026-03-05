@@ -20,14 +20,14 @@ form.addEventListener('submit', async (e) => {
             .eq('email', email)
             .maybeSingle();
 
+        if (fetchError) throw fetchError;
+
         if (!data) {
             showToast("This email is not registered with Hive Nectar.", "error");
-            btn.innerText = "Send Reset Link";
-            btn.disabled = false;
             return;
         }
 
-        // 2. GENERATE THE SECURE RECOVERY LINK VIA SUPABASE
+        // 2. CONSTRUCT THE RESET PATH
         const isGitHub = window.location.hostname.includes('github.io');
         const repoName = '/Hive-Nectar-Website'; 
         const resetPath = '/reset-password.html';
@@ -36,27 +36,27 @@ form.addEventListener('submit', async (e) => {
             ? `https://${window.location.hostname}${repoName}${resetPath}`
             : window.location.origin + resetPath;
 
-        // We ask Supabase to create the "Secret" link that Brevo will send
+        // 3. GENERATE SECURE LINK (Requires Service Role Key in supabase-config.js)
         const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
             type: 'recovery',
             email: email,
             options: { redirectTo: finalRedirectUrl }
         });
 
-        if (linkError) throw linkError;
+        if (linkError) {
+            console.error("Link Generation Error:", linkError.message);
+            throw new Error("Permission denied. Ensure you are using the Service Role Key.");
+        }
 
-        // This link now contains the #access_token needed to actually update the password
         const secureLink = linkData.properties.action_link;
 
-        // 3. CALL RENDER BACKEND TO SEND BREVO EMAIL
+        // 4. CALL RENDER BACKEND TO SEND BREVO EMAIL
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userEmail: email,
-                resetLink: secureLink // Passing the SECURE link instead of the plain one
+                resetLink: secureLink // This now contains the required token
             })
         });
 
@@ -71,7 +71,8 @@ form.addEventListener('submit', async (e) => {
 
     } catch (err) {
         console.error("Forgot Password Error:", err);
-        showToast("An unexpected error occurred.", "error");
+        // This shows the specific error instead of just "unexpected error"
+        showToast(err.message || "An unexpected error occurred.", "error");
     } finally {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
