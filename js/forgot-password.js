@@ -18,7 +18,7 @@ form.addEventListener('submit', async (e) => {
             .from('profiles') 
             .select('email')
             .eq('email', email)
-            .single();
+            .maybeSingle();
 
         if (!data) {
             showToast("This email is not registered with Hive Nectar.", "error");
@@ -27,8 +27,7 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // 2. CONSTRUCT THE RESET LINK
-        // This creates a link to your reset-password.html page
+        // 2. GENERATE THE SECURE RECOVERY LINK VIA SUPABASE
         const isGitHub = window.location.hostname.includes('github.io');
         const repoName = '/Hive-Nectar-Website'; 
         const resetPath = '/reset-password.html';
@@ -37,8 +36,19 @@ form.addEventListener('submit', async (e) => {
             ? `https://${window.location.hostname}${repoName}${resetPath}`
             : window.location.origin + resetPath;
 
+        // We ask Supabase to create the "Secret" link that Brevo will send
+        const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+            type: 'recovery',
+            email: email,
+            options: { redirectTo: finalRedirectUrl }
+        });
+
+        if (linkError) throw linkError;
+
+        // This link now contains the #access_token needed to actually update the password
+        const secureLink = linkData.properties.action_link;
+
         // 3. CALL RENDER BACKEND TO SEND BREVO EMAIL
-        // We send the email and the link to your server
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: {
@@ -46,7 +56,7 @@ form.addEventListener('submit', async (e) => {
             },
             body: JSON.stringify({
                 userEmail: email,
-                resetLink: finalRedirectUrl
+                resetLink: secureLink // Passing the SECURE link instead of the plain one
             })
         });
 
