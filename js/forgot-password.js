@@ -12,9 +12,10 @@ form.addEventListener('submit', async (e) => {
     btn.disabled = true;
 
     try {
+        // 1. Fetch both email and display_name from the profiles table
         const { data } = await supabase
             .from('profiles') 
-            .select('email')
+            .select('email, display_name') // Added display_name to the selection
             .eq('email', email)
             .maybeSingle();
 
@@ -28,11 +29,13 @@ form.addEventListener('submit', async (e) => {
             ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
             : window.location.origin + '/reset-password.html';
 
+        // 2. Send the userEmail, redirectUrl, and the retrieved userName to your backend
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 userEmail: email,
+                userName: data.display_name, // Pass the name fetched from Supabase
                 redirectUrl: finalRedirectUrl
             })
         });
