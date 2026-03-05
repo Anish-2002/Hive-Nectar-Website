@@ -66,19 +66,24 @@ app.post("/admin-reply", async (req, res) => {
     }
 });
 // ROUTE 3: Password Reset Email
-// server.js - Updated Route 3
 app.post("/send-reset-email", async (req, res) => {
-  // 1. Receive userName from the frontend
   const { userEmail, redirectUrl, userName } = req.body; 
   
+  // Debug: See what the server actually received
+  console.log("Backend received:", { userEmail, redirectUrl, userName });
+
   try {
     const { data, error } = await supabaseAdmin.auth.admin.generateLink({
       type: 'recovery',
-      email: userEmail,
+      email: userEmail.trim(), // Remove hidden spaces
       options: { redirectTo: redirectUrl }
     });
 
-    if (error) throw error;
+    if (error) {
+        console.error("Supabase Admin Auth Error:", error.message);
+        return res.status(400).json({ success: false, error: error.message });
+    }
+
     const secureLink = data.properties.action_link;
 
     await axios.post("https://api.brevo.com/v3/smtp/email", {
@@ -87,7 +92,7 @@ app.post("/send-reset-email", async (req, res) => {
       templateId: 2, 
       params: { 
           RESET_LINK: secureLink,
-          NAME: userName // <--- 2. Send the name to Brevo
+          NAME: userName || "Hiver" 
       }
     }, {
       headers: { 
@@ -98,12 +103,13 @@ app.post("/send-reset-email", async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error("Backend Reset Error:", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Internal Server Crash:", error.message);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Hive Server is buzzing on port ${PORT}`));
+
 
