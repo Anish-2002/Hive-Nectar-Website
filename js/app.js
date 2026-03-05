@@ -2,24 +2,22 @@ import { handleLogin } from './login.js';
 import { setupAddressAutocomplete, handleSignup } from './signup.js';
 import { initProfile } from './profile.js'; 
 import { supabase } from './supabase-config.js';
-
-// --- NEW IMPORT ---
 import { handleContactSubmit } from './contact.js'; 
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. PAGE ROUTING LOGIC ---
+    // --- 1. IMPROVED ROUTING LOGIC ---
+    // Works on both Localhost and GitHub Pages Subdirectories
     const path = window.location.pathname;
-    
 
-    // If on profile.html, initialize the dashboard data
-    if (page === 'profile.html' || path.endsWith('profile')) {
+    // Profile Page
+    if (path.includes('profile.html')) {
+        console.log("Initializing Profile...");
         initProfile();
     }
 
-    // --- NEW: CONTACT PAGE LOGIC ---
-    // Detects if the user is on contact.html to attach the listener
-    if (page === 'contact.html' || path.endsWith('contact')) {
+    // Contact Page
+    if (path.includes('contact.html')) {
         const contactForm = document.getElementById('contactForm');
         if (contactForm) {
             contactForm.addEventListener('submit', handleContactSubmit);
@@ -37,24 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
         signupForm.addEventListener('submit', handleSignup);
     }
 
-    // --- 3. OTP VERIFICATION LOGIC ---
-    const verifyBtn = document.getElementById('verifyBtn');
-    if (verifyBtn) {
-        verifyBtn.addEventListener('click', async () => {
-            const phone = document.getElementById('signupPhone').value;
-            const otp = document.getElementById('otpCode').value;
-
-            const { error } = await supabase.auth.verifyOtp({
-                phone: phone,
-                token: otp,
-                type: 'sms',
-            });
-
-            if (error) {
-                alert("Verification Failed: " + error.message);
-            } else {
-                alert("Verification Successful! Redirecting to profile...");
-                window.location.href = 'profile.html';
+    // --- 3. PASSWORD RECOVERY LOGIC ---
+    // This handles the redirect from the email link
+    if (window.location.hash.includes('type=recovery')) {
+        supabase.auth.onAuthStateChange(async (event) => {
+            if (event === "PASSWORD_RECOVERY") {
+                showToast("Verification Successful! Redirecting to reset page...");
+                // Using a relative redirect for portability
+                window.location.replace('./reset-password.html');
             }
         });
     }
@@ -75,8 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Global notification function
-
+/**
+ * Global notification function
+ */
 export function showToast(message, type = 'success') {
     let container = document.getElementById('toast-container');
     if (!container) {
@@ -92,15 +81,15 @@ export function showToast(message, type = 'success') {
     const iconClass = type === 'error' ? 'fa-circle-exclamation' : 'fa-check-circle';
     
     toast.innerHTML = `
-        <i class="fas ${iconClass}"></i>
+        <i class=\"fas ${iconClass}\"></i>
         <span>${message}</span>
     `;
 
     container.appendChild(toast);
 
+    // Auto-remove after 4 seconds
     setTimeout(() => {
-        toast.style.animation = 'fadeOutUp 0.5s ease-in forwards';
+        toast.style.animation = 'fadeOut 0.5s forwards';
         setTimeout(() => toast.remove(), 500);
     }, 4000);
-
 }
