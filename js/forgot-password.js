@@ -12,7 +12,6 @@ form.addEventListener('submit', async (e) => {
     btn.disabled = true;
 
     try {
-        // 1. Check if user exists (using standard anon client)
         const { data } = await supabase
             .from('profiles') 
             .select('email')
@@ -24,13 +23,11 @@ form.addEventListener('submit', async (e) => {
             return;
         }
 
-        // 2. Determine redirect URL
         const isGitHub = window.location.hostname.includes('github.io');
         const finalRedirectUrl = isGitHub 
             ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
             : window.location.origin + '/reset-password.html';
 
-        // 3. Tell Render to handle the rest
         const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -46,7 +43,7 @@ form.addEventListener('submit', async (e) => {
             showToast("Check your inbox for the secure link!", "success");
             form.reset();
         } else {
-            throw new Error(result.error);
+            throw new Error(result.error || "Failed to send email");
         }
 
     } catch (err) {
