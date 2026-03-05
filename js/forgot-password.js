@@ -28,7 +28,7 @@ form.addEventListener('submit', async (e) => {
         // 2. Fallback logic: If profile query fails or is empty, 
         // we still want to try sending the email using the input email
         const finalEmail = profile ? profile.email : emailInput;
-        const finalName = profile ? profile.display_name : "Valued Member";
+        const finalName = profile ? profile.first_name : "Valued Member";
 
         // 3. Determine redirect URL for GitHub vs Localhost
         const isGitHub = window.location.hostname.includes('github.io');
@@ -74,4 +74,5 @@ form.addEventListener('submit', async (e) => {
         btn.disabled = false;
     }
 });
+
 
