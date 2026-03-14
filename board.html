@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
-    /* Adding a few helper styles for the comments you requested */
     .comment-section { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
     .comment-item { font-size: 0.85rem; background: #f8fafc; padding: 8px; border-radius: 8px; margin-bottom: 5px; color: var(--fg); }
     .comment-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
@@ -16,12 +15,17 @@
   </style>
 </head>
 <body>
+
 <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
+    </div>
     <span class="brand-title">HIVE NECTAR</span>
-  </div>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
   <nav class="nav-links" id="navLinks">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
@@ -33,14 +37,24 @@
 </header>
 
 <main class="wrap">
-    <div class="filter-navigation">
-        <button class="pill active">All Buzz</button>
-        <button class="pill">Announcements</button>
-        <button class="pill">Community</button>
-        <button class="pill">System Updates</button>
+    <section class="hero-card">
+        <h1>Communication Board</h1>
+        <p>Stay updated with the latest hive activity.</p>
+    </section>
+
+    <div class="filter-controls">
+        <div id="recent-pill-container"></div>
+        
+        <div class="filter-dropdown-wrapper">
+            <select id="categoryDropdown" class="category-select">
+                <option value="" disabled selected hidden>Select Categories</option>
+                <option value="all">All Categories</option>
+                </select>
+            <span id="dropdown-global-badge" class="notif-badge hidden"></span>
+        </div>
     </div>
 
-    <div class="board-container-full" id="dynamicBoard">
+    <div id="dynamicBoard" class="board-container">
         </div>
 </main>
 
@@ -54,93 +68,66 @@
 </footer>
 
 <script>
-    // Initial data matching your JSON structure
-    const defaultData = {
-      "posts": [
-        {
-          "id": "1",
-          "title": "PollenPop is available for early access! 🚀",
-          "short_desc": "Be the first to experience our new physical product line. Early hive members get a 20% discount on their first harvest.",
-          "created_at": new Date().toISOString(),
-          "comments": []
+  //import { CommsManager } from './comms.js';
+
+async function initBoard() {
+    const posts = await CommsManager.fetchPosts();
+    renderPills(posts);
+    renderPosts(posts);
+    updateNotificationBadges(posts);
+}
+
+function renderPills(posts) {
+    const filterNav = document.querySelector('.filter-navigation');
+    const types = ['all', ...new Set(posts.map(p => p.post_type))];
+    
+    filterNav.innerHTML = types.map(type => `
+        <button class="pill ${type === 'all' ? 'active' : ''}" onclick="filterBy('${type}')">
+            ${type.charAt(0).toUpperCase() + type.slice(1)}
+            <span class="badge" id="badge-${type}"></span>
+        </button>
+    `).join('');
+}
+
+function updateNotificationBadges(posts) {
+    const counts = {};
+    posts.forEach(p => {
+        counts[p.post_type] = (counts[p.post_type] || 0) + 1;
+    });
+
+    Object.keys(counts).forEach(type => {
+        const badge = document.getElementById(`badge-${type}`);
+        if (badge && counts[type] > 0) {
+            badge.innerText = counts[type];
+            badge.style.display = 'inline-block';
         }
-      ]
-    };
+    });
+}
 
-    function loadBoard() {
-        const board = document.getElementById('dynamicBoard');
-        const data = JSON.parse(localStorage.getItem('admin_comms')) || defaultData;
-        
-        board.innerHTML = '';
+window.filterBy = async (type) => {
+    const filtered = await CommsManager.fetchByType(type);
+    renderPosts(filtered);
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    event.target.classList.add('active');
+};
 
-        data.posts.forEach((post, index) => {
-            const timeLabel = new Date(post.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            // Design Choice: First post uses the "Hero" style, others use "Rectangular" style
-            if (index === 0) {
-                board.innerHTML += `
-                <section class="card glass-card announcement-hero">
-                    <div class="announcement-content">
-                        <div class="badge-row">
-                            <span class="status-btn complete">New Update</span>
-                            <span class="tiny muted">Just Now</span>
-                        </div>
-                        <h2>${post.title}</h2>
-                        <p>${post.short_desc}</p>
-                        <div class="announcement-actions">
-                            <button class="reaction-btn"><i class="fas fa-heart"></i> Reaction</button>
-                        </div>
-                        ${renderComments(post)}
-                    </div>
-                    <div class="announcement-visual">
-                        <i class="fas fa-bullhorn fa-5x" style="color: var(--primary); opacity: 0.5;"></i>
-                    </div>
-                </section>`;
-            } else {
-                board.innerHTML += `
-                <section class="card glass-card rectangular-update">
-                    <div class="update-header-row">
-                        <div class="update-title">
-                            <div class="dot green"></div>
-                            <h3 style="margin:0; font-size: 1.1rem;">${post.title}</h3>
-                        </div>
-                        <span class="tiny muted">${timeLabel}</span>
-                    </div>
-                    <p class="muted">${post.short_desc}</p>
-                    ${renderComments(post)}
-                </section>`;
-            }
-        });
-    }
-
-    function renderComments(post) {
-        const commentsHtml = (post.comments || []).map(c => `<div class="comment-item"><strong>Bee:</strong> ${c}</div>`).join('');
-        return `
-            <div class="comment-section">
-                <div id="comment-list-${post.id}">${commentsHtml}</div>
-                <div class="comment-input-wrap">
-                    <input type="text" id="input-${post.id}" class="comment-input" placeholder="Add a comment...">
-                    <button class="comment-btn" onclick="addComment('${post.id}')">Send</button>
-                </div>
-            </div>
-        `;
-    }
-
-    window.addComment = function(postId) {
-        const input = document.getElementById(`input-${postId}`);
-        if (!input.value.trim()) return;
-
-        const data = JSON.parse(localStorage.getItem('admin_comms')) || defaultData;
-        const post = data.posts.find(p => p.id === postId);
-        if (!post.comments) post.comments = [];
-        
-        post.comments.push(input.value);
-        localStorage.setItem('admin_comms', JSON.stringify(data));
-        loadBoard();
-    };
-
-    document.addEventListener('DOMContentLoaded', loadBoard);
+document.addEventListener('DOMContentLoaded', initBoard);
 </script>
-<script src="app.js"></script>
+
+<div id="commsModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalData"></div>
+        </div>
+    </div>
+
+ <script type="module" src="js/app.js"></script>
+ 
+ <div id="global-loader" class="loader-overlay" style="display: none;">
+    <div class="loader-content">
+        <div class="buffering-icon"></div>
+        <p id="loader-text">Fetching hive updates...</p>
+    </div>
+</div>
 </body>
 </html>

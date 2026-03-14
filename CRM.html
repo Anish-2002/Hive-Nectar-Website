@@ -16,7 +16,6 @@
       margin-top: 20px;
     }
 
-    /* Sidebar Navigation */
     .crm-sidebar {
       background: var(--card-bg, #ffffff);
       border-radius: 12px;
@@ -47,11 +46,9 @@
       color: white;
     }
 
-    /* Layer Management */
     .crm-layer { display: none; }
     .crm-layer.active { display: block; animation: slideUp 0.3s ease-out; }
 
-    /* Inquiry Category Cards */
     .category-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -91,15 +88,25 @@
 </head>
 <body>
 
-  <header class="header">
-    <div class="logo-area">
-      <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-      <span class="brand-title">HIVE CRM</span>
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
     </div>
-    <div class="nav-links">
-      <a href="index.html" class="btn" style="padding: 8px 15px; font-size: 0.8rem;">Log Out</a>
-    </div>
-  </header>
+    <span class="brand-title">HIVE NECTAR</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
 
   <main class="wrap">
     <div class="admin-container">
@@ -215,10 +222,18 @@
     </div>
   </main>
 
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
   <div id="toast-container"></div>
 
   <script>
-    // Simple UI Controller for Layers
     function switchLayer(layerId) {
       document.querySelectorAll('.crm-layer').forEach(l => l.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -227,13 +242,11 @@
       event.currentTarget.classList.add('active');
     }
 
-    // Inquiry Filtering Controller
     function filterInquiries(category) {
       document.querySelector('.category-grid').style.display = 'none';
       const detailView = document.getElementById('inquiry-detail-view');
       detailView.style.display = 'block';
       document.getElementById('current-category-title').innerText = category + " Inquiries";
-      // We will add the Supabase fetch logic in the JS file later
     }
 
     function closeInquiryDetail() {

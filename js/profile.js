@@ -1,5 +1,5 @@
 import { supabase } from './supabase-config.js';
-
+import { showToast, Loader } from './app.js';
 let allTasks = [];
 let completedIds = [];
 let userProfile = null;
@@ -13,40 +13,56 @@ let activeFilters = {
 };
 
 export async function initProfile() {
-      const getBaseURL = () => {
-    const { origin, pathname } = window.location;
-    // If we are on GitHub Pages, the pathname starts with the repo name
-    if (origin.includes('github.io')) {
-        return `${origin}/Hive-Nectar-Website/`;
-    }
-    // Otherwise (localhost), just use the origin
-    return `${origin}/`;
-};
+    const getBaseURL = () => {
+        const { origin, pathname } = window.location;
+        if (origin.includes('github.io')) {
+            return `${origin}/Hive-Nectar-Website/`;
+        }
+        return `${origin}/`;
+    };
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) { window.location.replace(getBaseURL() + 'login.html'); return; }
+    if (authError || !user) { 
+        window.location.replace(getBaseURL() + 'login.html'); 
+        return; 
+    }
 
-    const [profileRes, tasksRes, userTasksRes, feedbackRes, commentsRes] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
-        supabase.from('tasks').select('*'),
-        supabase.from('user_tasks').select('task_id').eq('user_id', user.id),
-        supabase.from('task_feedback').select('task_id, reaction').eq('user_id', user.id),
-        supabase.from('task_comments').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
-    ]);
+    // 1. START LOADER
+    Loader.show("Gathering your nectar..."); 
 
-    userProfile = profileRes.data;
-    allTasks = tasksRes.data || [];
-    completedIds = userTasksRes.data.map(t => t.task_id);
-    userComments = commentsRes.data || [];
-    
-    userReactions = {};
-    feedbackRes.data?.forEach(f => {
-        userReactions[f.task_id] = f.reaction;
-    });
+    try {
+        const [profileRes, tasksRes, userTasksRes, feedbackRes, commentsRes] = await Promise.all([
+            supabase.from('profiles').select('*').eq('id', user.id).single(),
+            supabase.from('tasks').select('*'),
+            supabase.from('user_tasks').select('task_id').eq('user_id', user.id),
+            supabase.from('task_feedback').select('task_id, reaction').eq('user_id', user.id),
+            supabase.from('task_comments').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+        ]);
 
-    updateProfileUI();
-    setupMultiFilters();
-    applyFiltersAndRender();
-    setupLogout();
+        userProfile = profileRes.data;
+        allTasks = tasksRes.data || [];
+        completedIds = userTasksRes.data.map(t => t.task_id);
+        userComments = commentsRes.data || [];
+        
+        userReactions = {};
+        feedbackRes.data?.forEach(f => {
+            userReactions[f.task_id] = f.reaction;
+        });
+
+        // Initialize UI components
+        updateProfileUI();
+        setupMultiFilters();
+        applyFiltersAndRender();
+        setupLogout();
+
+    } catch (err) {
+        console.error("Profile initialization failed:", err);
+        showToast("Failed to load profile data.", "error");
+    } finally {
+        // 2. HIDE LOADER (The Closure)
+        // This runs whether the try block succeeded or the catch block caught an error
+        Loader.hide();
+    }
 }
 
 function updateProfileUI() {
@@ -301,9 +317,32 @@ async function handleReact(btn) {
 }
 
 function setupLogout() {
-    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-        await supabase.auth.signOut();
-        window.location.replace('index.html');
-    });
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            // 1. Show the loader immediately
+            Loader.show("Safely signing you out...");
 
+            try {
+                // 2. Call Supabase sign out
+                const { error } = await supabase.auth.signOut();
+                
+                if (error) throw error;
+
+                // 3. Clear local session/cache and redirect
+                // We use replace so they can't hit "back" to see the profile
+                window.location.replace('index.html');
+
+            } catch (err) {
+                console.error("Logout Error:", err);
+                showToast("Error signing out. Please try again.", "error");
+                
+                // 4. ONLY hide the loader if there's an error. 
+                // If successful, the page redirect will handle the "removal"
+                Loader.hide();
+            }
+        });
+    }
 }
+

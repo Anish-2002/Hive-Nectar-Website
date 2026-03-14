@@ -3,7 +3,24 @@ import { setupAddressAutocomplete, handleSignup } from './signup.js';
 import { initProfile } from './profile.js'; 
 import { supabase } from './supabase-config.js';
 import { handleContactSubmit } from './contact.js'; 
+import { initCommunicationBoard, initHomeNotifications } from './comms.js';
 
+//Loader while fetching data from DB
+
+export const Loader = {
+    show(message = "Loading...") {
+        const loader = document.getElementById('global-loader');
+        const text = document.getElementById('loader-text');
+        if (loader) {
+            if (text) text.innerText = message;
+            loader.style.display = 'flex';
+        }
+    },
+    hide() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.style.display = 'none';
+    }
+};
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. IMPROVED ROUTING LOGIC ---
@@ -29,7 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signupAddressInput) {
         setupAddressAutocomplete();
     }
+    // Home Page Notifications
+    if (path === '/' || path.includes('index.html')) {
+        initHomeNotifications();
+    }
 
+    // Communication Board Page
+    if (path.includes('board.html')) {
+        initCommunicationBoard();
+    }
     const signupForm = document.getElementById('signupForm');
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
@@ -57,10 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.getElementById('menuToggle');
     const navLinks = document.getElementById('navLinks');
     if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+       document.getElementById('menuToggle').addEventListener('click', function() {
+  document.getElementById('navLinks').classList.toggle('show');
         });
     }
+    
 });
 
 /**

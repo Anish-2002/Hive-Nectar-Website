@@ -1,6 +1,6 @@
 import { supabase } from './supabase-config.js';
-// 1. ADD THIS IMPORT AT THE TOP
 import { sendWelcomeEmail } from './email.js';
+import { showToast, Loader } from './app.js'; // Ensure Loader is imported
 
 // --- Address Auto-populate Logic (No changes here) ---
 export function setupAddressAutocomplete() {
@@ -49,66 +49,78 @@ export async function handleSignup(e) {
     const lastName = document.getElementById('signupLast').value;
     const phone = document.getElementById('signupPhone').value;
     const address = document.getElementById('signupAddress').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
-    // 1. Basic Email Validation
+    // 1. Basic Email Validation (Client-side check before showing loader)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        alert("Please enter a valid email address.");
+        showToast("Please enter a valid email address.", "error");
         return;
     }
 
-    // 2. Signup in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            data: {
-                first_name: firstName,
-                last_name: lastName,
-            },
-        },
-    });
+    // START LOADING
+    Loader.show("Creating your Hive profile...");
+    if (submitBtn) submitBtn.disabled = true;
 
-    if (authError) {
-        alert("Signup Error: " + authError.message);
-        return;
-    }
-
-    // 3. Insert into Profiles Table
-    const { error: dbError } = await supabase
-        .from('profiles')
-        .insert([
-            { 
-                id: authData.user.id, 
-                first_name: firstName,
-                last_name: lastName,
-                email: email,
-                phone_number: phone,
-                address: address,
-                nectar_points: 0
-            },
-        ]);
-
-    if (dbError) {
-        alert("Database Error: " + dbError.message);
-        return;
-    }
-
-    // 4. TRIGGER WELCOME EMAIL
-    // We use a try/catch so that if Brevo fails, the user can still proceed to verify their phone
     try {
-        await sendWelcomeEmail(email, firstName);
-    } catch (emailErr) {
-        console.error("Email failed to send, but proceeding with signup:", emailErr);
-    }
-    
-    // 5. Switch to Verification Section
-    document.getElementById('signupForm').classList.add('hide');
-    document.getElementById('formTitle').innerText = "Verify Mobile/Email";
-    document.getElementById('verificationSection').classList.remove('hide');
+        // 2. Signup in Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    first_name: firstName,
+                    last_name: lastName,
+                },
+            },
+        });
 
-    // 6. Trigger OTP via Supabase
-    await supabase.auth.signInWithOtp({
-        phone: phone,
-    });
+        if (authError) throw authError;
+
+        // 3. Insert into Profiles Table
+        const { error: dbError } = await supabase
+            .from('profiles')
+            .insert([
+                { 
+                    id: authData.user.id, 
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                    phone_number: phone,
+                    address: address,
+                    nectar_points: 0
+                },
+            ]);
+
+        if (dbError) throw dbError;
+
+        // 4. TRIGGER WELCOME EMAIL
+        try {
+            await sendWelcomeEmail(email, firstName);
+        } catch (emailErr) {
+            console.error("Email failed to send, but proceeding with signup:", emailErr);
+        }
+        
+        // 5. Trigger OTP via Supabase
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+            phone: phone,
+        });
+        
+        if (otpError) throw otpError;
+
+        // 6. UI Transition (Success)
+        showToast("Account created! Check your phone for the code.", "success");
+        document.getElementById('signupForm').classList.add('hide');
+        document.getElementById('formTitle').innerText = "Verify Mobile/Email";
+        document.getElementById('verificationSection').classList.remove('hide');
+
+    } catch (err) {
+        // Handle all errors here
+        console.error("Signup Process Error:", err);
+        showToast(err.message, "error");
+        if (submitBtn) submitBtn.disabled = false;
+    } finally {
+        // ALWAYS HIDE LOADER
+        Loader.hide();
+    }
 }
