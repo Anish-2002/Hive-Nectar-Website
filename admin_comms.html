@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin - Create Buzz</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-container { max-width: 500px; margin: 50px auto; padding: 20px; }
+    input, textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
+    </div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+    <div class="admin-container card">
+        <h2>Post New Communication</h2>
+        <input type="text" id="title" placeholder="Post Title">
+        <textarea id="desc" placeholder="Post Description" rows="4"></textarea>
+        <button class="btn" onclick="savePost()">Publish to Board</button>
+        <hr>
+        <button onclick="localStorage.removeItem('admin_comms'); alert('Cleared');" style="color:red; background:none; border:none; cursor:pointer;">Clear All Posts</button>
+    </div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+    <script>
+        function savePost() {
+            const title = document.getElementById('title').value;
+            const desc = document.getElementById('desc').value;
+
+            let data = JSON.parse(localStorage.getItem('admin_comms')) || { "posts": [] };
+
+            const newPost = {
+                "id": Date.now().toString(),
+                "title": title,
+                "short_desc": desc,
+                "created_at": new Date().toISOString(),
+                "comments": []
+            };
+
+            data.posts.unshift(newPost);
+            localStorage.setItem('admin_comms', JSON.stringify(data));
+
+            alert("Post Published!");
+            document.getElementById('title').value = '';
+            document.getElementById('desc').value = '';
+        }
+    </script>
+</body>
+</html>

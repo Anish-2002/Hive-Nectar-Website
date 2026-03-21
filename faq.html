@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FAQ | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-section {
+      margin-bottom: 40px;
+    }
+    
+    .faq-section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .faq-section-title i {
+      color: var(--primary);
+    }
+    
+    .faq-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+    
+    .faq-item:hover {
+      border-color: var(--primary);
+    }
+    
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--fg);
+      transition: var(--transition-smooth);
+    }
+    
+    .faq-question:hover {
+      background: var(--secondary);
+    }
+    
+    .faq-question i {
+      color: var(--primary);
+      transition: transform 0.3s ease;
+    }
+    
+    .faq-item.open .faq-question i {
+      transform: rotate(180deg);
+    }
+    
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .faq-item.open .faq-answer {
+      max-height: 500px;
+    }
+    
+    .faq-answer-content {
+      padding: 0 24px 24px;
+      color: var(--fg-muted);
+      line-height: 1.7;
+    }
+    
+    .contact-cta {
+      background: var(--honey-gradient);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      text-align: center;
+      margin-top: 48px;
+    }
+    
+    .contact-cta h3 {
+      color: white;
+      margin: 0 0 12px;
+    }
+    
+    .contact-cta p {
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 24px;
+    }
+    
+    .contact-cta .btn {
+      background: white;
+      color: var(--primary-dark);
+    }
+  </style>
+</head>
+<body data-theme="classic">
+
+<header class="header" data-testid="main-header">
+  <a href="index.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
+    </div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks" data-testid="nav-links">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html">About</a>
+    <a href="faq.html" class="active">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <!-- Hero -->
+  <section class="hero-card" data-testid="faq-hero">
+    <h1>Frequently Asked Questions</h1>
+    <p>Find answers to common questions about Hive Nectar</p>
+  </section>
+
+  <div class="faq-container" data-testid="faq-container">
+    <!-- Getting Started -->
+    <section class="faq-section">
+      <h2 class="faq-section-title"><i class="fas fa-rocket"></i> Getting Started</h2>
+      
+      <div class="faq-item" data-testid="faq-item">
+        <div class="faq-question">
+          <span>What is Hive Nectar?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Hive Nectar is a gamified sustainability platform that helps you build positive habits through daily micro-tasks. Complete tasks, earn Nectar points, level up, and join a community of changemakers working together for a better future.
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I create an account?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Simply click "Join the Hive" and fill out the signup form with your name, email, phone, and address. You'll receive a verification code to confirm your account, and then you're ready to start your journey!
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Is Hive Nectar free to use?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Yes! The basic membership is completely free and gives you access to our Seed-level tasks. For more advanced tasks and features, you can upgrade to Hive+ or Steward tiers.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nectar & Points -->
+    <section class="faq-section">
+      <h2 class="faq-section-title"><i class="fas fa-coins"></i> Nectar & Points</h2>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I earn Nectar points?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            You earn Nectar by completing tasks! Each task awards experience points based on its difficulty level (Seed, Sprout, or Bloom). When your experience bar fills to 100, you earn 1 Nectar point. The more consistently you complete tasks, the higher your engagement multiplier becomes.
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What can I do with Nectar points?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Nectar points represent your contribution to the hive. They unlock milestones and badges, help you climb the ranks, and demonstrate your commitment to sustainability. In the future, Nectar may unlock exclusive rewards and benefits!
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What are engagement multipliers?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Engagement multipliers boost the points you earn based on how often you complete tasks within a task group. The more consistent you are, the higher your multiplier (up to 6x with influence). Having referrals also increases your multiplier!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tasks & Levels -->
+    <section class="faq-section">
+      <h2 class="faq-section-title"><i class="fas fa-tasks"></i> Tasks & Levels</h2>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What are the different task stages?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Tasks are organized into three stages:<br><br>
+            <strong>🌰 Seeds:</strong> Entry-level tasks available to everyone<br>
+            <strong>🌱 Sprout:</strong> Intermediate tasks requiring Hive+ membership<br>
+            <strong>🌸 Bloom:</strong> Advanced tasks for Steward members<br><br>
+            Each stage offers progressively more challenging and impactful tasks.
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What's the difference between Novice and Experienced tasks?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Each task has two versions. Novice versions are simpler introductions to the task concept. Once you complete all Novice tasks, you'll be prompted to switch to Experienced versions, which offer more depth and challenge for the same tasks.
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What are Sigma Logs?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Sigma Logs are reflection entries using the DMAIC framework (Define, Measure, Analyse, Improve, Control). After completing tasks, you can add reflections to deepen your learning. Standalone Sigma Logs also count towards the Sigma Eye achievement badge.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Account & Membership -->
+    <section class="faq-section">
+      <h2 class="faq-section-title"><i class="fas fa-user-circle"></i> Account & Membership</h2>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What membership tiers are available?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            <strong>Free:</strong> Access to Seed tasks and basic features<br>
+            <strong>Hive+:</strong> Unlocks Sprout tasks and enhanced features<br>
+            <strong>Steward:</strong> Full access to all tasks including Bloom level<br><br>
+            All tiers include milestones, badges, and community features.
+          </div>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How do I reset my password?</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Click "Forgot password?" on the login page and enter your email address. You'll receive a link to reset your password. If you don't see the email, check your spam folder or contact us for help.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <div class="contact-cta" data-testid="faq-contact-cta">
+      <h3>Still have questions?</h3>
+      <p>We're here to help. Reach out to our team and we'll get back to you as soon as possible.</p>
+      <a href="contact.html" class="btn">
+        <i class="fas fa-envelope"></i> Contact Us
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer class="footer" data-testid="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+
+<script>
+  // FAQ Accordion functionality
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const item = question.parentElement;
+      const isOpen = item.classList.contains('open');
+      
+      // Close all other items
+      document.querySelectorAll('.faq-item').forEach(faq => {
+        faq.classList.remove('open');
+      });
+      
+      // Toggle current item
+      if (!isOpen) {
+        item.classList.add('open');
+      }
+    });
+  });
+</script>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content">
+    <div class="buffering-icon"></div>
+    <p id="loader-text">Loading...</p>
+  </div>
+</div>
+
+</body>
+</html>
