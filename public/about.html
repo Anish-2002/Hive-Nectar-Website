@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>About Us | Hive Nectar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* Page-specific styles */
+    .about-section {
+      margin-bottom: 40px;
+    }
+    
+    .mission-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+    }
+    
+    @media (max-width: 800px) {
+      .mission-card {
+        grid-template-columns: 1fr;
+        padding: 32px;
+      }
+    }
+    
+    .mission-content h2 {
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .mission-content h2 i {
+      color: var(--primary);
+    }
+    
+    .mission-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .mission-visual .hex-container {
+      width: 200px;
+      height: 200px;
+      background: var(--honey-gradient);
+      clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--honey-glow);
+    }
+    
+    .mission-visual .hex-container i {
+      font-size: 5rem;
+      color: white;
+    }
+    
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    
+    @media (max-width: 900px) {
+      .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .values-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .value-card {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: var(--transition-bouncy);
+    }
+    
+    .value-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: var(--card-shadow-hover);
+    }
+    
+    .value-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 1.8rem;
+      color: var(--primary);
+      transition: var(--transition-smooth);
+    }
+    
+    .value-card:hover .value-icon {
+      background: var(--honey-gradient);
+      color: white;
+    }
+    
+    .value-card h4 {
+      margin: 0 0 12px;
+    }
+    
+    .value-card p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    
+    .stats-banner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      background: var(--honey-gradient);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      color: white;
+      text-align: center;
+    }
+    
+    @media (max-width: 800px) {
+      .stats-banner {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 500px) {
+      .stats-banner {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .stat-item h3 {
+      font-size: 2.5rem;
+      margin: 0;
+      color: white;
+    }
+    
+    .stat-item p {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body data-theme="classic">
+
+<header class="header" data-testid="main-header">
+  <a href="index.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
+    </div>
+    <span class="brand-title">HIVE NECTAR</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks" data-testid="nav-links">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Hive</a>
+    <a href="about.html" class="active">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <!-- Hero -->
+  <section class="hero-card" data-testid="about-hero">
+    <h1>About Hive Nectar</h1>
+    <p>Building a community of changemakers, one small action at a time.</p>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="about-section">
+    <div class="mission-card" data-testid="mission-card">
+      <div class="mission-content">
+        <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+        <p style="line-height: 1.8; margin-bottom: 20px;">
+          At Hive Nectar, we believe that lasting change happens through small, consistent actions. Just like bees working together to create something sweet, we're building a community where individual efforts combine to create meaningful impact.
+        </p>
+        <p style="line-height: 1.8;">
+          Our platform gamifies sustainability and personal growth, making it fun and rewarding to build positive habits while contributing to collective goals.
+        </p>
+      </div>
+      <div class="mission-visual">
+        <div class="hex-container">
+          <i class="fas fa-leaf"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="about-section">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h2>Our Values</h2>
+      <p class="muted">The principles that guide everything we do</p>
+    </div>
+    
+    <div class="values-grid" data-testid="values-grid">
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-users"></i></div>
+        <h4>Community First</h4>
+        <p>We believe in the power of collective action and supporting each other's growth.</p>
+      </div>
+      
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-seedling"></i></div>
+        <h4>Sustainable Impact</h4>
+        <p>Small, consistent actions lead to lasting change for both individuals and the planet.</p>
+      </div>
+      
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-trophy"></i></div>
+        <h4>Gamified Growth</h4>
+        <p>Making positive habits fun and rewarding through engaging challenges and rewards.</p>
+      </div>
+      
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-lightbulb"></i></div>
+        <h4>Continuous Learning</h4>
+        <p>Always evolving and improving based on feedback and new insights.</p>
+      </div>
+      
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-shield-alt"></i></div>
+        <h4>Trust & Transparency</h4>
+        <p>Open communication and honest relationships with our community members.</p>
+      </div>
+      
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-heart"></i></div>
+        <h4>Passion Driven</h4>
+        <p>We're genuinely passionate about making a difference and helping others do the same.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Banner -->
+  <section class="about-section">
+    <div class="stats-banner" data-testid="stats-banner">
+      <div class="stat-item">
+        <h3>1000+</h3>
+        <p>Active Members</p>
+      </div>
+      <div class="stat-item">
+        <h3>50K+</h3>
+        <p>Tasks Completed</p>
+      </div>
+      <div class="stat-item">
+        <h3>100+</h3>
+        <p>Sustainability Tasks</p>
+      </div>
+      <div class="stat-item">
+        <h3>∞</h3>
+        <p>Possibilities</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="card highlight-card" style="text-align: center; padding: 48px 32px;" data-testid="about-cta">
+    <h2 style="margin: 0 0 12px;">Ready to Join the Hive?</h2>
+    <p class="muted" style="margin-bottom: 24px;">Start your journey today and be part of something bigger.</p>
+    <a href="join.html" class="btn" data-testid="join-cta">
+      <i class="fas fa-rocket"></i> Get Started
+    </a>
+  </section>
+</main>
+
+<footer class="footer" data-testid="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a>
+  </div>
+  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content">
+    <div class="buffering-icon"></div>
+    <p id="loader-text">Loading...</p>
+  </div>
+</div>
+
+</body>
+</html>
