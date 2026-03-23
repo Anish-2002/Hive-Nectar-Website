@@ -7,8 +7,6 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
-    .hide { display: none !important; }
-    
     .signup-layout {
       display: grid;
       grid-template-columns: 1fr 340px;
@@ -16,13 +14,11 @@
       max-width: 1000px;
       margin: 0 auto;
     }
-    
     @media (max-width: 900px) {
       .signup-layout {
         grid-template-columns: 1fr;
       }
     }
-    
     .signup-card {
       background: var(--card);
       border-radius: var(--radius-xl);
@@ -30,43 +26,35 @@
       box-shadow: var(--card-shadow-hover);
       border: 1px solid var(--border);
     }
-    
     .signup-header {
       margin-bottom: 28px;
     }
-    
     .signup-header h2 {
       margin: 0 0 8px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
     .signup-header h2 i {
       color: var(--primary);
     }
-    
     .signup-header p {
       margin: 0;
       color: var(--fg-muted);
     }
-    
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-    
     @media (max-width: 500px) {
       .form-row {
         grid-template-columns: 1fr;
       }
     }
-    
     .form-field {
       margin-bottom: 20px;
     }
-    
     .form-field label {
       display: block;
       margin-bottom: 8px;
@@ -74,11 +62,9 @@
       font-size: 0.9rem;
       color: var(--fg);
     }
-    
     .form-field .input-wrapper {
       position: relative;
     }
-    
     .form-field .input-wrapper i {
       position: absolute;
       left: 16px;
@@ -86,73 +72,9 @@
       transform: translateY(-50%);
       color: var(--fg-muted);
     }
-    
     .form-field .input-wrapper input {
       padding-left: 48px;
     }
-    
-    #addressSuggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      z-index: 1000;
-      max-height: 180px;
-      overflow-y: auto;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-      margin-top: 4px;
-    }
-    
-    #addressSuggestions div {
-      padding: 14px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid var(--border-light);
-      font-size: 0.9rem;
-      transition: var(--transition-fast);
-    }
-    
-    #addressSuggestions div:last-child {
-      border-bottom: none;
-    }
-    
-    #addressSuggestions div:hover {
-      background: var(--secondary);
-    }
-    
-    .verification-section {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    
-    .verification-section .icon-circle {
-      width: 80px;
-      height: 80px;
-      background: var(--honey-gradient);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 2rem;
-      color: white;
-      box-shadow: var(--honey-glow);
-    }
-    
-    .verification-section h4 {
-      margin: 0 0 12px;
-    }
-    
-    .otp-input {
-      width: 180px;
-      text-align: center;
-      font-size: 1.5rem;
-      letter-spacing: 8px;
-      font-weight: 700;
-    }
-    
     .sidebar-card {
       background: var(--card);
       border-radius: var(--radius-xl);
@@ -160,13 +82,11 @@
       border: 1px solid var(--border);
       margin-bottom: 20px;
     }
-    
     .benefits-list {
       list-style: none;
       padding: 0;
       margin: 16px 0 0;
     }
-    
     .benefits-list li {
       display: flex;
       align-items: flex-start;
@@ -175,16 +95,13 @@
       border-bottom: 1px solid var(--border-light);
       font-size: 0.9rem;
     }
-    
     .benefits-list li:last-child {
       border-bottom: none;
     }
-    
     .benefits-list li i {
       color: var(--success);
       margin-top: 2px;
     }
-    
     .login-card {
       background: var(--honey-gradient);
       color: white;
@@ -192,18 +109,15 @@
       padding: 28px;
       text-align: center;
     }
-    
     .login-card h4 {
       color: white;
       margin: 0 0 8px;
     }
-    
     .login-card p {
       color: rgba(255,255,255,0.9);
       margin: 0 0 16px;
       font-size: 0.9rem;
     }
-    
     .login-card .btn {
       background: white;
       color: var(--primary-dark);
@@ -234,13 +148,12 @@
 
 <main class="wrap">
   <div class="signup-layout">
-    <!-- Main Signup Form -->
     <div class="signup-card" data-testid="signup-card">
       <div class="signup-header">
         <h2 id="formTitle"><i class="fas fa-user-plus"></i> Create Your Account</h2>
         <p>Join the hive and start earning Nectar today</p>
       </div>
-      
+
       <form id="signupForm" data-testid="signup-form">
         <div class="form-row">
           <div class="form-field">
@@ -254,27 +167,18 @@
         </div>
 
         <div class="form-field">
+          <label for="signupUsername">Username (choose a creative name)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="signupUsername" required placeholder="e.g., BusyBee" data-testid="signup-username">
+          </div>
+        </div>
+
+        <div class="form-field">
           <label for="signupEmail">Email Address</label>
           <div class="input-wrapper">
             <i class="fas fa-envelope"></i>
             <input type="email" id="signupEmail" required placeholder="you@example.com" data-testid="signup-email">
-          </div>
-        </div>
-
-        <div class="form-field">
-          <label for="signupPhone">Phone Number</label>
-          <div class="input-wrapper">
-            <i class="fas fa-phone"></i>
-            <input type="tel" id="signupPhone" required placeholder="+1 (555) 123-4567" data-testid="signup-phone">
-          </div>
-        </div>
-
-        <div class="form-field">
-          <label for="signupAddress">Address</label>
-          <div class="input-wrapper" style="position: relative;">
-            <i class="fas fa-map-marker-alt"></i>
-            <input type="text" id="signupAddress" placeholder="Start typing your address..." required data-testid="signup-address">
-            <div id="addressSuggestions"></div>
           </div>
         </div>
 
@@ -290,51 +194,20 @@
           <i class="fas fa-rocket"></i> Sign Up
         </button>
       </form>
-
-      <!-- Verification Section (Hidden by default) -->
-      <div id="verificationSection" class="hide verification-section" data-testid="verification-section">
-        <div class="icon-circle">
-          <i class="fas fa-shield-alt"></i>
-        </div>
-        <h4>Verify Your Account</h4>
-        <p class="tiny muted" style="margin-bottom: 24px;">Enter the 6-digit code sent to your phone/email.</p>
-        
-        <input type="text" id="otpCode" class="otp-input" placeholder="000000" maxlength="6" data-testid="otp-input">
-        <br><br>
-        <button id="verifyBtn" class="btn" data-testid="verify-btn">
-          <i class="fas fa-check"></i> Verify
-        </button>
-      </div>
     </div>
 
-    <!-- Sidebar -->
     <aside>
-      <!-- Benefits Card -->
       <div class="sidebar-card">
         <h4 style="margin: 0; display: flex; align-items: center; gap: 10px;">
           <i class="fas fa-gift" style="color: var(--primary);"></i> Member Benefits
         </h4>
         <ul class="benefits-list">
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Access to daily sustainability tasks</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Earn Nectar points for real rewards</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Track your growth & achievements</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Join a community of changemakers</span>
-          </li>
+          <li><i class="fas fa-check-circle"></i><span>Access to daily sustainability tasks</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Earn Nectar points for real rewards</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Track your growth & achievements</span></li>
+          <li><i class="fas fa-check-circle"></i><span>Join a community of changemakers</span></li>
         </ul>
       </div>
-      
-      <!-- Login Card -->
       <div class="login-card" data-testid="login-card">
         <h4>Already a member?</h4>
         <p>Welcome back! Sign in to continue your journey.</p>
