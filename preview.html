@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Achievements | Hive Nectar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --honey-gradient: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+            --honey-soft: rgba(251, 191, 36, 0.1);
+            --honey-border: rgba(245, 158, 11, 0.2);
+            --honey-amber: #d97706;
+        }
+
+        body {
+            background-color: #fcfcfc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1f2937;
+        }
+
+        /* --- HERO HEADER --- */
+        .profile-hero-mini {
+            background: var(--honey-gradient);
+            padding: 50px 20px;
+            border-radius: 0 0 50px 50px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2);
+        }
+
+        /* --- THE CARD --- */
+        .achievement-container { perspective: 1200px; }
+
+        .achievement-card {
+            position: relative;
+            background: white;
+            border: 1px solid var(--honey-border);
+            border-radius: 32px;
+            padding: 30px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-12px) rotateX(4deg) rotateY(4deg);
+            box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.2);
+        }
+
+        /* --- THE MYSTERY OVERLAY --- */
+        .mystery-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px) saturate(180%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        /* Message styling on overlay - OLD STYLE REVERTED */
+        .reveal-msg {
+            background: white;
+            color: var(--honey-amber);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .achievement-card:hover .reveal-msg {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        /* --- PERFECTLY ROUND BADGE STYLING --- */
+        .badge-icon {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto;
+            transform: translateZ(30px);
+            
+            /* ADDED: THIS MAKES THE IMAGE PERFECTLY ROUND */
+            border-radius: 50%;
+            
+            /* ADDED: Refined glow/shadow that follows the round shape */
+            border: 4px solid white; /* Essential for making the image pop */
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
+            object-fit: cover; /* Ensures image fills the circle without stretching */
+        }
+
+        /* --- POPUP MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 40px;
+            padding: 45px;
+            max-width: 460px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--honey-border);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.12);
+            transform: scale(0.85);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-img-animated {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            animation: float 4s ease-in-out infinite;
+            
+            /* ADDED: THIS MAKES THE POPUP IMAGE PERFECTLY ROUND */
+            border-radius: 50%;
+            
+            border: 6px solid white;
+            box-shadow: 0 20px 40px rgba(245, 158, 11, 0.4), 0 0 20px rgba(251, 191, 36, 0.3);
+            object-fit: cover;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(3deg); }
+        }
+
+        .btn-claim {
+            background: var(--honey-gradient);
+            color: white;
+            font-weight: 800;
+            padding: 16px 32px;
+            border-radius: 18px;
+            width: 100%;
+            margin-top: 30px;
+            transition: transform 0.2s;
+        }
+
+        .btn-claim:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="profile-hero-mini mb-16">
+        <h1 class="text-4xl font-black uppercase tracking-tighter italic">Nectar Artefacts</h1>
+        <p class="opacity-90 font-medium text-sm tracking-widest mt-2 uppercase">Unlock your garden milestones</p>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+        
+        <div class="achievement-container" onclick="openModal('Bloom Guardian', 'https://gxboojbfmpejbjolfmjq.supabase.co/storage/v1/object/public/Badges/Growth%20Journey/BloomGuardian50.png', 'Milestone 50', 'You have successfully nurtured 50 tasks. Your garden is starting to flourish with consistency.')">
+            <div class="achievement-card">
+                <div class="mystery-overlay">
+                    <div class="reveal-msg">Click To Reveal</div>
+                </div>
+                
+                <img src="https://gxboojbfmpejbjolfmjq.supabase.co/storage/v1/object/public/Badges/Growth%20Journey/BloomGuardian50.png" class="badge-icon">
+                <div class="text-center mt-8">
+                    <h3 class="font-bold text-gray-800 text-xl italic">Bloom Guardian</h3>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">Task Milestone 50</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="achievement-container" onclick="openModal('Harvest Mentor', 'https://gxboojbfmpejbjolfmjq.supabase.co/storage/v1/object/public/Badges/Growth%20Journey/HarvestMentor100.png', 'Milestone 100', '100 Tasks completed. You are no longer just a worker; you are a master of the harvest.')">
+            <div class="achievement-card">
+                <div class="mystery-overlay">
+                    <div class="reveal-msg">Click To Reveal</div>
+                </div>
+
+                <img src="https://gxboojbfmpejbjolfmjq.supabase.co/storage/v1/object/public/Badges/Growth%20Journey/HarvestMentor100.png" class="badge-icon">
+                <div class="text-center mt-8">
+                    <h3 class="font-bold text-gray-800 text-xl italic">Harvest Mentor</h3>
+                    <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">Task Milestone 100</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="achieveModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="modalImg" src="" class="modal-img-animated">
+            
+            <div class="mt-8">
+                <span id="modalSub" class="text-[10px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-4 py-1.5 rounded-full border border-amber-200">Milestone</span>
+                <h2 id="modalTitle" class="text-3xl font-black text-gray-900 mt-5 italic uppercase tracking-tight">Title</h2>
+                <p id="modalDesc" class="text-gray-500 mt-5 leading-relaxed text-md px-4">Detailed achievement description.</p>
+            </div>
+
+            <button class="btn-claim" onclick="closeModal()">COLLECT NECTAR</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(title, img, sub, desc) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalImg').src = img;
+            document.getElementById('modalSub').innerText = sub;
+            document.getElementById('modalDesc').innerText = desc;
+            
+            const modal = document.getElementById('achieveModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('achieveModal');
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 400);
+        }
+
+        // --- 3D INTERACTION LOGIC ---
+        document.querySelectorAll('.achievement-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const rotateX = (yc - y) / 10;
+                const rotateY = (x - xc) / 10;
+                card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(-10px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
