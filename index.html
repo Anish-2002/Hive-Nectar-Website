@@ -6,92 +6,9 @@
   <title>Hive Nectar | Grow Together</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <style>
-    /* Page-specific enhancements */
-    .feature-icon {
-      width: 64px;
-      height: 64px;
-      background: var(--honey-gradient);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 16px;
-      color: white;
-      font-size: 1.5rem;
-      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
-    }
-    
-    .founder-quote {
-      position: relative;
-      padding-left: 24px;
-      border-left: 4px solid var(--primary);
-    }
-    
-    .founder-quote::before {
-      content: '"';
-      position: absolute;
-      top: -10px;
-      left: -8px;
-      font-size: 4rem;
-      color: var(--primary);
-      opacity: 0.2;
-      font-family: serif;
-      line-height: 1;
-    }
-    
-    .cta-section {
-      background: var(--honey-gradient);
-      color: white;
-      padding: 48px 32px;
-      border-radius: var(--radius-xl);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 300px;
-      height: 300px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 50%;
-    }
-    
-    .cta-section h4 {
-      color: white;
-      margin-bottom: 8px;
-    }
-    
-    .cta-section .btn {
-      background: white;
-      color: var(--primary-dark);
-      margin-top: 20px;
-    }
-    
-    .cta-section .btn:hover {
-      background: var(--secondary);
-      transform: scale(1.05) translateY(-2px);
-    }
-    
-    .badge-float {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: var(--success);
-      color: white;
-      padding: 8px 16px;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 700;
-      animation: pulse 2s infinite;
-    }
-  </style>
+
 </head>
-<body data-theme="classic">
+<body class="page-index" data-theme="classic">
 
 <header class="header" data-testid="main-header">
   <a href="index.html" class="logo-area" data-testid="logo-link">
@@ -118,7 +35,7 @@
   <section class="hero-card" data-testid="hero-section">
     <h1>The Hive Ecosystem</h1>
     <p>Connecting people through meaningful growth and collective action. Small actions, big impact.</p>
-    <a href="join.html" class="btn" style="margin-top: 24px; background: white; color: var(--primary-dark);" data-testid="hero-cta">
+    <a href="join.html" class="btn" style="margin-top: 24px; ==; color: var(--primary-dark);" data-testid="hero-cta">
       <i class="fas fa-seedling"></i> Start Your Journey
     </a>
   </section>
@@ -207,7 +124,14 @@
           <p style="margin-top: 16px; font-weight: 600; color: var(--primary-dark);">— The Hive Team</p>
         </div>
       </section>
-
+      <section class="cta-section" data-testid="join-cta-section">
+        <h4>Already a member?</h4>
+        <a href="login.html" class="btn" data-testid="login-link">
+          <i class="fas fa-sign-in-alt"></i> Login here
+        </a>
+    </section>  
+      
+      </section>
       <!-- Join CTA -->
       <section class="cta-section" data-testid="join-cta-section">
         <h4>Join the Hive</h4>

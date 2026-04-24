@@ -846,31 +846,57 @@ function updateProfileUI() {
     const exp = points % 100;
     const tier = userProfile.tier || 'free';
 
-    document.getElementById('userNameDisplay').innerText = `${userProfile.first_name} ${userProfile.last_name}`;
-    document.getElementById('pointsVal').innerText = points;
-    document.getElementById('rankLevel').innerText = `#${userProfile.member_tier || 0}`;
-    document.getElementById('userTierBadge').innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
-    document.getElementById('experienceBar').value = exp;
-    document.getElementById('expText').innerText = `${exp}/100 towards next Nectar`;
-    document.getElementById('nectarPointsDisplay').innerText = points;
+    // Compact header elements (no background card)
+    const userNameShort = document.getElementById('userNameDisplayShort');
+    if (userNameShort) userNameShort.innerText = `${userProfile.first_name} ${userProfile.last_name}`;
 
+    const rankCompact = document.getElementById('rankNameDisplayCompact');
+    if (rankCompact) rankCompact.innerText = `Hive Level ${userProfile.member_tier || 0}`;
+
+    const tierCompact = document.getElementById('userTierBadgeCompact');
+    if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
+
+    // Stats and progress cards
+    const pointsVal = document.getElementById('pointsVal');
+    if (pointsVal) pointsVal.innerText = points;
+
+    const rankLevel = document.getElementById('rankLevel');
+    if (rankLevel) rankLevel.innerText = `#${userProfile.member_tier || 0}`;
+
+    const expText = document.getElementById('expText');
+    if (expText) expText.innerText = `${exp}/100 towards next Nectar`;
+
+    const nectarDisplay = document.getElementById('nectarPointsDisplay');
+    if (nectarDisplay) nectarDisplay.innerText = points;
+
+    const experienceBar = document.getElementById('experienceBar');
+    if (experienceBar) experienceBar.value = exp;
+
+    // Mobile elements (still exist)
     const mobilePointsVal = document.getElementById('mobilePointsVal');
     if (mobilePointsVal) mobilePointsVal.innerText = points;
+
     const mobileRankLevel = document.getElementById('mobileRankLevel');
     if (mobileRankLevel) mobileRankLevel.innerText = `#${userProfile.member_tier || 0}`;
+
     const mobileExpBar = document.getElementById('mobileExperienceBar');
     const mobileExpText = document.getElementById('mobileExpText');
     if (mobileExpBar && mobileExpText) {
         mobileExpBar.value = exp;
         mobileExpText.innerText = `${exp}/100`;
     }
+
     const mobileRankDisplay = document.getElementById('mobileRankDisplay');
     if (mobileRankDisplay) mobileRankDisplay.innerText = `Hive Level ${userProfile.member_tier || 0}`;
 
     const mobileTierBadge = document.querySelector('.mobile-hero .tier-badge');
     if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
+    // Update avatar from profile URL
+const avatarImg = document.getElementById('profileAvatar');
+if (avatarImg && userProfile.avatar_url) {
+    avatarImg.src = userProfile.avatar_url;
 }
-
+}
 function showCustomLevelModal(newLevel) {
     const modal = document.getElementById('achieveModal');
     const img = document.getElementById('modalImg');
