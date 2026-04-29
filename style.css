@@ -1198,3 +1198,46 @@ button,
     background: var(--honey-gradient);
     color: white;
 }
+
+.custom-progress-wrapper {
+  position: relative;
+  margin: 10px 0;
+}
+
+/* Style the native progress bar to remove default border and make it a clean track */
+progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #e9ecef;
+  border: none;
+}
+progress::-webkit-progress-bar {
+  background-color: #e9ecef;
+  border-radius: 20px;
+}
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #f5b041, #e67e22);
+  border-radius: 20px;
+}
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, #f5b041, #e67e22);
+  border-radius: 20px;
+}
+
+/* White circular knob that follows the progress */
+.custom-progress-knob {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border: 2px solid #e67e22;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: left 0.2s ease;
+  pointer-events: none;
+  left: 0%; /* will be updated by JS */
+}

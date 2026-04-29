@@ -24,7 +24,7 @@ function adjustBrightness(hex, magnitude) {
 
 // ======================== GLOBAL VARIABLES ========================
 let allTasks = [];
-let allTasksWithCompleted = []; // Full list including completed tasks – used for progress bar
+let allTasksWithCompleted = [];
 let baseTasks = [];
 let completedNovice = new Set();
 let completedExperienced = new Set();
@@ -34,6 +34,7 @@ let userReactions = {};
 let userComments = [];
 let themeStageProgress = {};
 let adminThemes = [];
+let stageGuardrails = {}; // { theme_id: { stage: { min_days } } }
 
 let activeFilters = {
     core_theme: [],
@@ -320,18 +321,15 @@ window.viewMilestone = async (containerEl) => {
     const sub   = containerEl.dataset.sub   || '';
     const desc  = containerEl.dataset.desc  || '';
 
-    // Remove mystery overlay immediately so it stays revealed regardless of DB outcome
     const overlay = containerEl.querySelector('.mystery-overlay');
     if (overlay) overlay.remove();
     containerEl.dataset.viewed = 'true';
 
-    // Mark as viewed in DB (fire-and-forget style — don't block the reveal animation)
     supabase.rpc('mark_milestone_viewed', {
         p_user_id: userProfile.id,
         p_milestone_id: milestoneId
     }).then(async ({ error }) => {
         if (error) {
-            // Fallback: direct table update
             await supabase
                 .from('user_milestones')
                 .update({ viewed: true })
@@ -341,7 +339,6 @@ window.viewMilestone = async (containerEl) => {
         await updateAchievementsBadge();
     }).catch(err => console.error('Error marking milestone as viewed:', err));
 
-    // Populate and show modal — use scoped IDs to avoid collision with #achieveModal
     const modal   = document.getElementById('achievementModal');
     if (!modal) return;
     const imgEl   = modal.querySelector('#achievementModalImg');
@@ -460,15 +457,26 @@ function attachTaskEventListeners(container) {
 
 // ======================== TASK RENDERING ========================
 async function refreshTasks() {
+    const now = new Date();
+    const joinDate = new Date(userProfile.join_date);
+    const daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24));
+
     const tasksWithUnlock = baseTasks.map(task => {
-        const prog = themeStageProgress[task.theme_id]?.[task.stage];
-        const days = showingExperienced ? (prog?.experienced || 0) : (prog?.novice || 0);
-        const isUnlocked = days >= task.task_order - 1;
-        const tasksNeeded = (task.task_order - 1) - days;
+        // Get guardrail min_days for this theme+stage (default 0)
+        const minDays = stageGuardrails[task.theme_id]?.[task.stage]?.min_days ?? 0;
+        // Effective days: after minDays has passed, start counting
+        const effectiveDays = Math.max(0, daysSinceJoin - minDays);
+        // Task order that is unlocked today: (effectiveDays + 1)  
+        // Example: day 0 -> task 1; day 1 -> task 2; etc.
+        const maxAllowedOrder = effectiveDays + 1;
+        const isUnlocked = task.task_order <= maxAllowedOrder;
+
         let unlockMessage = '';
         if (!isUnlocked) {
-            if (tasksNeeded > 0) {
-                unlockMessage = `🔒 Unlocks after completing ${tasksNeeded} more task(s) in this theme (${task.stage})`;
+            // Show when the next task will unlock
+            const daysNeeded = task.task_order - 1 - effectiveDays;
+            if (daysNeeded > 0) {
+                unlockMessage = `🔒 Unlocks in ${daysNeeded} day(s) (after ${minDays + task.task_order - 1} days total)`;
             } else {
                 unlockMessage = '🔒 Unlocks soon';
             }
@@ -481,7 +489,6 @@ async function refreshTasks() {
         filteredTasks = tasksWithUnlock.filter(task => selectedThemes.includes(task.theme_id));
     }
 
-    // Keep full list (including completed) for accurate progress bar calculation
     allTasksWithCompleted = filteredTasks;
 
     if (showingExperienced) {
@@ -494,7 +501,6 @@ async function refreshTasks() {
 }
 
 async function applyFiltersAndRender() {
-    // Visible (incomplete) tasks – what gets rendered
     let filtered = [...allTasks];
     if (activeFilters.core_theme.length > 0) {
         filtered = filtered.filter(t => activeFilters.core_theme.includes(t.core_theme));
@@ -506,7 +512,6 @@ async function applyFiltersAndRender() {
         filtered = filtered.filter(t => activeFilters.subcategory.includes(t.subcategory));
     }
 
-    // Full task list (incl. completed) filtered the same way – for progress bar
     let filteredWithCompleted = [...allTasksWithCompleted];
     if (activeFilters.core_theme.length > 0) {
         filteredWithCompleted = filteredWithCompleted.filter(t => activeFilters.core_theme.includes(t.core_theme));
@@ -523,7 +528,6 @@ async function applyFiltersAndRender() {
     const unlockedShown = filtered.filter(t => t.is_unlocked);
     const lockedTasks   = filtered.filter(t => !t.is_unlocked);
 
-    // Progress is based on the full set (completed + incomplete) so it doesn't reset to 0
     totalVisibleTasks    = unlockedAll.length;
     completedVisibleTasks = unlockedAll.filter(t => completedSet.has(t.id)).length;
 
@@ -542,7 +546,6 @@ async function applyFiltersAndRender() {
     if (mobileProgressBar) mobileProgressBar.value = pct;
     if (mobileProgressPct) mobileProgressPct.innerText = `${pct}% (${completedVisibleTasks}/${totalVisibleTasks})`;
 
-    // Sync any open mobile bottom-sheet copy too
     const mobileProgressBarCopy = document.getElementById('mobileProgressBarCopy');
     const mobileProgressPctCopy = document.getElementById('mobileProgressPctCopy');
     if (mobileProgressBarCopy) mobileProgressBarCopy.value = pct;
@@ -711,7 +714,10 @@ async function handleDone(checkbox) {
         if (version === 'novice') completedNovice.add(taskId);
         else completedExperienced.add(taskId);
 
-        userProfile.total_points = (userProfile.total_points || 0) + result.points_earned;
+        const pointsEarned = result.points_earned;
+        // Update local total points and nectar_points (raw points)
+        userProfile.total_points = (userProfile.total_points || 0) + pointsEarned;
+        userProfile.nectar_points = userProfile.total_points;  // keep in sync
         userProfile.experience = userProfile.total_points % 100;
         userProfile.user_level = result.new_user_level;
         userProfile.engagement_level = result.new_engagement_level;
@@ -757,7 +763,6 @@ async function handleDone(checkbox) {
                     });
                     attachTaskEventListeners(tasksContainer);
                 }
-                // Use full task list (incl. completed) for accurate progress bar
                 const completedSet = showingExperienced ? completedExperienced : completedNovice;
                 const unlockedAll = allTasksWithCompleted.filter(t => t.is_unlocked);
                 const completedVisible = unlockedAll.filter(t => completedSet.has(t.id)).length;
@@ -842,11 +847,13 @@ async function handleComment(btn) {
 
 // ======================== UI UPDATES ========================
 function updateProfileUI() {
-    const points = userProfile.total_points || 0;
-    const exp = points % 100;
+    const totalPoints = userProfile.total_points || 0;
+    const nectarEarned = Math.floor(totalPoints / 100);
+    const progressToNext = totalPoints % 100;
+    const percent = progressToNext; // 0–100
     const tier = userProfile.tier || 'free';
 
-    // Compact header elements (no background card)
+    // ----- Compact header -----
     const userNameShort = document.getElementById('userNameDisplayShort');
     if (userNameShort) userNameShort.innerText = `${userProfile.first_name} ${userProfile.last_name}`;
 
@@ -856,25 +863,31 @@ function updateProfileUI() {
     const tierCompact = document.getElementById('userTierBadgeCompact');
     if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
 
-    // Stats and progress cards
+    // ----- Stats card (shows Nectar count) -----
     const pointsVal = document.getElementById('pointsVal');
-    if (pointsVal) pointsVal.innerText = points;
+    if (pointsVal) pointsVal.innerText = nectarEarned;
 
     const rankLevel = document.getElementById('rankLevel');
     if (rankLevel) rankLevel.innerText = `#${userProfile.member_tier || 0}`;
 
+    // ----- Progress card (text + native progress bar + custom knob) -----
     const expText = document.getElementById('expText');
-    if (expText) expText.innerText = `${exp}/100 towards next Nectar`;
+    if (expText) expText.innerText = `${progressToNext}/100 towards next Nectar`;
 
     const nectarDisplay = document.getElementById('nectarPointsDisplay');
-    if (nectarDisplay) nectarDisplay.innerText = points;
+    if (nectarDisplay) nectarDisplay.innerText = nectarEarned;
 
+    // Update native progress bar
     const experienceBar = document.getElementById('experienceBar');
-    if (experienceBar) experienceBar.value = exp;
+    if (experienceBar) experienceBar.value = progressToNext;
 
-    // Mobile elements (still exist)
+    // Update custom white knob (must be inside a relative container)
+    const knobEl = document.getElementById('customProgressKnob');
+    if (knobEl) knobEl.style.left = `${percent}%`;
+
+    // ----- Mobile elements (unchanged) -----
     const mobilePointsVal = document.getElementById('mobilePointsVal');
-    if (mobilePointsVal) mobilePointsVal.innerText = points;
+    if (mobilePointsVal) mobilePointsVal.innerText = totalPoints;
 
     const mobileRankLevel = document.getElementById('mobileRankLevel');
     if (mobileRankLevel) mobileRankLevel.innerText = `#${userProfile.member_tier || 0}`;
@@ -882,8 +895,8 @@ function updateProfileUI() {
     const mobileExpBar = document.getElementById('mobileExperienceBar');
     const mobileExpText = document.getElementById('mobileExpText');
     if (mobileExpBar && mobileExpText) {
-        mobileExpBar.value = exp;
-        mobileExpText.innerText = `${exp}/100`;
+        mobileExpBar.value = progressToNext;
+        mobileExpText.innerText = `${progressToNext}/100`;
     }
 
     const mobileRankDisplay = document.getElementById('mobileRankDisplay');
@@ -891,11 +904,12 @@ function updateProfileUI() {
 
     const mobileTierBadge = document.querySelector('.mobile-hero .tier-badge');
     if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
-    // Update avatar from profile URL
-const avatarImg = document.getElementById('profileAvatar');
-if (avatarImg && userProfile.avatar_url) {
-    avatarImg.src = userProfile.avatar_url;
-}
+
+    // ----- Avatar -----
+    const avatarImg = document.getElementById('profileAvatar');
+    if (avatarImg && userProfile.avatar_url) {
+        avatarImg.src = userProfile.avatar_url;
+    }
 }
 function showCustomLevelModal(newLevel) {
     const modal = document.getElementById('achieveModal');
@@ -1093,7 +1107,6 @@ async function openMissionsModal() {
 
 // ======================== MODALS ========================
 async function loadAchievementsModal() {
-    // Inject global achievement modal styles into <head> once
     if (!document.getElementById('achievementModalStyles')) {
         const styleEl = document.createElement('style');
         styleEl.id = 'achievementModalStyles';
@@ -1202,8 +1215,6 @@ async function loadAchievementsModal() {
         Loader.hide();
     }
 
-    // Inject the achievement popup directly into document.body so it is never
-    // trapped inside the bottom-sheet's CSS transform stacking context.
     const existingModal = document.getElementById('achievementModal');
     if (existingModal) existingModal.remove();
 
@@ -1234,7 +1245,6 @@ async function loadAchievementsModal() {
         attachAchievement3DEffects(sheet.querySelector('.bottom-sheet-content'));
     }, 100);
 
-    // Remove modal from body when sheet is closed
     const cleanup = () => {
         const m = document.getElementById('achievementModal');
         if (m) m.remove();
@@ -1680,7 +1690,9 @@ async function openTaskSigmaModal(taskId, taskTitle) {
             }
         });
     }
-}// ======================== THEME SELECTOR ========================
+}
+
+// ======================== THEME SELECTOR ========================
 async function showThemeSelectorModal() {
     const availableThemeIds = [...new Set(baseTasks.map(t => t.theme_id))];
     if (!availableThemeIds.length) return;
@@ -2288,6 +2300,10 @@ async function restartProgress() {
         await supabase.from('task_sigma_logs').delete().eq('user_id', userProfile.id);
         await supabase.from('user_milestones').delete().eq('user_id', userProfile.id);
         await supabase.from('profiles').update({ nectar_points: 0, experience: 0, referral_count: 0 }).eq('id', userProfile.id);
+        userProfile.total_points = 0;
+        userProfile.nectar_points = 0;
+        userProfile.experience = 0;
+        userProfile.referral_count = 0;
         completedNovice.clear();
         completedExperienced.clear();
         loggedSigmaTasks.clear();
@@ -2351,6 +2367,9 @@ export async function initProfile() {
         if (profileError) throw profileError;
         userProfile = profile;
         if (!userProfile.tier) userProfile.tier = 'free';
+        // IMPORTANT: map nectar_points to total_points and experience
+        userProfile.total_points = userProfile.nectar_points;
+        userProfile.experience = userProfile.total_points % 100;
 
         const tierNum = tierToNumber[userProfile.tier];
 
@@ -2568,6 +2587,17 @@ export async function initProfile() {
                 checkAndShowDeadEndModal();
             };
         }
+        // Load guardrails for time-based unlocking
+const { data: guardrails, error: guardrailsError } = await supabase
+    .from('theme_guardrails')
+    .select('theme_id, stage, min_days');
+if (!guardrailsError && guardrails) {
+    stageGuardrails = {};
+    guardrails.forEach(g => {
+        if (!stageGuardrails[g.theme_id]) stageGuardrails[g.theme_id] = {};
+        stageGuardrails[g.theme_id][g.stage] = { min_days: g.min_days };
+    });
+}
 
         checkAndShowUpgradeModal();
         await updateAchievementsBadge();

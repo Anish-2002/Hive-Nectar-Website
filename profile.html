@@ -58,10 +58,19 @@
 
   <!-- Progress Compact Card -->
   <div class="progress-compact-card">
-    <div class="progress-header"><span><i class="fas fa-honey-pot"></i> Nectar Progress</span><span id="expText">0/100</span></div>
-    <progress id="experienceBar" value="0" max="100"></progress>
-    <div class="progress-footer"><span class="tiny">Experience points</span><span class="tiny">Nectar: <span id="nectarPointsDisplay">0</span></span></div>
+  <div class="progress-header">
+    <span><i class="fas fa-honey-pot"></i> Nectar Progress</span>
+    <span id="expText">0/100</span>
   </div>
+  <div class="custom-progress-wrapper">
+    <progress id="experienceBar" value="0" max="100"></progress>
+    
+  </div>
+  <div class="progress-footer">
+    <span class="tiny">Experience points</span>
+    <span class="tiny">Nectar: <span id="nectarPointsDisplay">0</span></span>
+  </div>
+</div>
 
   <!-- Desktop Layout Grid (tasks, filters, sidebars – identical to before) -->
   <div class="profile-layout-grid">
@@ -250,6 +259,13 @@
 </div>
 
 <script>
+
+    // Check for successful checkout redirect
+  if (window.location.search.includes('checkout=success')) {
+    alert('Payment successful! Your tier will be upgraded shortly.');
+    // Remove the query param to avoid repeated alerts on refresh
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
   // ========== GLOBAL FUNCTIONS (required) ==========
   function openAchieve(src) { document.getElementById('modalImg').src = src; document.getElementById('achieveModal').style.display = 'flex'; }
   function closeAchieve() { document.getElementById('achieveModal').style.display = 'none'; }
@@ -293,6 +309,43 @@
     }
     return supabaseClient;
   }
+
+  // ========== STRIPE CHECKOUT ==========
+async function startCheckout(tier) {
+  const supabase = await getSupabase();
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError || !session) {
+    alert('Please log in first');
+    return;
+  }
+
+  // Your Edge Function URL (replace with your actual one)
+  const functionUrl = 'https://gxboojbfmpejbjolfmjq.supabase.co/functions/v1/stripe-checkout';
+
+  try {
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tier }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      alert('Checkout error: ' + (errorData.error || 'Unknown error'));
+      return;
+    }
+
+    const { url } = await response.json();
+    window.location.href = url; // redirect to Stripe Checkout
+  } catch (err) {
+    console.error('Checkout failed:', err);
+    alert('Could not start checkout. Please try again.');
+  }
+}
+
 
   async function uploadAvatar(file) {
     const supabase = await getSupabase();
@@ -404,36 +457,20 @@
   } else {
     console.error('Upgrade button NOT found!');
   }
-
+  // ========== STRIPE CHECKOUT FOR TIER SELECTION ==========
   const tierSelectBtns = document.querySelectorAll('.tier-option .select-tier');
   if (tierSelectBtns.length) {
-    console.log(`Found ${tierSelectBtns.length} tier selection buttons, attaching listeners`);
+    console.log(`Found ${tierSelectBtns.length} tier selection buttons, attaching Stripe checkout`);
     tierSelectBtns.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        console.log('Tier selection clicked');
-        const tierOption = btn.closest('.tier-option');
+      // Remove any existing listeners (to avoid double calls)
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const tierOption = newBtn.closest('.tier-option');
         const tier = tierOption.dataset.tier;
-        let tierName = '', memberTier = 0;
-        switch (tier) {
-          case 'plus': tierName = 'plus'; memberTier = 1; break;
-          case 'steward': tierName = 'steward'; memberTier = 2; break;
-          case 'collective': tierName = 'collective'; memberTier = 3; break;
-          default: return;
-        }
-        const supabase = await getSupabase();
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        if (userError || !user) { console.error('Auth error upgrade:', userError); alert('You must be logged in'); return; }
-        console.log('Upgrading user to:', tierName, memberTier);
-        const { error } = await supabase.from('profiles').update({ tier: tierName, member_tier: memberTier }).eq('id', user.id);
-        if (error) {
-          console.error('Upgrade error:', error);
-          alert('Upgrade failed: ' + error.message);
-        } else {
-          console.log('Upgrade success');
-          alert(`Upgraded to ${tierName.charAt(0).toUpperCase() + tierName.slice(1)} tier!`);
-          closeUpgradeTierSheet();
-          setTimeout(() => location.reload(), 1500);
-        }
+        console.log('Starting Stripe checkout for tier:', tier);
+        await startCheckout(tier);
       });
     });
   } else {

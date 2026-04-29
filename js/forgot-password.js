@@ -6,46 +6,26 @@ const btn = document.getElementById('sendLinkBtn');
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const emailInput = document.getElementById('resetEmail').value.trim();
-    
+    let emailInput = document.getElementById('resetEmail').value.trim();
+    emailInput = emailInput.toLowerCase();               // 👈 convert to lowercase
+
     btn.innerText = "Processing...";
     btn.disabled = true;
 
+    const isGitHub = window.location.hostname.includes('github.io');
+    const redirectUrl = isGitHub 
+        ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
+        : window.location.origin + '/reset-password.html';
+
     try {
-        console.log("Attempting to find user:", emailInput);
+        console.log("Requesting password reset for:", emailInput);
 
-        // 1. Try to fetch user from 'profiles' table
-        const { data: profile, error: profileError } = await supabase
-            .from('profiles') 
-            .select('email, first_name') 
-            .eq('email', emailInput)
-            .maybeSingle();
-
-        if (profileError) {
-            console.error("Supabase RLS/Query Error:", profileError.message);
-        }
-
-        // 2. Fallback logic: If profile query fails or is empty, 
-        // we still want to try sending the email using the input email
-        const finalEmail = profile ? profile.email : emailInput;
-        const finalName = profile ? profile.first_name : "Valued Member";
-
-        // 3. Determine redirect URL for GitHub vs Localhost
-        const isGitHub = window.location.hostname.includes('github.io');
-        const finalRedirectUrl = isGitHub 
-            ? `https://${window.location.hostname}/Hive-Nectar-Website/reset-password.html`
-            : window.location.origin + '/reset-password.html';
-
-        console.log("Sending request to backend for:", finalEmail);
-
-        // 4. Send to Render Backend
-        const response = await fetch('https://hive-nectar-backend.onrender.com/send-reset-email', {
+        const response = await fetch('https://gxboojbfmpejbjolfmjq.supabase.co/functions/v1/send-reset-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                userEmail: finalEmail,
-                userName: finalName,
-                redirectUrl: finalRedirectUrl
+                userEmail: emailInput,   // now lowercase
+                redirectUrl: redirectUrl
             })
         });
 
@@ -55,24 +35,15 @@ form.addEventListener('submit', async (e) => {
             showToast("A reset link has flown to your inbox!", "success");
             form.reset();
         } else {
-            // This captures the 400 error message from your server
-            const errorMsg = result.error || "Server rejected the request";
-            console.error("Backend 400/500 Error:", errorMsg);
-            
-            if (errorMsg.includes("User not found")) {
-                showToast("No account found with that email.", "error");
-            } else {
-                showToast(`Error: ${errorMsg}`, "error");
-            }
+            // For security, don't reveal that the email doesn't exist
+            showToast("If an account exists, a reset link will be sent.", "success");
+            form.reset();
         }
-
     } catch (err) {
         console.error("Frontend Reset Error:", err);
-        showToast("Connection error. Is the backend awake?", "error");
+        showToast("Connection error. Please try again later.", "error");
     } finally {
         btn.innerText = "Send Reset Link";
         btn.disabled = false;
     }
 });
-
-
