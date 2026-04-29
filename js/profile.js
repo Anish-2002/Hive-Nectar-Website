@@ -34,7 +34,7 @@ let userReactions = {};
 let userComments = [];
 let themeStageProgress = {};
 let adminThemes = [];
-let stageGuardrails = {}; // { theme_id: { stage: { min_days } } }
+let stageGuardrails = {};
 
 let activeFilters = {
     core_theme: [],
@@ -462,18 +462,13 @@ async function refreshTasks() {
     const daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24));
 
     const tasksWithUnlock = baseTasks.map(task => {
-        // Get guardrail min_days for this theme+stage (default 0)
         const minDays = stageGuardrails[task.theme_id]?.[task.stage]?.min_days ?? 0;
-        // Effective days: after minDays has passed, start counting
         const effectiveDays = Math.max(0, daysSinceJoin - minDays);
-        // Task order that is unlocked today: (effectiveDays + 1)  
-        // Example: day 0 -> task 1; day 1 -> task 2; etc.
         const maxAllowedOrder = effectiveDays + 1;
         const isUnlocked = task.task_order <= maxAllowedOrder;
 
         let unlockMessage = '';
         if (!isUnlocked) {
-            // Show when the next task will unlock
             const daysNeeded = task.task_order - 1 - effectiveDays;
             if (daysNeeded > 0) {
                 unlockMessage = `🔒 Unlocks in ${daysNeeded} day(s) (after ${minDays + task.task_order - 1} days total)`;
@@ -524,11 +519,11 @@ async function applyFiltersAndRender() {
     }
 
     const completedSet = showingExperienced ? completedExperienced : completedNovice;
-    const unlockedAll   = filteredWithCompleted.filter(t => t.is_unlocked);
+    const unlockedAll = filteredWithCompleted.filter(t => t.is_unlocked);
     const unlockedShown = filtered.filter(t => t.is_unlocked);
-    const lockedTasks   = filtered.filter(t => !t.is_unlocked);
+    const lockedTasks = filtered.filter(t => !t.is_unlocked);
 
-    totalVisibleTasks    = unlockedAll.length;
+    totalVisibleTasks = unlockedAll.length;
     completedVisibleTasks = unlockedAll.filter(t => completedSet.has(t.id)).length;
 
     const tasksToShow = [...unlockedShown, ...lockedTasks];
@@ -715,9 +710,8 @@ async function handleDone(checkbox) {
         else completedExperienced.add(taskId);
 
         const pointsEarned = result.points_earned;
-        // Update local total points and nectar_points (raw points)
         userProfile.total_points = (userProfile.total_points || 0) + pointsEarned;
-        userProfile.nectar_points = userProfile.total_points;  // keep in sync
+        userProfile.nectar_points = userProfile.total_points;
         userProfile.experience = userProfile.total_points % 100;
         userProfile.user_level = result.new_user_level;
         userProfile.engagement_level = result.new_engagement_level;
@@ -788,6 +782,11 @@ async function handleDone(checkbox) {
             checkAndShowDeadEndModal();
         }
 
+        // Refresh mobile bottom sheet if open
+        if (window._mobileSheetOpen && window.refreshMobileSheet) {
+            window.refreshMobileSheet();
+        }
+
     } catch (err) {
         console.error("Completion error:", err);
         showToast(err.message, "error");
@@ -850,10 +849,9 @@ function updateProfileUI() {
     const totalPoints = userProfile.total_points || 0;
     const nectarEarned = Math.floor(totalPoints / 100);
     const progressToNext = totalPoints % 100;
-    const percent = progressToNext; // 0–100
+    const percent = progressToNext;
     const tier = userProfile.tier || 'free';
 
-    // ----- Compact header -----
     const userNameShort = document.getElementById('userNameDisplayShort');
     if (userNameShort) userNameShort.innerText = `${userProfile.first_name} ${userProfile.last_name}`;
 
@@ -863,29 +861,24 @@ function updateProfileUI() {
     const tierCompact = document.getElementById('userTierBadgeCompact');
     if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
 
-    // ----- Stats card (shows Nectar count) -----
     const pointsVal = document.getElementById('pointsVal');
     if (pointsVal) pointsVal.innerText = nectarEarned;
 
     const rankLevel = document.getElementById('rankLevel');
     if (rankLevel) rankLevel.innerText = `#${userProfile.member_tier || 0}`;
 
-    // ----- Progress card (text + native progress bar + custom knob) -----
     const expText = document.getElementById('expText');
     if (expText) expText.innerText = `${progressToNext}/100 towards next Nectar`;
 
     const nectarDisplay = document.getElementById('nectarPointsDisplay');
     if (nectarDisplay) nectarDisplay.innerText = nectarEarned;
 
-    // Update native progress bar
     const experienceBar = document.getElementById('experienceBar');
     if (experienceBar) experienceBar.value = progressToNext;
 
-    // Update custom white knob (must be inside a relative container)
     const knobEl = document.getElementById('customProgressKnob');
     if (knobEl) knobEl.style.left = `${percent}%`;
 
-    // ----- Mobile elements (unchanged) -----
     const mobilePointsVal = document.getElementById('mobilePointsVal');
     if (mobilePointsVal) mobilePointsVal.innerText = totalPoints;
 
@@ -905,7 +898,6 @@ function updateProfileUI() {
     const mobileTierBadge = document.querySelector('.mobile-hero .tier-badge');
     if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
 
-    // ----- Avatar -----
     const avatarImg = document.getElementById('profileAvatar');
     if (avatarImg && userProfile.avatar_url) {
         avatarImg.src = userProfile.avatar_url;
@@ -1069,42 +1061,198 @@ function attachMobileFilterListeners(suffix) {
     tagContainer.querySelectorAll('input').forEach(cb => cb.addEventListener('change', updateFilters));
 }
 
+// ======================== MOBILE MISSIONS BOTTOM SHEET (exact copy of desktop daily tasks) ========================
 async function openMissionsModal() {
-    const filterRowHtml = `
-        <div class="compact-filter-row" id="mobileFilterRowCopy">
-            <div class="dropdown-container" id="mobileCoreFilterDropdownCopy">
-                <span style="font-size: 0.7rem; font-weight: 700;">Theme:</span>
-                <div class="dropdown-header"><span id="mobileCoreFilterSummaryCopy">All</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileCoreFilterListCopy"></div>
+    // Ensure we have tasks to show
+    if ((!allTasksWithCompleted || allTasksWithCompleted.length === 0) && (!allTasks || allTasks.length === 0)) {
+        console.error('No tasks loaded');
+        showToast('Tasks not loaded yet. Please refresh.', 'error');
+        return;
+    }
+
+    // Use allTasksWithCompleted for filter options (it contains all possible tasks)
+    const sourceForFilters = allTasksWithCompleted.length ? allTasksWithCompleted : allTasks;
+
+    console.log('Source for filters:', sourceForFilters);
+
+    const uniqueThemes = [...new Set(sourceForFilters.map(t => t.core_theme).filter(Boolean))];
+    const uniqueStages = [...new Set(sourceForFilters.map(t => t.stage).filter(Boolean))];
+    const uniqueTags = [...new Set(sourceForFilters.map(t => t.subcategory).filter(Boolean))];
+
+    const contentHtml = `
+        <div class="filter-row" style="margin-bottom: 16px;">
+            <div class="dropdown-container" id="mobileCoreFilterDropdown">
+                <span style="font-size: 0.75rem; font-weight: 700;">Core Theme:</span>
+                <div class="dropdown-header"><span id="mobileCoreFilterSummary">Themes</span> <i class="fas fa-chevron-down"></i></div>
+                <div class="dropdown-list" id="mobileCoreFilterList"></div>
             </div>
-            <div class="dropdown-container" id="mobileStageFilterDropdownCopy">
-                <span style="font-size: 0.7rem; font-weight: 700;">Stage:</span>
-                <div class="dropdown-header"><span id="mobileStageFilterSummaryCopy">All</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileStageFilterListCopy"></div>
+            <div class="dropdown-container" id="mobileStageFilterDropdown">
+                <span style="font-size: 0.75rem; font-weight: 700;">Stage:</span>
+                <div class="dropdown-header"><span id="mobileStageFilterSummary">Stages</span> <i class="fas fa-chevron-down"></i></div>
+                <div class="dropdown-list" id="mobileStageFilterList"></div>
             </div>
-            <div class="dropdown-container" id="mobileTagFilterDropdownCopy">
-                <span style="font-size: 0.7rem; font-weight: 700;">Tag:</span>
-                <div class="dropdown-header"><span id="mobileTagFilterSummaryCopy">All</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileTagFilterListCopy"></div>
+            <div class="dropdown-container" id="mobileTagFilterDropdown">
+                <span style="font-size: 0.75rem; font-weight: 700;">Subcategory:</span>
+                <div class="dropdown-header"><span id="mobileTagFilterSummary">Tags</span> <i class="fas fa-chevron-down"></i></div>
+                <div class="dropdown-list" id="mobileTagFilterList"></div>
             </div>
         </div>
         <div class="progressWrap" style="margin: 12px 0;">
-            <progress id="mobileProgressBarCopy" value="0" max="100" style="width: 100%; height: 8px;"></progress>
-            <div style="text-align: right; margin-top: 4px;"><span id="mobileProgressPctCopy">0%</span></div>
+            <progress id="mobileProgressBar" value="0" max="100" style="width: 100%; height: 14px;"></progress>
+            <div style="text-align: right; margin-top: 8px;"><span id="mobileProgressPct" class="tiny bold">0%</span></div>
         </div>
-        <div id="mobileTasksContainerCopy"></div>
+        <div id="mobileTasksContainer" class="tasks"></div>
     `;
 
-    const sheet = showBottomSheet('Daily Tasks', filterRowHtml);
-    setTimeout(() => {
-        populateMobileFilters('Copy');
-        renderMobileTasksInSheet('Copy');
-        attachMobileFilterListeners('Copy');
-        const tasksContainer = document.getElementById('mobileTasksContainerCopy');
-        if (tasksContainer) attachTaskEventListeners(tasksContainer);
-    }, 50);
-}
+    const sheet = showBottomSheet('Daily Tasks', contentHtml);
 
+    setTimeout(() => {
+        // Setup dropdown toggles
+        const setupDropdown = (id) => {
+            const container = document.getElementById(id);
+            if (!container) return;
+            const header = container.querySelector('.dropdown-header');
+            if (header) {
+                header.onclick = (e) => {
+                    e.stopPropagation();
+                    const isOpen = container.classList.contains('open');
+                    document.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
+                    if (!isOpen) container.classList.add('open');
+                };
+            }
+        };
+        setupDropdown('mobileCoreFilterDropdown');
+        setupDropdown('mobileStageFilterDropdown');
+        setupDropdown('mobileTagFilterDropdown');
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
+        });
+
+        // Populate filter checkboxes
+        const themeList = document.getElementById('mobileCoreFilterList');
+        const stageList = document.getElementById('mobileStageFilterList');
+        const tagList = document.getElementById('mobileTagFilterList');
+
+        if (themeList) {
+            themeList.innerHTML = uniqueThemes.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+        }
+        if (stageList) {
+            stageList.innerHTML = uniqueStages.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+        }
+        if (tagList) {
+            tagList.innerHTML = uniqueTags.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+        }
+
+        // Helper: get selected filters
+        function getSelectedFilters() {
+            const themes = Array.from(document.querySelectorAll('#mobileCoreFilterList input:checked')).map(cb => cb.value);
+            const stages = Array.from(document.querySelectorAll('#mobileStageFilterList input:checked')).map(cb => cb.value);
+            const tags = Array.from(document.querySelectorAll('#mobileTagFilterList input:checked')).map(cb => cb.value);
+            return { themes, stages, tags };
+        }
+
+        // Render tasks (unlocked first)
+        function renderMobileTasks() {
+            const container = document.getElementById('mobileTasksContainer');
+            if (!container) return;
+            const { themes, stages, tags } = getSelectedFilters();
+            let filtered = [...allTasks];
+            if (themes.length) filtered = filtered.filter(t => themes.includes(t.core_theme));
+            if (stages.length) filtered = filtered.filter(t => stages.includes(t.stage));
+            if (tags.length) filtered = filtered.filter(t => tags.includes(t.subcategory));
+
+            // Sort: unlocked first
+            filtered.sort((a, b) => {
+                if (a.is_unlocked === b.is_unlocked) return 0;
+                return a.is_unlocked ? -1 : 1;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="tiny muted" style="padding:20px;">No missions available with current filters.</p>';
+                return;
+            }
+            container.innerHTML = '';
+            filtered.forEach(task => {
+                const taskCard = createTaskCard(task);
+                container.appendChild(taskCard);
+            });
+            attachTaskEventListeners(container);
+        }
+
+        // Update progress bar
+        function updateMobileProgress() {
+            const { themes, stages, tags } = getSelectedFilters();
+            let filteredAll = [...allTasksWithCompleted];
+            if (themes.length) filteredAll = filteredAll.filter(t => themes.includes(t.core_theme));
+            if (stages.length) filteredAll = filteredAll.filter(t => stages.includes(t.stage));
+            if (tags.length) filteredAll = filteredAll.filter(t => tags.includes(t.subcategory));
+            const unlockedAll = filteredAll.filter(t => t.is_unlocked);
+            const completedSet = showingExperienced ? completedExperienced : completedNovice;
+            const total = unlockedAll.length;
+            const completed = unlockedAll.filter(t => completedSet.has(t.id)).length;
+            const pct = total ? Math.min(Math.round((completed / total) * 100), 100) : 0;
+            const progressBar = document.getElementById('mobileProgressBar');
+            const progressPct = document.getElementById('mobileProgressPct');
+            if (progressBar) progressBar.value = pct;
+            if (progressPct) progressPct.innerText = `${pct}% (${completed}/${total})`;
+        }
+
+        // Update filter summary text
+        function updateFilterSummaries() {
+            const themeCount = document.querySelectorAll('#mobileCoreFilterList input:checked').length;
+            const stageCount = document.querySelectorAll('#mobileStageFilterList input:checked').length;
+            const tagCount = document.querySelectorAll('#mobileTagFilterList input:checked').length;
+            const themeSummary = document.getElementById('mobileCoreFilterSummary');
+            const stageSummary = document.getElementById('mobileStageFilterSummary');
+            const tagSummary = document.getElementById('mobileTagFilterSummary');
+            if (themeSummary) themeSummary.innerText = themeCount ? `${themeCount} Selected` : 'Themes';
+            if (stageSummary) stageSummary.innerText = stageCount ? `${stageCount} Selected` : 'Stages';
+            if (tagSummary) tagSummary.innerText = tagCount ? `${tagCount} Selected` : 'Tags';
+        }
+
+        // Attach filter change listeners
+        const allCheckboxes = document.querySelectorAll('#mobileCoreFilterList input, #mobileStageFilterList input, #mobileTagFilterList input');
+        allCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                renderMobileTasks();
+                updateMobileProgress();
+                updateFilterSummaries();
+            });
+        });
+
+        // Initial render
+        renderMobileTasks();
+        updateMobileProgress();
+        updateFilterSummaries();
+
+        // Store refresh function for task completion
+        window.refreshMobileSheet = () => {
+            renderMobileTasks();
+            updateMobileProgress();
+            updateFilterSummaries();
+        };
+        window._mobileSheetOpen = true;
+
+        // Cleanup on close
+        const closeSheet = () => {
+            window._mobileSheetOpen = false;
+            window.refreshMobileSheet = null;
+        };
+        const closeBtn = sheet.querySelector('.bottom-sheet-close');
+        if (closeBtn) {
+            const originalClick = closeBtn.onclick;
+            closeBtn.onclick = () => {
+                closeSheet();
+                if (originalClick) originalClick();
+                sheet.remove();
+            };
+        }
+        sheet.addEventListener('click', (e) => {
+            if (e.target === sheet) closeSheet();
+        });
+    }, 100);
+}
 // ======================== MODALS ========================
 async function loadAchievementsModal() {
     if (!document.getElementById('achievementModalStyles')) {
@@ -2367,7 +2515,6 @@ export async function initProfile() {
         if (profileError) throw profileError;
         userProfile = profile;
         if (!userProfile.tier) userProfile.tier = 'free';
-        // IMPORTANT: map nectar_points to total_points and experience
         userProfile.total_points = userProfile.nectar_points;
         userProfile.experience = userProfile.total_points % 100;
 
@@ -2587,17 +2734,17 @@ export async function initProfile() {
                 checkAndShowDeadEndModal();
             };
         }
-        // Load guardrails for time-based unlocking
-const { data: guardrails, error: guardrailsError } = await supabase
-    .from('theme_guardrails')
-    .select('theme_id, stage, min_days');
-if (!guardrailsError && guardrails) {
-    stageGuardrails = {};
-    guardrails.forEach(g => {
-        if (!stageGuardrails[g.theme_id]) stageGuardrails[g.theme_id] = {};
-        stageGuardrails[g.theme_id][g.stage] = { min_days: g.min_days };
-    });
-}
+
+        const { data: guardrails, error: guardrailsError } = await supabase
+            .from('theme_guardrails')
+            .select('theme_id, stage, min_days');
+        if (!guardrailsError && guardrails) {
+            stageGuardrails = {};
+            guardrails.forEach(g => {
+                if (!stageGuardrails[g.theme_id]) stageGuardrails[g.theme_id] = {};
+                stageGuardrails[g.theme_id][g.stage] = { min_days: g.min_days };
+            });
+        }
 
         checkAndShowUpgradeModal();
         await updateAchievementsBadge();
@@ -2609,6 +2756,17 @@ if (!guardrailsError && guardrails) {
             setTimeout(() => {
                 showThemeSelectorModal();
             }, 500);
+        }
+
+        // Floating button for mobile (optional – not required if you use the left column button)
+        const floatingBtn = document.getElementById('mobileFloatingMissionsBtn');
+        if (floatingBtn) {
+            const updateVisibility = () => {
+                floatingBtn.style.display = window.innerWidth <= 767 ? 'flex' : 'none';
+            };
+            updateVisibility();
+            window.addEventListener('resize', updateVisibility);
+            floatingBtn.addEventListener('click', () => openMissionsModal());
         }
 
     } catch (err) {

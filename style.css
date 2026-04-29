@@ -1241,3 +1241,229 @@ progress::-moz-progress-bar {
   pointer-events: none;
   left: 0%; /* will be updated by JS */
 }
+
+.messenger-circle {
+    position: relative;
+}
+.messenger-circle .notification-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 2px solid white;
+}
+.messenger-circle.has-notifications {
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+
+/* ==========================================================================
+   PROFILE PAGE – FULL RESPONSIVE (mobile + tablet)
+   ========================================================================== */
+
+/* Tablet (768px – 1024px) */
+@media screen and (max-width: 1024px) {
+    .page-profile .profile-layout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px;
+    }
+    .page-profile .left-column,
+    .page-profile .right-column {
+        display: block;
+        width: 100%;
+    }
+    .page-profile .middle-column {
+        display: block !important; /* override existing hidden on tablet */
+    }
+    .page-profile .stats-compact-card {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .page-profile .progress-compact-card progress {
+        width: 100%;
+    }
+}
+
+/* Mobile (320px – 767px) */
+@media screen and (max-width: 767px) {
+    .page-profile .profile-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .page-profile .user-info-row {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+    }
+    .page-profile .stats-compact-card {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .page-profile .stat-item {
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .page-profile .stat-label {
+        font-size: 0.8rem;
+    }
+    .page-profile .stat-value {
+        font-size: 1.2rem;
+    }
+    .page-profile .progress-compact-card {
+        padding: 16px;
+    }
+    /* Hide desktop-only elements */
+    .page-profile .left-column .sub-nav .sub-link:not(#desktopMissionsBtn) {
+        display: none;
+    }
+    /* Show mobile-specific buttons (if any) – you may keep desktop buttons but stack them */
+    .page-profile .left-column .card {
+        padding: 12px;
+    }
+    .page-profile .sub-link {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+    .page-profile #desktopMissionsBtn {
+        display: block !important;
+        background: var(--honey-gradient);
+        color: white;
+        text-align: center;
+    }
+    /* Bottom sheet adjustments for mobile */
+    .bottom-sheet-overlay.active .bottom-sheet {
+        max-height: 95vh;
+        border-radius: 24px 24px 0 0;
+    }
+    .bottom-sheet-header {
+        padding: 16px;
+    }
+    .bottom-sheet-content {
+        padding: 16px;
+    }
+    .posts-container .post-card {
+        padding: 16px;
+    }
+    .post-header {
+        flex-wrap: wrap;
+    }
+    .post-category {
+        font-size: 1rem !important;
+    }
+    .post-date {
+        font-size: 0.7rem;
+    }
+}
+
+/* Mobile (up to 767px) – hide daily tasks column, keep left and right sidebars as stacked */
+@media screen and (max-width: 767px) {
+    .page-profile .profile-layout-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .page-profile .middle-column {
+        display: none !important;  /* Hides the daily tasks on the main page */
+    }
+    .page-profile .left-column,
+    .page-profile .right-column {
+        width: 100%;
+    }
+    .page-profile .left-column .card {
+        padding: 16px;
+    }
+    .page-profile .sub-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .page-profile .sub-link {
+        flex: 1 1 auto;
+        text-align: center;
+        justify-content: center;
+        padding: 12px 8px;
+        font-size: 0.85rem;
+    }
+    /* Make the “Go to Missions” button stand out */
+    #desktopMissionsBtn {
+        background: var(--honey-gradient);
+        color: white;
+        font-weight: bold;
+    }
+    /* Optional: ensure floating button (if used) is visible */
+    #mobileFloatingMissionsBtn {
+        display: flex !important;
+    }
+}
+@media screen and (max-width: 767px) {
+    .page-profile .stats-compact-card {
+        grid-template-columns: repeat(2, 1fr); /* keep 2 columns on mobile */
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .page-profile .profile-layout-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    .page-profile .middle-column {
+        display: none !important;
+    }
+    .page-profile .left-column,
+    .page-profile .right-column {
+        width: 100%;
+        display: block !important;
+    }
+    .page-profile .left-column .sub-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .page-profile .left-column .sub-link {
+        flex: 1 1 auto;
+        text-align: center;
+        justify-content: center;
+        background: var(--secondary);
+        border-radius: var(--radius-md);
+        padding: 12px 8px;
+        font-size: 0.85rem;
+    }
+    .page-profile .stats-compact-card {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.page-profile .left-column .card {
+    display: block !important;
+}
+.page-profile .sub-nav {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Hide theme selector for free tier */
+.page-profile[data-tier="free"] .theme-selector-card,
+.page-profile .themeSelectorDesktopBtn[data-tier="free"],
+#themeSelectorDesktopBtn[data-tier="free"],
+#mobileThemeSelectorBtn[data-tier="free"] {
+    display: none !important;
+}
