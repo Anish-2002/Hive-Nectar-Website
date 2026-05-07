@@ -1,0 +1,12 @@
+[
+  {
+    "email": "bee@hivenectar.com",
+    "password": "password123",
+    "name": "Busy Bee"
+  },
+  {
+    "email": "test@user.com",
+    "password": "hivepassword",
+    "name": "Test User"
+  }
+]
