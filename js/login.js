@@ -1,4 +1,4 @@
-// js/login.js
+﻿// js/login.js
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
 export async function handleLogin(e) {
@@ -32,7 +32,7 @@ export async function handleLogin(e) {
         }
 
         if (data.user) {
-            showToast("Welcome to the Hive!", "success");
+            showToast("Welcome to the Meadow!", "success");
             // Successful login leads to a page change, so no need to reset button
             window.location.assign('profile.html'); 
         }

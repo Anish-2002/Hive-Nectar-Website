@@ -6,7 +6,8 @@ import { handleContactSubmit } from './contact.js';
 import { initCommunicationBoard, initHomeNotifications } from './comms.js';
 
 // ======================== THEME CACHING ========================
-const THEME_CACHE_KEY = 'hive_theme_cache';
+const THEME_CACHE_KEY = 'meadow_theme_cache';
+const LEGACY_THEME_CACHE_KEY = 'hive_theme_cache';
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 // Apply theme object to CSS variables
@@ -118,7 +119,14 @@ function subscribeToThemeChanges() {
 // Main theme loader – applies cached theme instantly, then updates in background
 async function loadSiteTheme() {
     // 1. Try cache first (synchronous, no lag)
-    const cached = localStorage.getItem(THEME_CACHE_KEY);
+    let cached = localStorage.getItem(THEME_CACHE_KEY);
+    if (!cached) {
+        const legacy = localStorage.getItem(LEGACY_THEME_CACHE_KEY);
+        if (legacy) {
+            localStorage.setItem(THEME_CACHE_KEY, legacy);
+            cached = legacy;
+        }
+    }
     if (cached) {
         try {
             const { data, timestamp } = JSON.parse(cached);

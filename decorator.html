@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trophy Studio | Hive Nectar</title>
+    <title>Trophy Studio | The Meadow</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     
     <style>
@@ -97,9 +97,9 @@
 <header class="header">
   <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
     <div class="brandmark">
-      <img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
     </div>
-    <span class="brand-title">HIVE NECTAR</span>
+    <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
@@ -107,10 +107,11 @@
   <nav class="nav-links" id="navLinks">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
+    <a href="join.html">Join the Meadow</a>
     <a href="about.html">About</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
   </nav>
 </header>
 
@@ -154,9 +155,9 @@
   <div class="footer-links">
     <a href="profile.html">My Profile</a>
     <span>|</span>
-    <a href="board.html">Communication Board</a>
+    <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
 <script type="importmap">
@@ -174,7 +175,7 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     import { DragControls } from 'three/addons/controls/DragControls.js';
 
-    document.body.setAttribute('data-theme', localStorage.getItem('hive-theme') || 'classic');
+    document.body.setAttribute('data-theme', localStorage.getItem('meadow-theme') || localStorage.getItem('hive-theme') || 'classic');
 
     const scene = new THREE.Scene();
     const workspace = document.getElementById('workspace');

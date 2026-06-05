@@ -1,5 +1,5 @@
 /* ==========================================================================
-   THE MEADOW + HIVE NECTAR - STRUCTURAL STYLESHEET
+   THE MEADOW + THE MEADOW - STRUCTURAL STYLESHEET
    Colors are loaded dynamically from Supabase via app.js
    This file contains ALL styles – global + page-specific.
    ========================================================================== */
@@ -54,7 +54,7 @@ a:hover { color: var(--primary); }
     gap: 32px;
 }
 /* --- HEADER (unchanged) --- */
-.header { position:sticky; top:0; z-index:1000; display:flex; justify-content:space-between; align-items:center; padding:0.75rem 5%; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--header-border); box-shadow:0 4px 24px rgba(0,0,0,0.06); }
+.header { position:sticky; top:0; z-index:1000; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; padding:0.75rem 5%; background:var(--header-bg); backdrop-filter:blur(20px); border-bottom:1px solid var(--header-border); box-shadow:0 4px 24px rgba(0,0,0,0.06); }
 .logo-area { display:flex; align-items:center; gap:0.75rem; text-decoration:none; }
 .brandmark { display:flex; align-items:center; justify-content:center; }
 .logo-img { height:48px; width:auto; object-fit:contain; border-radius:0 !important; transition:transform var(--transition-smooth); }
@@ -196,13 +196,65 @@ progress::-moz-progress-bar { background:var(--honey-gradient); border-radius:va
 /* --- RESPONSIVE (unchanged) --- */
 @media (max-width:1024px) { .logo-img { height:40px; } .brand-title { font-size:1.15rem; } .nav-links { gap:4px; } .nav-links a { padding:8px 12px; font-size:0.85rem; } .team-grid, .how-it-works-grid { grid-template-columns:repeat(2,1fr); } .grid-container { grid-template-columns:1fr; } }
 @media (max-width:900px) { .dashboard-container { grid-template-columns:1fr; } .grid-main { grid-template-columns:1fr; } }
-@media (max-width:768px) { .menu-toggle { display:flex; } .nav-links { display:none; position:absolute; top:100%; left:0; right:0; background:var(--card); flex-direction:column; padding:16px; gap:8px; z-index:9999; box-shadow:0 12px 40px rgba(0,0,0,0.1); border-bottom:2px solid var(--border); } .nav-links.show { display:flex; } .nav-links a { width:100%; padding:14px 20px; border-radius:var(--radius-md); } .announcement-hero { flex-direction:column-reverse; text-align:center; padding:32px 24px; } .hero-card { padding:36px 24px; } .hero-card h1 { font-size:2rem; } .wrap { padding:24px 4%; } }
+@media (max-width:768px) { .header { position:relative; } .menu-toggle { display:flex; } .nav-links { display:none; position:absolute; top:100%; left:0; right:0; background:var(--card); flex-direction:column; padding:16px; gap:8px; z-index:10001; box-shadow:0 12px 40px rgba(0,0,0,0.15); border-bottom:2px solid var(--border); } .nav-links.show { display:flex; } .nav-links a { width:100%; padding:14px 20px; border-radius:var(--radius-md); } .announcement-hero { flex-direction:column-reverse; text-align:center; padding:32px 24px; } .hero-card { padding:36px 24px; } .hero-card h1 { font-size:2rem; } .wrap { padding:24px 4%; } }
 @media (max-width:600px) { .team-grid, .how-it-works-grid, .step-grid { grid-template-columns:1fr; } .card { padding:20px; } .modal-content { padding:28px 20px; margin:16px; } }
 @media (max-width:480px) { .header { padding:0.75rem 4%; } .logo-img { height:36px; } .brand-title { font-size:1rem; } .filter-controls { gap:10px; } .category-select { padding:10px 36px 10px 14px; font-size:0.85rem; } .btn { padding:12px 20px; font-size:0.9rem; } #messenger-buzz { bottom:20px; right:20px; } .messenger-circle { width:56px; height:56px; } }
 
-/* --- DROPDOWN OVERRIDES (unchanged) --- */
-.dropdown-container { position:relative; z-index:20; }
-.dropdown-list { position:absolute; top:100%; left:0; z-index:1000; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:0 8px 24px rgba(0,0,0,0.15); min-width:180px; max-height:200px; overflow-y:auto; }
+/* --- DROPDOWN OVERRIDES --- */
+.dropdown-container { position:relative; z-index:1; }
+.dropdown-container.open { z-index:50; }
+.dropdown-list { position:absolute; top:100%; left:0; right:0; z-index:51; background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:0 8px 24px rgba(0,0,0,0.15); min-width:180px; max-height:200px; overflow-y:auto; }
+.bottom-sheet-content .filter-row { overflow:visible; position:relative; z-index:1; }
+.bottom-sheet-content .dropdown-container { z-index:2; }
+.bottom-sheet-content .dropdown-container.open { z-index:100; }
+.bottom-sheet-content .dropdown-list {
+  z-index:101;
+  top:calc(100% + 8px);
+  width:100%;
+  min-width:100%;
+  border:2px solid var(--border);
+  border-radius:var(--radius-lg);
+  max-height:280px;
+  padding:0;
+}
+.bottom-sheet-content .filter-label {
+  display:block;
+  font-size:0.75rem;
+  font-weight:700;
+  color:var(--fg-muted);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:6px;
+}
+.bottom-sheet-content .dropdown-list .filter-item {
+  display:flex !important;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  cursor:pointer;
+  border-bottom:1px solid var(--border);
+  font-size:0.9rem;
+  font-weight:500;
+  text-align:left;
+  width:100%;
+  box-sizing:border-box;
+  margin:0;
+}
+.bottom-sheet-content .dropdown-list .filter-item:last-child { border-bottom:none; }
+.bottom-sheet-content .dropdown-list .filter-item:hover { background:var(--secondary); }
+.bottom-sheet-content .dropdown-list .filter-item input[type="checkbox"] {
+  width:20px;
+  height:20px;
+  margin:0;
+  flex-shrink:0;
+  accent-color:var(--primary);
+  cursor:pointer;
+}
+.bottom-sheet-content .dropdown-list .filter-item span {
+  flex:1;
+  text-align:left;
+  line-height:1.4;
+}
 
 /* --- BOTTOM SHEET (unchanged) --- */
 .bottom-sheet-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:10000; display:flex; align-items:flex-end; justify-content:center; opacity:0; transition:opacity 0.2s ease; visibility:hidden; }
@@ -666,7 +718,7 @@ button,
 }
 .page-profile .profile-layout-grid { 
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
+  grid-template-columns: 280px 1fr;
   gap: 24px;
   align-items: start;
 }
@@ -1054,19 +1106,67 @@ button,
   font-size: 0.7rem;
 }
 
-/* Hide old hero and mobile hero – replace with compact */
+/* Hide legacy hero blocks – compact header is used instead */
 .page-profile .profile-hero,
-.page-profile .mobile-hero,
-.page-profile .mobile-actions {
+.page-profile .mobile-hero {
   display: none !important;
+}
+
+/* Mobile action panel – hidden on desktop, shown on mobile */
+.page-profile .mobile-actions {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.page-profile .mobile-action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.page-profile .mobile-action-btn:hover {
+  background: var(--secondary);
+  transform: translateY(-1px);
+}
+.page-profile .mobile-action-btn.mobile-accent {
+  background: var(--honey-gradient);
+  color: white;
+  border: none;
+}
+.page-profile .mobile-action-btn .action-badge {
+  background: var(--honey-gradient);
+  color: white;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+.page-profile .mobile-link-btn {
+  text-decoration: none;
 }
 
 /* Ensure compact shows on both desktop and mobile */
 @media (max-width: 768px) {
-  .page-profile .compact-profile-header,
-  .page-profile .stats-compact-card,
-  .page-profile .progress-compact-card {
+  .page-profile .compact-profile-header {
     display: flex !important;
+  }
+  .page-profile .stats-compact-card {
+    display: grid !important;
+  }
+  .page-profile .progress-compact-card {
+    display: block !important;
   }
   .page-profile .compact-profile-header {
     flex-wrap: wrap;
@@ -1310,43 +1410,29 @@ progress::-moz-progress-bar {
         width: 100%;
     }
     .page-profile .stats-compact-card {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 16px;
     }
     .page-profile .stat-item {
-        text-align: left;
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--border);
+        text-align: center;
     }
     .page-profile .stat-label {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
     .page-profile .stat-value {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
     .page-profile .progress-compact-card {
         padding: 16px;
+        margin-bottom: 20px;
     }
-    /* Hide desktop-only elements */
-    .page-profile .left-column .sub-nav .sub-link:not(#desktopMissionsBtn) {
-        display: none;
+    /* Show mobile action panel; hide desktop sidebar grid */
+    .page-profile .mobile-actions {
+        display: flex !important;
     }
-    /* Show mobile-specific buttons (if any) – you may keep desktop buttons but stack them */
-    .page-profile .left-column .card {
-        padding: 12px;
-    }
-    .page-profile .sub-link {
-        font-size: 0.9rem;
-        padding: 12px;
-    }
-    .page-profile #desktopMissionsBtn {
-        display: block !important;
-        background: var(--honey-gradient);
-        color: white;
-        text-align: center;
+    .page-profile .desktop-only-grid {
+        display: none !important;
     }
     /* Bottom sheet adjustments for mobile */
     .bottom-sheet-overlay.active .bottom-sheet {
@@ -1373,44 +1459,13 @@ progress::-moz-progress-bar {
     }
 }
 
-/* Mobile (up to 767px) – hide daily tasks column, keep left and right sidebars as stacked */
+/* Mobile (up to 767px) – compact header + action buttons; tasks open in bottom sheet */
 @media screen and (max-width: 767px) {
-    .page-profile .profile-layout-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-    .page-profile .middle-column {
-        display: none !important;  /* Hides the daily tasks on the main page */
-    }
-    .page-profile .left-column,
-    .page-profile .right-column {
-        width: 100%;
-    }
-    .page-profile .left-column .card {
-        padding: 16px;
-    }
-    .page-profile .sub-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .page-profile .sub-link {
-        flex: 1 1 auto;
-        text-align: center;
-        justify-content: center;
-        padding: 12px 8px;
-        font-size: 0.85rem;
-    }
-    /* Make the “Go to Missions” button stand out */
-    #desktopMissionsBtn {
-        background: var(--honey-gradient);
-        color: white;
-        font-weight: bold;
-    }
-    /* Optional: ensure floating button (if used) is visible */
-    #mobileFloatingMissionsBtn {
+    .page-profile .mobile-actions {
         display: flex !important;
+    }
+    .page-profile .desktop-only-grid {
+        display: none !important;
     }
 }
 @media screen and (max-width: 767px) {
@@ -1420,32 +1475,6 @@ progress::-moz-progress-bar {
 }
 
 @media screen and (max-width: 767px) {
-    .page-profile .profile-layout-grid {
-        display: flex;
-        flex-direction: column;
-    }
-    .page-profile .middle-column {
-        display: none !important;
-    }
-    .page-profile .left-column,
-    .page-profile .right-column {
-        width: 100%;
-        display: block !important;
-    }
-    .page-profile .left-column .sub-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .page-profile .left-column .sub-link {
-        flex: 1 1 auto;
-        text-align: center;
-        justify-content: center;
-        background: var(--secondary);
-        border-radius: var(--radius-md);
-        padding: 12px 8px;
-        font-size: 0.85rem;
-    }
     .page-profile .stats-compact-card {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1487,6 +1516,17 @@ progress::-moz-progress-bar {
 button[style*="background: var(--honey-gradient)"],
 #desktopMissionsBtn {
     color: white !important;
+}
+
+/* Confirmation / danger modals – ensure readable text */
+#confirmationModal .btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+    color: #ffffff !important;
+    border-color: #991b1b !important;
+}
+#confirmationModal .btn-secondary {
+    color: var(--fg) !important;
+    background: var(--secondary) !important;
 }
 
 /* Secondary/neutral buttons → use foreground color */
@@ -1706,5 +1746,29 @@ button[style*="background: var(--honey-gradient)"],
 .pill:hover:not(.active) {
   background: #dee2e6;
 }
+/* COMPLETE REPLACEMENT: Use flexbox for "What Exists Here" cards */
+.how-it-works-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 24px !important;
+  margin-top: 2rem !important;
+}
 
+/* Each card takes equal width on desktop, but allows wrapping */
+.how-it-works-grid .step-card {
+  flex: 1 1 220px !important;  /* base width 220px, grows/shrinks */
+  min-width: 180px !important;
+  max-width: 280px !important;
+}
 
+/* On mobile, make cards full width */
+@media (max-width: 767px) {
+  .how-it-works-grid .step-card {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+  }
+}/* Prevent signup card from stretching to match sidebar height */
+.page-join .signup-layout {
+  align-items: flex-start !important;
+}

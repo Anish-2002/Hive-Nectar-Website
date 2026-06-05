@@ -1,4 +1,4 @@
-import { supabase } from './supabase-config.js';
+﻿import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
 
 // --------------------------------------------------------------
@@ -521,7 +521,7 @@ document.getElementById('trialLoginForm')?.addEventListener('submit', async (e) 
   Loader.hide();
   if (error) showToast(error.message, 'error');
   else {
-    showToast('Welcome to the Hive!', 'success');
+    showToast('Welcome to the Meadow!', 'success');
     await checkAuth();
   }
 });

@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Communication Board | Hive Nectar</title>
+  <title>Communication Board | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
@@ -11,8 +11,8 @@
 
 <header class="header" data-testid="main-header">
   <a href="index.html" class="logo-area" data-testid="logo-link">
-    <div class="brandmark"><img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img"></div>
-    <span class="brand-title">HIVE NECTAR</span>
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
     <i class="fas fa-bars"></i>
@@ -20,17 +20,19 @@
   <nav class="nav-links" id="navLinks" data-testid="nav-links">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
+    <a href="join.html">Join the Meadow</a>
     <a href="about.html">About</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
   </nav>
 </header>
 
 <main class="wrap">
   <section class="hero-card" data-testid="board-hero">
     <h1>Communication Board</h1>
-    <p>Stay updated with the latest announcements, updates, and community news</p>
+    <p>This is where signals, values, and impacts are shared. A space where observation is noticed without amplification.</p>
+    <p style="margin-top: 12px; font-size: 0.9rem;">Real‑time metrics reflect the state of global environmental systems and the collective impact within The Meadow.</p>
   </section>
 
   <div class="board-layout">
@@ -44,6 +46,32 @@
     </div>
 
     <aside>
+      <!-- Announcements sidebar card -->
+      <div class="sidebar-card">
+        <h4><i class="fas fa-bullhorn"></i> Announcements</h4>
+        <div class="recent-list">
+          <div class="recent-item" style="background: transparent; padding: 8px 0;">
+            <div class="icon"><i class="fas fa-megaphone"></i></div>
+            <div>
+              <p class="muted" style="margin: 0;">System updates, stage releases, structural changes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reflections / Signals sidebar card -->
+      <div class="sidebar-card">
+        <h4><i class="fas fa-lightbulb"></i> Reflections / Signals</h4>
+        <div class="recent-list">
+          <div class="recent-item" style="background: transparent; padding: 8px 0;">
+            <div class="icon"><i class="fas fa-comment-dots"></i></div>
+            <div>
+              <p class="muted" style="margin: 0;">Short observations from users, behaviour trends, pattern notes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="sidebar-card">
         <h4><i class="fas fa-clock"></i> Recent Activity</h4>
         <div class="recent-list" id="recentActivityList">
@@ -61,8 +89,8 @@
       </div>
 
       <div class="sidebar-card" style="background: var(--honey-gradient); color: white; border: none;">
-        <h4 style="color: white;"><i class="fas fa-rocket" style="color: white;"></i> Not a Member?</h4>
-        <p style="color: rgba(255,255,255,0.9); margin: 0 0 16px; font-size: 0.9rem;">Join the hive and start your journey today!</p>
+        <h4 style="color: white;"><i class="fas fa-seedling" style="color: white;"></i> Not a Member?</h4>
+        <p style="color: rgba(255,255,255,0.9); margin: 0 0 16px; font-size: 0.9rem;">Join The Meadow and start your journey today.</p>
         <a href="join.html" class="btn" style="background: rgb(63, 71, 45); color: var(--primary-dark); width: 100%;">Join Now</a>
       </div>
     </aside>
@@ -80,7 +108,7 @@
       <div id="postSheetBody">Post content goes here...</div>
       <div class="post-meta" style="margin-top: 16px; font-size: 0.8rem; color: var(--muted);">
         <span><i class="fas fa-calendar"></i> <span id="postSheetDate"></span></span>
-        <span style="margin-left: 16px;"><i class="fas fa-user"></i> Hive Team</span>
+        <span style="margin-left: 16px;"><i class="fas fa-user"></i> Meadow Team</span>
       </div>
     </div>
   </div>
@@ -89,12 +117,10 @@
 <footer class="footer" data-testid="footer">
   <div class="footer-links">
     <a href="profile.html">My Profile</a><span>|</span>
-    <a href="board.html">Communication Board</a>
+    <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
-
-
 
 <script type="module" src="js/app.js"></script>
 <script type="module" src="js/comms.js"></script>
@@ -113,6 +139,5 @@
   }
 </script>
 
-<
 </body>
 </html>

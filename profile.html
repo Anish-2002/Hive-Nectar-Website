@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My Profile | Hive Nectar</title>
+  <title>My Profile | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="tester.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -14,8 +14,8 @@
 
 <header class="header">
   <a href="index.html" class="logo-area">
-    <div class="brandmark"><img src="newlogo.webp" alt="Hive Nectar Logo" class="logo-img"></div>
-    <span class="brand-title">HIVE NECTAR</span>
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
@@ -23,10 +23,11 @@
   <nav class="nav-links" id="navLinks">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
+    <a href="join.html">Join the Meadow</a>
     <a href="about.html">About</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
   </nav>
 </header>
 
@@ -44,7 +45,7 @@
           <a href="#" id="logoutBtnHeader"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
       </div>
-      <div class="rank-badge" id="rankNameDisplayCompact">Hive Novice</div>
+      <div class="rank-badge" id="rankNameDisplayCompact">Meadow Novice</div>
     </div>
   </div>
 
@@ -52,7 +53,7 @@
   <div class="stats-compact-card">
     <div class="stat-item"><span class="stat-label">Total Nectar</span><span class="stat-value" id="pointsVal">0</span></div>
     <div class="stat-item"><span class="stat-label">Status</span><span class="stat-value">Active</span></div>
-    <div class="stat-item"><span class="stat-label">Hive Rank</span><span class="stat-value" id="rankLevel">#--</span></div>
+    <div class="stat-item"><span class="stat-label">Meadow Rank</span><span class="stat-value" id="rankLevel">#--</span></div>
     <div class="stat-item"><span class="stat-label">Tier</span><span class="stat-value" id="userTierBadgeCompact">Free</span></div>
   </div>
 
@@ -72,13 +73,53 @@
   </div>
 </div>
 
+  <!-- Mobile action buttons – each opens a bottom sheet -->
+  <div class="mobile-actions" id="mobileActionsPanel">
+    <button type="button" class="btn mobile-action-btn" id="mobileMissionsBtn">
+      <span><i class="fas fa-rocket"></i> Daily Tasks</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobilePendingSigmaBtn">
+      <span><i class="fas fa-clipboard-list"></i> Tasks Reflection</span>
+      <span class="action-badge" id="mobilePendingSigmaBadge">0</span>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileCompletedTasksBtn">
+      <span><i class="fas fa-check-circle"></i> Completed Tasks</span>
+      <span class="action-badge" id="mobileCompletedBadge">0</span>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileAchievementsBtn">
+      <span><i class="fas fa-award"></i> Achievements</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileAddSigmaBtn">
+      <span><i class="fas fa-chart-line"></i> Add Sigma Log</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileThemeSelectorBtn" style="display:none;">
+      <span><i class="fas fa-palette"></i> Choose Focus Themes</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <a href="board.html" class="btn mobile-action-btn mobile-link-btn">
+      <span><i class="fas fa-comments"></i> Meadow Buzz</span>
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="decorator.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
+      <span><i class="fas fa-paint-brush"></i> Decorate Jar</span>
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    <button type="button" class="btn mobile-action-btn mobile-accent" id="mobileUpgradeBtn">
+      <span><i class="fas fa-crown"></i> Upgrade Tier</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
   <!-- Desktop Layout Grid (tasks, filters, sidebars – identical to before) -->
-  <div class="profile-layout-grid">
+  <div class="profile-layout-grid desktop-only-grid">
     <aside class="left-column">
       <div class="card">
         <nav class="sub-nav">
           <a href="#" class="sub-link active" id="desktopMissionsBtn"><i class="fas fa-rocket"></i> Go to Missions</a>
-          <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Hive Buzz</a>
+          <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Meadow Buzz</a>
           <a href="#" id="desktopAchievementsBtn" class="sub-link">
             <i class="fas fa-award"></i> Achievements
             <span class="achievements-badge" style="margin-left: auto; background: var(--honey-gradient); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; display: none;"></span>
@@ -138,53 +179,17 @@
       </div>
     </section>
 
-    <aside class="right-column">
-      <div id="adminSimulator" class="card" style="display: none; margin-top: 20px;">
-        <h4 style="font-size: 0.9rem; margin-bottom: 12px;"><i class="fas fa-tools"></i> Admin Simulator (test unlocking)</h4>
-        <div style="margin-bottom: 12px;"><label class="tiny" style="display: block;">Theme</label><select id="adminThemeSelect" style="width: 100%; padding: 8px; margin-bottom: 8px;"></select></div>
-        <div style="margin-bottom: 12px;"><label class="tiny" style="display: block;">Stage</label><select id="adminStageSelect" style="width: 100%; padding: 8px; margin-bottom: 8px;"><option value="🌰 Seeds">🌰 Seeds</option><option value="🌱 Sprout">🌱 Sprout</option><option value="🌸 Bloom">🌸 Bloom</option><option value="🌾 Harvest">🌾 Harvest</option></select></div>
-        <div style="margin-bottom: 12px;"><label class="tiny" style="display: block;">Increment by</label><input type="number" id="adminIncrementAmount" value="1" min="1" style="width: 100%; padding: 8px;"></div>
-        <div style="display: flex; gap: 8px; margin-bottom: 12px;"><button id="adminIncrementBtn" class="btn tiny" style="background: var(--primary);">Increment</button><button id="adminUnlockAllBtn" class="btn tiny" style="background: var(--success);">Unlock All (set to 100)</button><button id="adminResetBtn" class="btn tiny" style="background: var(--error);">Reset to 0</button></div>
-        <div id="adminMessage" class="tiny muted" style="font-size: 0.7rem;"></div>
-      </div>
-    </aside>
   </div>
 </main>
 
 <footer class="footer">
-  <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="board.html">Communication Board</a></div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+  <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a></div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
 <script type="module" src="js/app.js"></script>
 
 <!-- ========== ALL MODALS (must be before script that references them) ========== -->
-<div id="noviceCompleteModal" class="modal-overlay" style="display:none;">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeNoviceCompleteModal()">&times;</span>
-    <div style="font-size: 64px; margin-bottom: 20px;">🎉</div>
-    <h2 style="margin: 0 0 12px; font-size: 1.75rem;">Novice Tasks Complete!</h2>
-    <p style="color: var(--fg-muted); line-height: 1.7; margin-bottom: 28px;">You've completed all novice tasks for your current tier.<br>Ready for the experienced versions?</p>
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <button id="noviceCompleteYesBtn" class="btn btn-success"><i class="fas fa-arrow-up"></i> Show Experienced</button>
-      <button id="noviceCompleteLaterBtn" class="btn btn-secondary">Later</button>
-    </div>
-  </div>
-</div>
-
-<div id="deadEndModal" class="modal-overlay" style="display:none;">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeDeadEndModal()">&times;</span>
-    <div style="font-size: 64px; margin-bottom: 20px;">🌻</div>
-    <h2 style="margin: 0 0 12px; font-size: 1.75rem;">All Tasks Completed!</h2>
-    <p style="color: var(--fg-muted); line-height: 1.7; margin-bottom: 28px;">You've completed every available task for your current tier.<br>What would you like to do?</p>
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <button id="deadEndRestartBtn" class="btn"><i class="fas fa-redo"></i> Restart Progress</button>
-      <button id="deadEndUpgradeBtn" class="btn btn-success"><i class="fas fa-crown"></i> Upgrade to Hive+</button>
-    </div>
-  </div>
-</div>
-
 <div id="achieveModal" class="modal-overlay" style="display:none;">
   <div class="modal-content" style="max-width: 440px; padding: 32px;">
     <button onclick="closeAchieve()" class="close-modal-btn" style="position: absolute; top: 16px; right: 16px; background: var(--secondary); width: 44px; height: 44px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; color: var(--fg); z-index: 2001; display: flex; align-items: center; justify-content: center;">&times;</button>
@@ -194,26 +199,6 @@
       </div>
     </div>
     <button class="btn" onclick="shareTrophy()" style="width: 100%; margin-top: 16px;">Share Trophy</button>
-  </div>
-</div>
-
-<div id="upgradePromptModal" class="modal-overlay" style="display:none;">
-  <div class="modal-content" style="max-width: 480px;">
-    <span class="close-modal" onclick="closeUpgradePromptModal()">&times;</span>
-    <div style="font-size: 48px; text-align: center; margin-bottom: 16px;">🚀</div>
-    <h2 style="text-align: center;">Ready to level up?</h2>
-    <p style="text-align: center; margin-bottom: 24px;">You've completed all free tasks! Unlock more with <strong>Hive+</strong>:</p>
-    <ul style="margin-bottom: 24px; list-style: none; padding-left: 0;">
-      <li>✅ <strong>5 full themes</strong> (Seed, Wellbeing, Innovation, etc.)</li>
-      <li>✅ Choose your own <strong>habit development path</strong></li>
-      <li>✅ Advanced tasks and badges</li>
-      <li>✅ Priority support</li>
-    </ul>
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      <button id="upgradeToPlusBtn" class="btn btn-success">Upgrade to Hive+</button>
-      <button id="continueExperiencedBtn" class="btn btn-secondary">Continue with Free (Experienced tasks)</button>
-    </div>
-    <p class="tiny muted" style="text-align: center; margin-top: 24px;">Hive+ will be integrated with Stripe soon. For now, upgrade is free for testing.</p>
   </div>
 </div>
 
@@ -271,11 +256,11 @@
 </div>
     <div class="bottom-sheet-content">
       
-      <div class="tier-option" data-tier="plus"><h4>🌱 Hive+</h4><p>Unlock Sprout tasks, choose focus themes, and accelerate your impact.</p><button class="btn tiny select-tier">Select</button></div>
+      <div class="tier-option" data-tier="plus"><h4>🌱 Meadow+</h4><p>Unlock Sprout tasks, choose focus themes, and accelerate your impact.</p><button class="btn tiny select-tier">Select</button></div>
       <hr>
-      <div class="tier-option" data-tier="steward"><h4>🌸 Steward Hive</h4><p>Full access to all tasks (Bloom stage), priority support, and community leadership.</p><button class="btn tiny select-tier">Select</button></div>
+      <div class="tier-option" data-tier="steward"><h4>🌸 Steward Meadow</h4><p>Full access to all tasks (Bloom stage), priority support, and community leadership.</p><button class="btn tiny select-tier">Select</button></div>
       <hr>
-      <div class="tier-option" data-tier="collective"><h4>🌾 Collective Hive</h4><p>Everything in Steward + influence multiplier, early feature access, and collective decision‑making.</p><button class="btn tiny select-tier">Select</button></div>
+      <div class="tier-option" data-tier="collective"><h4>🌾 Collective Meadow</h4><p>Everything in Steward + influence multiplier, early feature access, and collective decision‑making.</p><button class="btn tiny select-tier">Select</button></div>
       <p class="tiny muted" style="margin-top: 20px; text-align: center;">Upgrade is free during early access. Stripe integration coming soon.</p>
     </div>
   </div>
@@ -294,8 +279,6 @@
   function closeAchieve() { document.getElementById('achieveModal').style.display = 'none'; }
   async function shareTrophy() {}
   async function shareStats() {}
-  function closeNoviceCompleteModal() { document.getElementById('noviceCompleteModal').style.display = 'none'; }
-  function closeDeadEndModal() { document.getElementById('deadEndModal').style.display = 'none'; }
   function closeMobileStatsModal() { document.getElementById('mobileStatsModal').style.display = 'none'; }
 
   document.getElementById('viewProfileStatusBtn')?.addEventListener('click', () => {
@@ -303,7 +286,7 @@
     document.getElementById('mobileStatsModal').style.display = 'flex';
   });
   document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('hive-theme') || 'classic';
+    const savedTheme = localStorage.getItem('meadow-theme') || localStorage.getItem('hive-theme') || 'classic';
     document.body.setAttribute('data-theme', savedTheme);
   });
 
@@ -497,6 +480,10 @@ window.closeEditProfileSheet = () => {
   } else {
     console.error('Upgrade button NOT found!');
   }
+  document.getElementById('mobileUpgradeBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openUpgradeTierSheet();
+  });
   // ========== STRIPE CHECKOUT FOR TIER SELECTION ==========
   const tierSelectBtns = document.querySelectorAll('.tier-option .select-tier');
   if (tierSelectBtns.length) {

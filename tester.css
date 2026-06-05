@@ -1,5 +1,5 @@
-/* ==========================================================================
-   HIVE NECTAR - PROFILE & TASKS STYLES (Redesigned)
+﻿/* ==========================================================================
+   THE MEADOW - PROFILE & TASKS STYLES (Redesigned)
    ========================================================================== */
 
 /* --- FILTER BAR (Multi-Select Dropdowns) --- */
@@ -14,8 +14,13 @@
     position: relative;
     flex: 1 1 180px;
     min-width: 160px;
-    z-index: 10;
+    z-index: 1;
     user-select: none;
+}
+
+.filter-dropdown.open,
+.dropdown-container.open {
+    z-index: 50;
 }
 
 .dropdown-header {

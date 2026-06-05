@@ -1,4 +1,4 @@
-import { supabase } from './supabase-config.js';
+﻿import { supabase } from './supabase-config.js';
 
 const Loader = {
     show(message = "Loading...") {
@@ -254,7 +254,7 @@ export async function initCommunicationBoard() {
     const postsContainer = document.getElementById('postsContainer');
     if (!postsContainer) return;
 
-    Loader.show("Fetching hive updates...");
+    Loader.show("Fetching meadow updates...");
 
     try {
         const posts = await fetchAllPosts();

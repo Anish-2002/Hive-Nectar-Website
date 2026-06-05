@@ -1,5 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
+import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
 
 // ======================== HELPER FUNCTIONS ========================
 function hexToRgba(hex, alpha) {
@@ -88,6 +89,8 @@ async function checkAndAwardMilestones() {
             });
             await updateAchievementsBadge();
         }
+
+        await checkAndAwardThemeTokens(userProfile.id, updateAchievementsBadge);
     } catch (err) {
         console.error('Failed to check milestones:', err);
     }
@@ -141,9 +144,8 @@ async function generateAchievementsHtml() {
     for (const um of userMilestones) {
         const milestone = um.milestones;
         const icon = milestone.icon_url || 'https://via.placeholder.com/140?text=🏆';
-        const description = milestone.description || 'Great achievement!';
-        const categoryLabel = milestone.category.charAt(0).toUpperCase() + milestone.category.slice(1);
-        const subText = `${categoryLabel} Milestone ${milestone.requirement_value}`;
+        const description = getMilestoneDisplayDescription(milestone);
+        const subText = getAchievementSubtext(milestone);
         const isUnviewed = !um.viewed;
 
         const safeIcon = (icon || '').replace(/"/g, '%22');
@@ -166,7 +168,7 @@ async function generateAchievementsHtml() {
                         </div>
                     ` : ''}
                     <div class="badge-icon-wrap">
-                        <img src="${icon}" class="achievement-badge-img" alt="${safeName}">
+                        <img src="${icon}" class="achievement-badge-img${milestone.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">
                     </div>
                     <div class="achievement-card-text">
                         <h3 class="font-bold text-gray-800 text-xl italic">${milestone.name}</h3>
@@ -267,6 +269,16 @@ async function generateAchievementsHtml() {
                 border: 4px solid white;
                 box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
                 object-fit: cover;
+            }
+            .achievement-badge-img.token-badge-img {
+                width: 100%;
+                max-width: 220px;
+                height: auto;
+                min-height: 56px;
+                border-radius: 12px;
+                object-fit: contain;
+                background: #fff;
+                padding: 8px;
                 flex-shrink: 0;
                 display: block;
             }.grid-achievements {
@@ -592,10 +604,6 @@ function createTaskCard(task) {
     const subcategoryPill = `<span style="background:#f0fdf4; color:#15803d; border:1px solid #dcfce7; padding:2px 8px; border-radius:12px;">${task.category || 'Subcategory'}</span>`;
     const audiencePill = `<span style="background:#f3f0ff; color:#7c3aed; border:1px solid #ede9fe; padding:2px 8px; border-radius:12px;">${task.audience || 'All'}</span>`;
 
-    const versionBadge = !showingExperienced
-        ? '<span style="background:#3b82f6; color:white; padding:2px 8px; border-radius:12px; font-size:0.7rem; margin-left:8px;">Novice</span>'
-        : '<span style="background:#f59e0b; color:white; padding:2px 8px; border-radius:12px; font-size:0.7rem; margin-left:8px;">Experienced</span>';
-
     const description = showingExperienced ? (task.experienced_description || task.task_description) : (task.novice_description || task.task_description);
 
     const likeBtnColor = (currentReaction === 'like') ? '#22c55e' : (isLocked ? '#ccc' : '#ffcc00');
@@ -625,7 +633,7 @@ function createTaskCard(task) {
                 ${leftColumn}
                 <div style="flex-grow: 1;">
                     <div style="font-weight: 800; font-size: 1.05rem; color: var(--fg);">
-                        ${task.task_title || 'Task'} ${versionBadge}
+                        ${task.task_title || 'Task'}
                     </div>
                     <div style="font-size: 0.9rem; margin: 6px 0; color: var(--fg-muted);">
                         ${description}
@@ -784,11 +792,7 @@ async function handleDone(checkbox) {
             showCustomLevelModal(result.new_user_level);
         }
 
-        if (!showingExperienced) {
-            checkAndShowUpgradeModal();
-        } else {
-            checkAndShowDeadEndModal();
-        }
+        autoSwitchToExperiencedIfReady();
 
         // Refresh mobile bottom sheet if open
         if (window._mobileSheetOpen && window.refreshMobileSheet) {
@@ -864,10 +868,10 @@ function updateProfileUI() {
     if (userNameShort) userNameShort.innerText = `${userProfile.first_name} ${userProfile.last_name}`;
 
     const rankCompact = document.getElementById('rankNameDisplayCompact');
-    if (rankCompact) rankCompact.innerText = `Hive Level ${userProfile.member_tier || 0}`;
+    if (rankCompact) rankCompact.innerText = `Meadow Level ${userProfile.member_tier || 0}`;
 
     const tierCompact = document.getElementById('userTierBadgeCompact');
-    if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
+    if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : 'Steward';
 
     const pointsVal = document.getElementById('pointsVal');
     if (pointsVal) pointsVal.innerText = nectarEarned;
@@ -901,10 +905,10 @@ function updateProfileUI() {
     }
 
     const mobileRankDisplay = document.getElementById('mobileRankDisplay');
-    if (mobileRankDisplay) mobileRankDisplay.innerText = `Hive Level ${userProfile.member_tier || 0}`;
+    if (mobileRankDisplay) mobileRankDisplay.innerText = `Meadow Level ${userProfile.member_tier || 0}`;
 
     const mobileTierBadge = document.querySelector('.mobile-hero .tier-badge');
-    if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Hive+' : 'Steward';
+    if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : 'Steward';
 
     const avatarImg = document.getElementById('profileAvatar');
     if (avatarImg && userProfile.avatar_url) {
@@ -924,6 +928,13 @@ function showCustomLevelModal(newLevel) {
 }
 
 // ======================== FILTERS ========================
+function buildFilterOptionHtml(val, checked = false) {
+    return `<label class="filter-item">
+        <input type="checkbox" value="${val}" ${checked ? 'checked' : ''}>
+        <span>${val}</span>
+    </label>`;
+}
+
 function setupMultiFilters() {
     const setupDropdown = (id) => {
         const container = document.getElementById(id);
@@ -954,12 +965,9 @@ function updateFilterOptions(availableTasks) {
         const summarySpan = document.getElementById(summaryId);
         const currentSelected = activeFilters[field] || [];
         activeFilters[field] = currentSelected.filter(val => uniqueValues.includes(val));
-        listContainer.innerHTML = uniqueValues.map(val => `
-            <label class="filter-item" style="display:flex; align-items:center; gap:10px; padding:10px; cursor:pointer; border-bottom:1px solid #e2e8f0; font-size:0.8rem;">
-                <input type="checkbox" value="${val}" ${activeFilters[field].includes(val) ? 'checked' : ''}>
-                <span>${val}</span>
-            </label>
-        `).join('');
+        listContainer.innerHTML = uniqueValues.map(val =>
+            buildFilterOptionHtml(val, activeFilters[field].includes(val))
+        ).join('');
         summarySpan.innerText = activeFilters[field].length > 0 ? `${activeFilters[field].length} Selected` : "All";
         listContainer.querySelectorAll('input').forEach(cb => {
             cb.onchange = () => {
@@ -1010,19 +1018,13 @@ function populateMobileFilters(suffix) {
     const tagList = document.getElementById(`mobileTagFilterList${suffix}`);
 
     if (themeList) {
-        themeList.innerHTML = uniqueThemes.map(val => `
-            <label class="filter-item"><input type="checkbox" value="${val}"> ${val}</label>
-        `).join('');
+        themeList.innerHTML = uniqueThemes.map(val => buildFilterOptionHtml(val)).join('');
     }
     if (stageList) {
-        stageList.innerHTML = uniqueStages.map(val => `
-            <label class="filter-item"><input type="checkbox" value="${val}"> ${val}</label>
-        `).join('');
+        stageList.innerHTML = uniqueStages.map(val => buildFilterOptionHtml(val)).join('');
     }
     if (tagList) {
-        tagList.innerHTML = uniqueTags.map(val => `
-            <label class="filter-item"><input type="checkbox" value="${val}"> ${val}</label>
-        `).join('');
+        tagList.innerHTML = uniqueTags.map(val => buildFilterOptionHtml(val)).join('');
     }
 }
 
@@ -1088,21 +1090,21 @@ async function openMissionsModal() {
     const uniqueTags = [...new Set(sourceForFilters.map(t => t.subcategory).filter(Boolean))];
 
     const contentHtml = `
-        <div class="filter-row" style="margin-bottom: 16px;">
+        <div class="filter-row mobile-sheet-filters" style="margin-bottom: 16px;">
             <div class="dropdown-container" id="mobileCoreFilterDropdown">
-                <span style="font-size: 0.75rem; font-weight: 700;">Core Theme:</span>
+                <span class="filter-label">Core Theme:</span>
                 <div class="dropdown-header"><span id="mobileCoreFilterSummary">Themes</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileCoreFilterList"></div>
+                <div class="dropdown-list scroll-list" id="mobileCoreFilterList"></div>
             </div>
             <div class="dropdown-container" id="mobileStageFilterDropdown">
-                <span style="font-size: 0.75rem; font-weight: 700;">Stage:</span>
+                <span class="filter-label">Stage:</span>
                 <div class="dropdown-header"><span id="mobileStageFilterSummary">Stages</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileStageFilterList"></div>
+                <div class="dropdown-list scroll-list" id="mobileStageFilterList"></div>
             </div>
             <div class="dropdown-container" id="mobileTagFilterDropdown">
-                <span style="font-size: 0.75rem; font-weight: 700;">Subcategory:</span>
+                <span class="filter-label">Subcategory:</span>
                 <div class="dropdown-header"><span id="mobileTagFilterSummary">Tags</span> <i class="fas fa-chevron-down"></i></div>
-                <div class="dropdown-list" id="mobileTagFilterList"></div>
+                <div class="dropdown-list scroll-list" id="mobileTagFilterList"></div>
             </div>
         </div>
         <div class="progressWrap" style="margin: 12px 0;">
@@ -1115,7 +1117,9 @@ async function openMissionsModal() {
     const sheet = showBottomSheet('Daily Tasks', contentHtml);
 
     setTimeout(() => {
-        // Setup dropdown toggles
+        const sheetContent = sheet.querySelector('.bottom-sheet-content');
+
+        // Setup dropdown toggles (scoped to this bottom sheet only)
         const setupDropdown = (id) => {
             const container = document.getElementById(id);
             if (!container) return;
@@ -1124,7 +1128,7 @@ async function openMissionsModal() {
                 header.onclick = (e) => {
                     e.stopPropagation();
                     const isOpen = container.classList.contains('open');
-                    document.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
+                    sheetContent?.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
                     if (!isOpen) container.classList.add('open');
                 };
             }
@@ -1133,9 +1137,12 @@ async function openMissionsModal() {
         setupDropdown('mobileStageFilterDropdown');
         setupDropdown('mobileTagFilterDropdown');
 
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
-        });
+        const closeSheetDropdowns = (e) => {
+            if (e.target.closest('.dropdown-container')) return;
+            sheetContent?.querySelectorAll('.dropdown-container').forEach(d => d.classList.remove('open'));
+        };
+        sheetContent?.addEventListener('click', closeSheetDropdowns);
+        sheet.addEventListener('click', closeSheetDropdowns);
 
         // Populate filter checkboxes
         const themeList = document.getElementById('mobileCoreFilterList');
@@ -1143,13 +1150,13 @@ async function openMissionsModal() {
         const tagList = document.getElementById('mobileTagFilterList');
 
         if (themeList) {
-            themeList.innerHTML = uniqueThemes.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+            themeList.innerHTML = uniqueThemes.map(val => buildFilterOptionHtml(val)).join('');
         }
         if (stageList) {
-            stageList.innerHTML = uniqueStages.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+            stageList.innerHTML = uniqueStages.map(val => buildFilterOptionHtml(val)).join('');
         }
         if (tagList) {
-            tagList.innerHTML = uniqueTags.map(val => `<label><input type="checkbox" value="${val}"> ${val}</label>`).join('');
+            tagList.innerHTML = uniqueTags.map(val => buildFilterOptionHtml(val)).join('');
         }
 
         // Helper: get selected filters
@@ -2073,73 +2080,46 @@ async function showThemeSelectorModal() {
     cancelBtn.onclick = closeSheet;
 }
 
-// ======================== MODAL TRIGGERS ========================
-function checkAndShowUpgradeModal() {
-    if (upgradeModalShown) return;
-    if (!userProfile) return;
-    if (showingExperienced) return;
+// ======================== SILENT EXPERIENCED TASK SWITCH ========================
+async function autoSwitchToExperiencedIfReady() {
+    if (showingExperienced || !userProfile) return;
 
     const allNoviceCompleted = baseTasks.length > 0 && baseTasks.every(t => completedNovice.has(t.id));
-    if (allNoviceCompleted) {
-        upgradeModalShown = true;
-        showUpgradePromptModal();
+    if (!allNoviceCompleted) return;
+
+    if (userProfile.prefers_experienced) {
+        showingExperienced = true;
+        await refreshTasks();
+        return;
     }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ prefers_experienced: true })
+        .eq('id', userProfile.id);
+
+    if (error) {
+        console.warn('Failed to auto-switch to experienced tasks:', error);
+        return;
+    }
+
+    userProfile.prefers_experienced = true;
+    showingExperienced = true;
+    await refreshTasks();
+}
+
+function checkAndShowUpgradeModal() {
+    autoSwitchToExperiencedIfReady();
 }
 
 function checkAndShowDeadEndModal() {
-    if (deadEndModalShown) return;
-    if (!userProfile) return;
-    if (!showingExperienced) return;
-
-    const allExperiencedCompleted = baseTasks.length > 0 && baseTasks.every(t => completedExperienced.has(t.id));
-    if (allExperiencedCompleted) {
-        deadEndModalShown = true;
-        showDeadEndModal();
-    }
-}
-
-function showUpgradePromptModal() {
-    const modal = document.getElementById('upgradePromptModal');
-    if (modal) modal.style.display = 'flex';
+    // No popup – experienced tasks continue silently; tier upgrades via paid Stripe flow only
 }
 
 function closeUpgradePromptModal() {
     const modal = document.getElementById('upgradePromptModal');
     if (modal) modal.style.display = 'none';
     upgradeModalShown = false;
-}
-
-function showDeadEndModal() {
-    const modal = document.getElementById('deadEndModal');
-    if (!modal) return;
-
-    const restartBtn = document.getElementById('deadEndRestartBtn');
-    const upgradeBtn = document.getElementById('deadEndUpgradeBtn');
-    const tierNum = tierToNumber[userProfile.tier];
-
-    if (tierNum === 0) {
-        restartBtn.style.display = 'block';
-        upgradeBtn.innerText = 'Upgrade to Hive+';
-        upgradeBtn.onclick = () => {
-            upgradeTier('plus');
-            modal.style.display = 'none';
-            deadEndModalShown = false;
-        };
-    } else if (tierNum === 1) {
-        restartBtn.style.display = 'none';
-        upgradeBtn.innerText = 'Upgrade to Steward';
-        upgradeBtn.onclick = () => {
-            upgradeTier('steward');
-            modal.style.display = 'none';
-            deadEndModalShown = false;
-        };
-    } else {
-        restartBtn.style.display = 'none';
-        upgradeBtn.innerText = 'Coming Soon';
-        upgradeBtn.disabled = true;
-    }
-
-    modal.style.display = 'flex';
 }
 
 // ======================== OTHER FUNCTIONS ========================
@@ -2189,7 +2169,7 @@ async function loadSubscriptionInfo() {
   }
 
   container.style.display = 'block';
-  document.getElementById('subTier').innerText = tier === 'plus' ? 'Hive+' : tier === 'steward' ? 'Steward' : 'Collective';
+  document.getElementById('subTier').innerText = tier === 'plus' ? 'Meadow+' : tier === 'steward' ? 'Steward' : 'Collective';
 
   if (periodEnd) {
     const renewDate = new Date(periodEnd).toLocaleDateString();
@@ -2611,7 +2591,7 @@ function setThemeFromTier() {
     if (tier === 'plus') theme = 'gold';
     else if (tier === 'steward') theme = 'dark';
     document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('hive-theme', theme);
+    localStorage.setItem('meadow-theme', theme);
 }
 
 // ======================== INIT ========================
@@ -2752,11 +2732,6 @@ export async function initProfile() {
 
         setThemeFromTier();
 
-        if (userProfile.email === 'anhishgautam@gmail.com') {
-            const mobileSim = document.getElementById('mobileTierSimulator');
-            if (mobileSim) mobileSim.style.display = 'block';
-        }
-
         const mobileLogout = document.getElementById('mobileLogoutBtn');
         if (mobileLogout) {
             mobileLogout.addEventListener('click', async () => {
@@ -2809,50 +2784,6 @@ export async function initProfile() {
             mobilePendingBadge.innerText = pendingCount;
         }
 
-        const upgradeBtn = document.getElementById('upgradeToPlusBtn');
-        if (upgradeBtn) {
-            upgradeBtn.onclick = async () => {
-                closeUpgradePromptModal();
-                await upgradeTier('plus');
-            };
-        }
-        const continueExperiencedBtn = document.getElementById('continueExperiencedBtn');
-        if (continueExperiencedBtn) {
-            continueExperiencedBtn.onclick = async () => {
-                const { error } = await supabase
-                    .from('profiles')
-                    .update({ prefers_experienced: true })
-                    .eq('id', userProfile.id);
-                if (error) {
-                    showToast('Failed to save preference', 'error');
-                    return;
-                }
-                userProfile.prefers_experienced = true;
-                showingExperienced = true;
-                closeUpgradePromptModal();
-
-                await supabase.rpc('reset_experienced_progress', { p_user_id: userProfile.id });
-
-                const { data: progressData } = await supabase
-                    .from('user_theme_progress')
-                    .select('theme_id, stage, novice_days_count, experienced_days_count')
-                    .eq('user_id', userProfile.id);
-                if (progressData) {
-                    themeStageProgress = {};
-                    progressData.forEach(p => {
-                        if (!themeStageProgress[p.theme_id]) themeStageProgress[p.theme_id] = {};
-                        themeStageProgress[p.theme_id][p.stage] = {
-                            novice: p.novice_days_count,
-                            experienced: p.experienced_days_count
-                        };
-                    });
-                }
-
-                await refreshTasks();
-                checkAndShowDeadEndModal();
-            };
-        }
-
         const { data: guardrails, error: guardrailsError } = await supabase
             .from('theme_guardrails')
             .select('theme_id, stage, min_days');
@@ -2864,11 +2795,8 @@ export async function initProfile() {
             });
         }
 
-        checkAndShowUpgradeModal();
+        await autoSwitchToExperiencedIfReady();
         await updateAchievementsBadge();
-        checkAndShowDeadEndModal();
-
-        setupAdminSimulator();
 
         if (tierNum >= 1 && (!selectedThemes || selectedThemes.length === 0)) {
             setTimeout(() => {
@@ -2904,32 +2832,6 @@ export async function initProfile() {
 
 // ======================== MODAL EVENT LISTENERS ========================
 document.addEventListener('DOMContentLoaded', () => {
-    const noviceYes = document.getElementById('noviceCompleteYesBtn');
-    if (noviceYes) {
-        noviceYes.addEventListener('click', async () => {
-            showingExperienced = true;
-            document.getElementById('noviceCompleteModal').style.display = 'none';
-            noviceModalShown = false;
-            await applyFiltersAndRender();
-        });
-    }
-    const noviceLater = document.getElementById('noviceCompleteLaterBtn');
-    if (noviceLater) {
-        noviceLater.addEventListener('click', () => {
-            document.getElementById('noviceCompleteModal').style.display = 'none';
-            noviceModalShown = false;
-        });
-    }
-    const deadEndRestart = document.getElementById('deadEndRestartBtn');
-    if (deadEndRestart) deadEndRestart.addEventListener('click', restartProgress);
-    const deadEndUpgrade = document.getElementById('deadEndUpgradeBtn');
-    if (deadEndUpgrade) {
-        deadEndUpgrade.addEventListener('click', () => {
-            upgradeTier('plus');
-            document.getElementById('deadEndModal').style.display = 'none';
-            deadEndModalShown = false;
-        });
-    }
     const restartBtn = document.getElementById('restartBtn');
     if (restartBtn) restartBtn.addEventListener('click', restartProgress);
 });
@@ -2938,14 +2840,6 @@ window.closeCompletedModal = () => {
     document.getElementById('completedModal').style.display = 'none';
 };
 window.closePendingSigmaModal = closePendingSigmaModal;
-window.closeNoviceCompleteModal = () => {
-    document.getElementById('noviceCompleteModal').style.display = 'none';
-    noviceModalShown = false;
-};
-window.closeDeadEndModal = () => {
-    document.getElementById('deadEndModal').style.display = 'none';
-    deadEndModalShown = false;
-};
 window.closeSigmaModal = () => {
     document.getElementById('sigmaModal').style.display = 'none';
 };

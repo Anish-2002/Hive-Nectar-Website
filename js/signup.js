@@ -1,4 +1,4 @@
-import { supabase } from './supabase-config.js';
+﻿import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
 
 async function triggerWelcomeEmail(userId, email, firstName) {
@@ -61,7 +61,7 @@ export async function handleSignup(e) {
     return;
   }
 
-  Loader.show("Creating your Hive profile...");
+  Loader.show("Creating your Meadow profile...");
   const submitBtn = e.target.querySelector('button[type="submit"]');
   if (submitBtn) submitBtn.disabled = true;
 
