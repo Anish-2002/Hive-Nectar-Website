@@ -1,0 +1,16 @@
+﻿{
+  "posts": [
+    {
+      "id": "1",
+      "title": "Phase 3 is Live!",
+      "short_desc": "The Meadow is evolving. Check the new features.",
+      "created_at": "2026-02-02T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "title": "Maintenance Update",
+      "short_desc": "Brief downtime scheduled for tonight.",
+      "created_at": "2026-02-02T10:00:00Z"
+    }
+  ]
+}

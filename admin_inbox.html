@@ -1,0 +1,70 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin Inbox | The Meadow</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-admin"data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Meadow</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
+  </nav>
+</header>
+
+  <main class="wrap">
+    <h1>Inquiry Inbox</h1>
+    <div id="inboxContainer"></div>
+  </main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+  <script>
+    function renderInbox() {
+        const container = document.getElementById('inboxContainer');
+        const inquiries = JSON.parse(localStorage.getItem('hive_inquiries')) || [];
+        
+        if (inquiries.length === 0) {
+            container.innerHTML = '<p>No messages received yet.</p>';
+            return;
+        }
+
+        container.innerHTML = inquiries.map(iq => `
+            <div class="card" style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>${iq.category}</strong>
+                    <span class="tiny muted">${iq.timestamp}</span>
+                </div>
+                <h3 style="margin: 10px 0;">From: ${iq.name}</h3>
+                <p class="muted">${iq.message}</p>
+                <div class="tiny" style="color: var(--cta)">${iq.email}</div>
+            </div>
+        `).join('');
+    }
+    renderInbox();
+  </script>
+</body>
+</html>

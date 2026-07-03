@@ -1,0 +1,440 @@
+﻿/* ==========================================================================
+   THE MEADOW - PROFILE & TASKS STYLES (Redesigned)
+   ========================================================================== */
+
+/* --- FILTER BAR (Multi-Select Dropdowns) --- */
+.filterBar, .filter-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-dropdown, .dropdown-container {
+    position: relative;
+    flex: 1 1 180px;
+    min-width: 160px;
+    z-index: 1;
+    user-select: none;
+}
+
+.filter-dropdown.open,
+.dropdown-container.open {
+    z-index: 50;
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    background: var(--card);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+}
+
+.dropdown-header:hover {
+    border-color: var(--primary);
+}
+
+.dropdown-header.active,
+.filter-dropdown.open .dropdown-header,
+.dropdown-container.open .dropdown-header {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15);
+}
+
+.dropdown-header .summary {
+    font-weight: 700;
+    margin-left: 8px;
+    color: var(--primary-dark);
+}
+
+.dropdown-header .icon,
+.dropdown-header i {
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+    color: var(--primary);
+}
+
+.filter-dropdown.open .dropdown-header .icon,
+.filter-dropdown.open .dropdown-header i,
+.dropdown-container.open .dropdown-header i {
+    transform: rotate(180deg);
+}
+
+.dropdown-list {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    min-width: 260px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    z-index: 9999;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-list.scroll-list {
+    max-height: 280px;
+}
+
+.filter-dropdown.open .dropdown-list,
+.dropdown-container.open .dropdown-list {
+    display: block;
+    animation: slideUp 0.2s ease;
+}
+
+/* Filter Items */
+.filter-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition-fast);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.filter-item:last-child {
+    border-bottom: none;
+}
+
+.filter-item:hover {
+    background: var(--secondary);
+}
+
+.filter-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* --- TASK CARDS --- */
+.tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.task {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    gap: 16px;
+    align-items: start;
+    padding: 20px;
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--border);
+    background: var(--card);
+    transition: var(--transition-smooth);
+    word-wrap: break-word;
+}
+
+.task:hover {
+    border-color: var(--primary);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.task > input[type=checkbox] {
+    width: 24px;
+    height: 24px;
+    margin-top: 4px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.task .taskTitle, .taskTitle {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.task .meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Pills */
+.tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--fg);
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.pill.points-pill {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    color: white;
+    border: none;
+    font-weight: 700;
+}
+
+.pill.impact-pill {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #A7F3D0;
+}
+
+.pill.confidence-pill {
+    background: #EDE9FE;
+    color: #5B21B6;
+    border-color: #C4B5FD;
+}
+
+.pill.core-pill {
+    background: var(--honey-gradient);
+    color: white;
+    border: none;
+    font-weight: 700;
+}
+
+.pill.stage-pill {
+    background: #DBEAFE;
+    color: #1D4ED8;
+    border-color: #93C5FD;
+}
+
+.pill.audience-pill {
+    background: #F3E8FF;
+    color: #7C3AED;
+    border-color: #C4B5FD;
+}
+
+.pill.tag-pill {
+    background: #F0F9FF;
+    color: #0369A1;
+    border-color: #7DD3FC;
+}
+
+/* Votes */
+.votes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.votes .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    min-width: 100px;
+}
+
+.btn.ghost {
+    background: var(--card);
+    color: var(--fg);
+    border: 2px solid var(--border);
+    box-shadow: none;
+}
+
+.btn.ghost:hover {
+    border-color: var(--primary);
+    background: var(--secondary);
+}
+
+.btn.ghost.like.active {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
+    color: white;
+    border-color: transparent;
+}
+
+.btn.ghost.dislike.active {
+    background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Impact Line */
+.impact-line {
+    font-size: 0.85rem;
+    color: var(--fg-muted);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* --- PROGRESS WRAP --- */
+.progressWrap {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+#progressPct {
+    min-width: 60px;
+    text-align: right;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+/* --- MISC --- */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* --- TOAST WRAP (for tester.css toasts) --- */
+.toastWrap {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* --- CUSTOM MODAL --- */
+.custom-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.custom-modal-content {
+    background: var(--card);
+    padding: 32px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    max-width: 90%;
+    width: 360px;
+    text-align: center;
+    animation: modalIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.custom-modal-content p {
+    margin: 0 0 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--fg);
+}
+
+.custom-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 700px) {
+    .filter-row, .filterBar {
+        gap: 12px;
+    }
+    
+    .filter-dropdown, .dropdown-container {
+        flex: 1 1 100%;
+    }
+    
+    .task {
+        grid-template-columns: 28px 1fr;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .votes {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-top: 12px;
+    }
+    
+    .task .taskTitle {
+        font-size: 1rem;
+    }
+    
+    .filter-item {
+        padding: 14px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .task {
+        padding: 14px;
+    }
+    
+    .pill {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .votes .btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+}
+
+/* --- LARGE SCREEN EXPANSION --- */
+@media (min-width: 1400px) {
+    .wrap {
+        max-width: 1600px;
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+    
+    .grid-main {
+        grid-template-columns: 3fr 1fr;
+    }
+    
+    .dropdown-list {
+        min-width: 300px;
+    }
+}
+
+/* --- TASKS CONTAINER FIX --- */
+#tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}

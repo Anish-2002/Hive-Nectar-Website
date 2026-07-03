@@ -1,119 +1,183 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>About Us | Hive Nectar</title>
+  <title>About The Meadow | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
+<body class="page-about" data-theme="classic">
 
- <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-    <span class="brand-title">HIVE NECTAR</span>
-  </div>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+<header class="header" data-testid="main-header">
+  <a href="index.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
     <i class="fas fa-bars"></i>
   </button>
-  <nav class="nav-links" id="navLinks">
+  <nav class="nav-links" id="navLinks" data-testid="nav-links">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
-    <a href="about.html">About</a>
+    <a href="join.html">Join the Meadow</a>
+    <a href="about.html" class="active">About</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
   </nav>
 </header>
 
-  <main class="wrap">
-    <section class="hero-card">
-      <h1>About The Hive</h1>
-      <p class="hero-subtext">The people and values behind the ecosystem.</p>
-    </section>
+<main class="wrap">
+  <!-- Hero -->
+  <section class="hero-card" data-testid="about-hero">
+    <h1>About The Meadow</h1>
+    <p>Built for the space between corporate sustainability and everyday behaviour.</p>
+  </section>
 
-    <div class="grid-container">
-      <div class="main-column">
-        
-        <section class="card">
-          <h2 class="section-title"><i class="fas fa-bullseye"></i> Our Mission</h2>
-          <p class="placeholder-text">[Mission Statement Placeholder: Our core purpose and commitment to nature.]</p>
-          
-          <h3 style="margin: 25px 0 15px; font-size: 1rem;">Core Values</h3>
-          <div class="values-grid">
-            <div class="value-item">
-                <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                <span>Transparency</span>
-            </div>
-            <div class="value-item">
-                <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                <span>Community First</span>
-            </div>
-            <div class="value-item">
-                <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                <span>Action-Oriented</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-  <h2 class="section-title">Our Team</h2>
-  <div class="team-grid">
-    <div class="team-member">
-      <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Member 1" class="team-img">
-      <div class="member-info">
-        <h4>Member 1</h4>
-        <p class="role-tag">Position</p>
-        <p class="placeholder-text">[Short bio or introduction placeholder for Member 1.]</p>
+  <!-- Why This Exists (replaces Mission) -->
+  <section class="about-section">
+    <div class="mission-card" data-testid="mission-card">
+      <div class="mission-content">
+        <h2><i class="fas fa-question-circle"></i> Why This Exists</h2>
+        <p style="line-height: 1.8; margin-bottom: 20px;">
+          Most sustainability efforts operate at corporate or government scale and rely on information and innovation from the top down. Few address the architecture of everyday behaviour. The Meadow was built for that space.
+        </p>
+        <p style="line-height: 1.8; margin-bottom: 20px;">
+          It exists to prove that small, consistent actions can quietly rebuild lost habits and discipline into a stable, resilient lifestyle without moral pressure.
+        </p>
+        <p style="line-height: 1.8;">
+          To test that at scale, it was first embedded in the founder's own daily life. She is a scientist by training. A systems designer driven by both instinct and situation. A mother watching how habits and discipline shape the next generation, without anyone meaning for it to happen.
+        </p>
+      </div>
+      <div class="mission-visual">
+        <div class="hex-container">
+          <i class="fas fa-leaf"></i>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="team-member">
-      <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Member 2" class="team-img">
-      <div class="member-info">
-        <h4>Member 2</h4>
-        <p class="role-tag">Position</p>
-        <p class="placeholder-text">[Short bio or introduction placeholder for Member 2.]</p>
+  <!-- How This Is Different -->
+  <section class="about-section">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h2>How This Is Different</h2>
+      <p class="muted">The design rules are simple</p>
+    </div>
+    <div class="mission-card" style="grid-template-columns: 1fr 1fr; gap: 32px; padding: 40px;">
+      <div>
+        <h4 style="margin-bottom: 16px;"><i class="fas fa-ban" style="color: var(--primary);"></i> What we don't do</h4>
+        <ul style="list-style: none; padding-left: 0;">
+          <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No moral statements</li>
+          <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No competitive language</li>
+          <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No urgency framing</li>
+          <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No 'hero' narratives</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 16px;"><i class="fas fa-seedling" style="color: var(--primary);"></i> Built on three observations</h4>
+        <ul style="list-style: none; padding-left: 0;">
+          <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Humans are part of nature</li>
+          <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> When too much is extracted from a system's capacity to regenerate, fractures appear</li>
+          <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Nature corrects imbalance over time, and so can we</li>
+        </ul>
       </div>
     </div>
+    <div class="card lift" style="margin-top: 24px; text-align: center;">
+      <p style="font-size: 1.1rem; font-style: italic;">The Meadow is built as a micro‑regenerative loop: repair instead of replace, cook instead of order, talk before you shout.</p>
+    </div>
+  </section>
 
-    <div class="team-member">
-      <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Member 3" class="team-img">
-      <div class="member-info">
-        <h4>Member 3</h4>
-        <p class="role-tag">Position</p>
-        <p class="placeholder-text">[Short bio or introduction placeholder for Member 3.]</p>
+  <!-- Founder Snapshot (moved before Design Values) -->
+  <section class="about-section">
+    <div class="card lift" style="background: var(); border: 2px solid var(--border);">
+      <h2 style="display: flex; align-items: center; gap: 12px;"><i class="fas fa-user-check" style="color: var(--primary);"></i> Founder Snapshot</h2>
+      <p style="line-height: 1.8; margin-top: 16px;">Before The Meadow existed, the founder experienced career stagnation after parental leave due to a newborn, a young child, and self‑esteem that had quietly eroded. The fear of what came next was real, and what pulled her back was family.</p>
+      <p style="line-height: 1.8; margin-top: 16px;">The work happened in the margins – training courses squeezed into lunch breaks and late nights, dinner planned on the same kitchen bench as everything else. That is where The Meadow began.</p>
+      <p style="line-height: 1.8; margin-top: 16px;">Patterns emerged between lab work and school pick‑ups, between spreadsheets and garden beds, between noticing the slow drift of norms and trusting the resilience of structure.</p>
+      <p style="line-height: 1.8; margin-top: 16px;">Behaviour compounds over time, but so does neglect, and faster. The system was first tested in her own daily loops, then refined into themes, stages, gates, and units. It is still being refined now.</p>
+    </div>
+  </section>
+
+  <!-- Design Values (now after Founder Snapshot) -->
+  <section class="about-section">
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h2>Design Values</h2>
+      <p class="muted">Coherence over performance, regeneration over intensity</p>
+    </div>
+    <div class="values-grid" data-testid="values-grid">
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-leaf"></i></div>
+        <h4>Humans are part of nature</h4>
+        <p>We are not separate from the natural world – our habits and rhythms echo its cycles.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-sync-alt"></i></div>
+        <h4>Regeneration over intensity</h4>
+        <p>Repair instead of replace, cook instead of order, talk before you shout.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-dice-d6"></i></div>
+        <h4>Structure over motivation</h4>
+        <p>Systems outlast willpower. We provide the architecture; you bring the presence.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-eye-slash"></i></div>
+        <h4>Optional visibility</h4>
+        <p>You choose how visible you want to be. Comparison and competition are optional.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-chart-line"></i></div>
+        <h4>Earned progression</h4>
+        <p>Progression comes from behaviour, not instruction. You earn what you repeat.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <h4>Physical evidence of impact</h4>
+        <p>The jar, tokens, and cue card exist for you to interpret and assign meaning.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-gate"></i></div>
+        <h4>Behavioural gates, not checkpoints</h4>
+        <p>No forced milestones – you move forward when your actions naturally unlock the next stage.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon"><i class="fas fa-brain"></i></div>
+        <h4>Coherence over performance</h4>
+        <p>The system works because it is internally consistent, not because it is optimised for metrics.</p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-      </div>
+  <!-- CTA Section -->
+  <section class="card highlight-card" style="text-align: center; padding: 48px 32px;" data-testid="about-cta">
+    <h2 style="margin: 0 0 12px;">Ready to Join The Meadow?</h2>
+    <p class="muted" style="margin-bottom: 24px;">Start your journey today – no allegiance, just structure.</p>
+    <a href="join.html" class="btn" data-testid="join-cta">
+      <i class="fas fa-seedling"></i> Join Now
+    </a>
+  </section>
+</main>
 
-      <aside class="side-column">
-        <section class="card highlight-card">
-          <h3 class="section-title">Brand History</h3>
-          <p class="placeholder-text" style="font-size: 0.9rem;">[Placeholder: How we started and where we are heading.]</p>
-        </section>
-
-        <section class="card" style="background: #fff; text-align: center; border: 2px dashed var(--border);">
-          <p class="tiny">Want to learn more?</p>
-          <a href="contact.html" class="text-link">Get in touch →</a>
-        </section>
-      </aside>
-    </div>
-  </main>
-
- <footer class="footer">
+<footer class="footer" data-testid="footer">
   <div class="footer-links">
     <a href="profile.html">My Profile</a>
     <span>|</span>
-    <a href="board.html">Communication Board</a>
+    <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-  <script src="app.js"></script>
+<script type="module" src="js/app.js"></script>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content">
+    <div class="buffering-icon"></div>
+    <p id="loader-text">Loading...</p>
+  </div>
+</div>
+
 </body>
 </html>

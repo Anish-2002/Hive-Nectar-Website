@@ -1,0 +1,183 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin CRM | The Meadow</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+</head>
+<body class="page-crm"data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="join.html">Join the Meadow</a>
+    <a href="about.html">About</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Meadow</a>
+  </nav>
+</header>
+
+  <main class="wrap">
+    <div class="admin-container">
+      
+      <aside class="crm-sidebar">
+        <p class="tiny" style="font-weight: bold; margin-bottom: 15px; color: #888;">MANAGEMENT</p>
+        <div class="nav-item active" onclick="switchLayer('dashboard')">
+          <i class="fas fa-th-large"></i> Dashboard
+        </div>
+        <div class="nav-item" onclick="switchLayer('users')">
+          <i class="fas fa-users"></i> Member Profiles
+        </div>
+        <div class="nav-item" onclick="switchLayer('inquiries')">
+          <i class="fas fa-inbox"></i> Inquiries
+        </div>
+        <div class="nav-item" onclick="switchLayer('comms')">
+          <i class="fas fa-broadcast-tower"></i> System Comms
+        </div>
+      </aside>
+
+      <div class="crm-content">
+        
+        <section id="layer-dashboard" class="crm-layer active">
+          <div class="card" style="padding: 50px; text-align: center;">
+            <div style="background: #fff8e1; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-bee" style="font-size: 2.5rem; color: var(--cta);"></i>
+            </div>
+            <h2 class="section-title">Welcome back, Admin</h2>
+            <p class="tiny">The Meadow is buzzing. Use the sidebar to manage members, respond to task ideas, or broadcast new updates.</p>
+          </div>
+        </section>
+
+        <section id="layer-users" class="crm-layer">
+          <div class="card">
+            <h2 class="section-title">User Directory</h2>
+            <table class="crm-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crm-user-list">
+                </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="layer-inquiries" class="crm-layer">
+          <h2 class="section-title" style="margin-bottom: 20px;">Inquiry Inbox</h2>
+          
+          <div class="category-grid">
+            <div class="cat-card" onclick="filterInquiries('Task Idea')">
+              <i class="fas fa-lightbulb"></i>
+              <h4>Task Ideas</h4>
+              <span class="count-badge" id="count-tasks">0</span>
+            </div>
+            <div class="cat-card" onclick="filterInquiries('Account Issues')">
+              <i class="fas fa-user-gear"></i>
+              <h4>Account Issues</h4>
+              <span class="count-badge" id="count-account">0</span>
+            </div>
+            <div class="cat-card" onclick="filterInquiries('Suggestions')">
+              <i class="fas fa-comments"></i>
+              <h4>Suggestions</h4>
+              <span class="count-badge" id="count-suggestions">0</span>
+            </div>
+            <div class="cat-card" onclick="filterInquiries('Other')">
+              <i class="fas fa-circle-info"></i>
+              <h4>Other</h4>
+              <span class="count-badge" id="count-other">0</span>
+            </div>
+          </div>
+
+          <div class="card" id="inquiry-detail-view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 id="current-category-title">Inquiry Category</h3>
+                <button class="text-link" onclick="closeInquiryDetail()">Back to Categories</button>
+            </div>
+            <table class="crm-table">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Message Snippet</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="crm-inquiry-list"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="layer-comms" class="crm-layer">
+          <div class="card">
+            <h2 class="section-title">Post Announcement</h2>
+            <p class="tiny" style="margin-bottom: 20px;">Publish a notification that all users will see when they log in.</p>
+            <form id="adminCommsForm">
+              <label class="tiny">Broadcast Title</label>
+              <input type="text" id="commTitle" required style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid var(--border);">
+              
+              <label class="tiny">Message Details</label>
+              <textarea id="commContent" rows="5" required style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid var(--border);"></textarea>
+              
+              <button type="submit" class="btn" style="width: 100%;">Send Broadcast</button>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a>
+    <span>|</span>
+    <a href="board.html">Communication Board</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+  <div id="toast-container"></div>
+
+  <script>
+    function switchLayer(layerId) {
+      document.querySelectorAll('.crm-layer').forEach(l => l.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById('layer-' + layerId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function filterInquiries(category) {
+      document.querySelector('.category-grid').style.display = 'none';
+      const detailView = document.getElementById('inquiry-detail-view');
+      detailView.style.display = 'block';
+      document.getElementById('current-category-title').innerText = category + " Inquiries";
+    }
+
+    function closeInquiryDetail() {
+      document.getElementById('inquiry-detail-view').style.display = 'none';
+      document.querySelector('.category-grid').style.display = 'grid';
+    }
+  </script>
+  
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
