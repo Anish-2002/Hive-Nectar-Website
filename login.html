@@ -1,66 +1,96 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login | Hive Nectar</title>
+  <title>Login | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
 </head>
-<body>
+<body class= "page-login" data-theme="classic">
 
-  <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-    <span class="brand-title">HIVE NECTAR</span>
-  </div>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+<header class="header" data-testid="main-header">
+  <a href="index.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
     <i class="fas fa-bars"></i>
   </button>
-  <nav class="nav-links" id="navLinks">
+  <nav class="nav-links" id="navLinks" data-testid="nav-links">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
-    <a href="about.html">About</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html" class="active">Login to Pollen Pop</a>
   </nav>
 </header>
 
-  <main class="wrap">
-    <div style="max-width: 400px; margin: 40px auto;">
-        <section class="card">
-          <h2 class="section-title">Welcome Back</h2>
-          <form id="loginForm">
-            <div style="margin-bottom: 15px;">
-              <label class="tiny" style="display:block; margin-bottom:5px;">Email Address</label>
-              <input type="email" name="email" id="loginEmail" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
-            </div>
-            <div style="margin-bottom: 20px;">
-              <label class="tiny" style="display:block; margin-bottom:5px;">Password</label>
-              <input type="password" name="password" id="loginPassword" required style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px;">
-            </div>
-            
-            <p id="loginError" class="tiny" style="color: #ef4444; margin-bottom: 15px; display: none;"></p>
-
-            <button type="submit" class="btn" style="width:100%; background: var(--cta); color:white; border:none; padding:12px; cursor:pointer; border-radius:8px;">Login</button>
-          </form>
-          <p class="tiny" style="margin-top: 20px; text-align: center;">
-            Don't have an account? <a href="join.html" class="text-link">Sign up</a>
-          </p>
-        </section>
+<main class="auth-container">
+  <div class="auth-card" data-testid="login-card">
+    <div class="auth-header">
+      <div class="icon-circle">
+        <i class="fas fa-user"></i>
+      </div>
+      <h2>Welcome Back</h2>
+      <p>Sign in to continue your journey</p>
     </div>
-  </main>
-
-  <footer class="footer">
-  <div class="footer-links">
-    <a href="profile.html">My Profile</a>
-    <span>|</span>
-    <a href="board.html">Communication Board</a>
+    
+    <form id="loginForm" data-testid="login-form">
+      <div id="loginError" data-testid="login-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span></span>
+      </div>
+      
+      <div class="form-field">
+        <label for="loginEmail">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input type="email" name="email" id="loginEmail" required placeholder="you@example.com" data-testid="login-email">
+        </div>
+      </div>
+      
+      <div class="form-field">
+        <label for="loginPassword">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" id="loginPassword" required placeholder="Enter your password" data-testid="login-password">
+        </div>
+      </div>
+      
+      <a href="forgot-password.html" class="forgot-link" data-testid="forgot-password-link">Forgot password?</a>
+      
+      <button type="submit" class="btn" style="width: 100%;" data-testid="login-submit">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </button>
+    </form>
+    
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="join.html" data-testid="signup-link">Sign up</a></p>
+    </div>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</main>
+
+<footer class="footer" data-testid="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-  <script src="app.js"></script>
+<script type="module" src="js/app.js"></script>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content">
+    <div class="buffering-icon"></div>
+    <p id="loader-text">Loading...</p>
+  </div>
+</div>
+
 </body>
 </html>

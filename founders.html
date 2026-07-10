@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Founders | The Meadow</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* Additional styles for founders grid – uses existing card & grid classes */
+    .founders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 32px;
+      margin-top: 32px;
+    }
+    .founder-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      transition: var(--transition-bouncy);
+      text-align: center;
+      padding: 32px 24px;
+    }
+    .founder-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: var(--card-shadow-hover);
+    }
+    .founder-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 0;           /* square corners */
+  object-fit: cover;
+  border: 4px solid var(--primary);
+  margin: 0 auto 20px;
+}
+    .founder-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--fg);
+    }
+    .founder-position {
+      display: inline-block;
+      background: var(--honey-gradient);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .founder-bio {
+      color: var(--fg-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    @media (max-width: 768px) {
+      .founders-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="page-founders" data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero-card">
+    <h1>Founders</h1>
+    <p>The people who built The Meadow – and continue to tend it.</p>
+  </section>
+
+  <div class="founders-grid" id="foundersGrid">
+    <div class="founders-loading" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+      <div class="buffering-icon" style="margin: 0 auto 12px;"></div>
+      <p class="tiny muted">Loading founders...</p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span>
+    <a href="founders.html">Founders</a>
+  </div>
+  <div class="social-footer" style="margin-top: 16px;">
+    <a href="#" aria-label="Facebook" style="margin: 0 8px; color: var(--primary-dark);"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" aria-label="Instagram" style="margin: 0 8px; color: var(--primary-dark);"><i class="fab fa-instagram"></i></a>
+    <a href="#" aria-label="X (Twitter)" style="margin: 0 8px; color: var(--primary-dark);"><i class="fab fa-x-twitter"></i></a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+  import { showToast } from './js/app.js';
+
+  async function loadFounders() {
+    const container = document.getElementById('foundersGrid');
+    const { data, error } = await supabase
+      .from('founders')
+      .select('*')
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      showToast('Failed to load founders', 'error');
+      container.innerHTML = '<p class="muted" style="text-align:center;">Could not load founders. Please try again later.</p>';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<p class="muted" style="text-align:center;">No founder profiles yet.</p>';
+      return;
+    }
+
+    container.innerHTML = data.map(founder => `
+      <div class="founder-card">
+        <img src="${founder.avatar_url || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=' + founder.name}" class="founder-avatar" alt="${founder.name}">
+        <h3 class="founder-name">${escapeHtml(founder.name)}</h3>
+        <div class="founder-position">${escapeHtml(founder.position)}</div>
+        <p class="founder-bio">${escapeHtml(founder.bio)}</p>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  loadFounders();
+</script>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Nectar | The Golden Milestone Jar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        :root { --jar-glass: rgba(212,175,55,0.04); --gold-edge: rgba(212,175,55,0.35); --glow-color: #ffd700; }
+        #jar-container {
+            position: relative; width: 320px; height: 450px; margin: 0 auto;
+            background: var(--jar-glass); border-radius: 40px 40px 100px 100px;
+            border: 1px solid rgba(212,175,55,0.2);
+            box-shadow: inset 0 0 60px rgba(212,175,55,0.06), 0 20px 40px rgba(0,0,0,0.06);
+            backdrop-filter: blur(2px);
+        }
+        #jar-container::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 220px; height: 30px; background: rgba(212,175,55,0.04);
+            border: 2px solid var(--gold-edge); border-radius: 50%;
+            box-shadow: inset 0 0 15px rgba(212,175,55,0.15); z-index: 5;
+        }
+        .glass-reflection {
+            position: absolute; left: 15%; top: 15%; width: 12px; height: 60%;
+            background: linear-gradient(to bottom,rgba(255,255,255,0.25),transparent);
+            border-radius: 20px; pointer-events: none; z-index: 25;
+        }
+        .firefly {
+            position: absolute; width: 4px; height: 4px; background: #ffd700; border-radius: 50%;
+            box-shadow: 0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);
+            animation: drift 4s infinite ease-in-out; pointer-events: none; z-index: 30;
+        }
+        @keyframes drift { 0%,100%{opacity:0.3;transform:translateY(0)scale(1);} 50%{opacity:1;transform:translateY(-25px)scale(1.3);} }
+        canvas { position: absolute; top: 0; left: 0; z-index: 10; border-radius: inherit; }
+        .badge-grid::-webkit-scrollbar { width: 4px; }
+        .badge-grid::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .jar-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 84px; height: 84px; cursor: pointer; transition: all 0.25s ease;
+        }
+        .jar-badge img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 6px rgba(212,175,55,0.25)); }
+        .jar-badge:hover { transform: scale(1.1); }
+        .jar-badge:hover img { filter: drop-shadow(0 4px 12px rgba(212,175,55,0.45)); }
+        .jar-badge.dropped { opacity: 0.25; cursor: not-allowed; transform: none !important; pointer-events: none; }
+        .jar-badge.dropped img { filter: grayscale(1); }
+        .jar-actions { display: flex; gap: 16px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+        .jar-loading { color: var(--fg-muted); font-size: 0.85rem; padding: 20px; text-align: center; }
+        @media (max-width:640px) { .jar-badge { width: 68px; height: 68px; } #jar-container { width: 260px; height: 380px; } #jar-container::before { width: 180px; } }
+    </style>
+</head>
+<body class="page-jar" data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
+  </nav>
+</header>
+
+<div style="min-height:100vh;padding-top:6rem;">
+  <div style="width:60%;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;">
+    
+    <!-- Left: milestones -->
+    <div style="max-width:480px;">
+      <div style="border-left:4px solid #f59e0b;padding-left:16px;margin-bottom:24px;">
+        <h1 style="font-size:2.8rem;font-weight:900;text-transform:uppercase;font-style:italic;letter-spacing:-0.05em;color:var(--primary-dark);margin:0;">Hive Milestones</h1>
+        <p style="font-size:0.875rem;margin:8px 0 0;color:var(--fg-muted);">Click a badge to drop it into the Golden Jar.</p>
+      </div>
+      <div id="controls" class="badge-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-height:480px;overflow-y:auto;padding:8px;">
+        <div class="jar-loading">Loading your milestones...</div>
+      </div>
+    </div>
+
+    <!-- Right: jar -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-self:center;">
+      <div class="firefly" style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;box-shadow:0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);animation:drift 4s infinite ease-in-out;pointer-events:none;z-index:30;top:8%;left:-18%;animation-delay:0s;"></div>
+      <div class="firefly" style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;box-shadow:0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);animation:drift 4s infinite ease-in-out;pointer-events:none;z-index:30;top:45%;right:-12%;animation-delay:1.5s;"></div>
+      <div id="jar-container"><div class="glass-reflection"></div></div>
+      <div style="margin-top:1.25rem;width:16rem;height:0.75rem;background:rgba(212,175,55,0.12);border-radius:100%;filter:blur(12px);"></div>
+      <div class="jar-actions">
+        <button class="btn" onclick="window.location.href='profile.html'"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-success" id="saveBtn"><i class="fas fa-save"></i> Save Jar</button>
+        <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-trash"></i> Reset</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span>
+    <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+<script type="module">
+import { supabase } from './js/supabase-config.js';
+import { showToast } from './js/app.js';
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+    document.getElementById('controls').innerHTML = '<p class="text-sm p-4" style="color:var(--fg-muted);">Please <a href="login.html" style="color:var(--primary);font-weight:700;">log in</a> to view your milestones.</p>';
+    throw new Error('Not authenticated');
+}
+const USER_ID = session.user.id;
+
+// --- FETCH MILESTONES ---
+const { data: userM } = await supabase
+    .from('user_milestones')
+    .select('milestone_id, milestones(id, name, icon_url, category)')
+    .eq('user_id', USER_ID);
+const milestones = (userM || []).map(um => um.milestones).filter(m => m && m.icon_url);
+
+// --- FETCH SAVED POSITIONS ---
+const savedPositions = new Map(); // milestoneId -> { x, y }
+const { data: savedData } = await supabase
+    .from('user_jar_decorations')
+    .select('*')
+    .eq('user_id', USER_ID);
+if (savedData && savedData.length) {
+    savedData.forEach(d => savedPositions.set(d.milestone_id, { x: d.x_pos, y: d.y_pos }));
+} else {
+    try {
+        const local = JSON.parse(localStorage.getItem(`jar_deco_${USER_ID}`) || '[]');
+        local.forEach(s => savedPositions.set(s.milestone_id, { x: s.x, y: s.y }));
+    } catch {}
+}
+
+// --- PHYSICS ---
+const { Engine, Render, Runner, Bodies, Composite, Body, Mouse, MouseConstraint } = Matter;
+const engine = Engine.create({ gravity: { x: 0, y: 1 } });
+const jarEl = document.getElementById('jar-container');
+const JW = 320, JH = 450;
+
+const render = Render.create({
+    element: jarEl, engine,
+    options: { width: JW, height: JH, wireframes: false, background: 'transparent' }
+});
+
+// Jar walls
+const W = { isStatic: true, render: { visible: false } };
+Composite.add(engine.world, [
+    Bodies.rectangle(JW/2, JH-5, JW-20, 10, W),
+    Bodies.rectangle(5, JH/2, 10, JH, W),
+    Bodies.rectangle(JW-5, JH/2, 10, JH, W),
+]);
+
+// Mouse drag
+const mouse = Mouse.create(render.canvas);
+Composite.add(engine.world, MouseConstraint.create(engine, {
+    mouse, constraint: { stiffness: 0.2, render: { visible: false } }
+}));
+
+Render.run(render);
+Runner.run(Runner.create(), engine);
+
+// --- STATE ---
+const droppedIds = new Set();
+
+// --- PLACE TOKEN (static, used for restore) ---
+const placeStaticToken = (url, id, x, y) => {
+    droppedIds.add(id);
+    // Convert percentage to pixel coords (clamped inside jar)
+    const px = 20 + (x / 100) * (JW - 80);
+    const py = 20 + (y / 100) * (JH - 80);
+    const token = Bodies.circle(px, py, 30, {
+        isStatic: true, restitution: 0.5, friction: 0.3,
+        render: { sprite: { texture: url, xScale: 0.14, yScale: 0.14 } }
+    });
+    token.milestoneId = id;
+    Composite.add(engine.world, token);
+};
+
+// --- DROP TOKEN (dynamic, from top) ---
+const dropToken = (url, id) => {
+    droppedIds.add(id);
+    updateBadges();
+    const token = Bodies.circle(100 + Math.random() * 120, -50, 30, {
+        restitution: 0.6, friction: 0.1,
+        render: { sprite: { texture: url, xScale: 0.14, yScale: 0.14 } }
+    });
+    token.milestoneId = id;
+    Composite.add(engine.world, token);
+};
+
+// --- RESTORE SAVED TOKENS ---
+savedPositions.forEach((pos, id) => {
+    const m = milestones.find(mm => mm.id === id);
+    if (m) placeStaticToken(m.icon_url, id, pos.x, pos.y);
+});
+
+// --- UPDATE BADGES ---
+const updateBadges = () => {
+    document.querySelectorAll('.jar-badge').forEach(el => {
+        el.classList.toggle('dropped', droppedIds.has(parseInt(el.dataset.id)));
+    });
+};
+
+// --- INIT BADGES ---
+const init = () => {
+    const controls = document.getElementById('controls');
+    controls.innerHTML = '';
+    if (!milestones.length) {
+        controls.innerHTML = '<p style="color:var(--fg-muted);font-size:0.85rem;padding:20px;text-align:center;">No milestones earned yet. Complete tasks to unlock badges!</p>';
+        return;
+    }
+    milestones.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'jar-badge';
+        el.dataset.id = m.id;
+        if (droppedIds.has(m.id)) el.classList.add('dropped');
+        const img = document.createElement('img');
+        img.src = m.icon_url; img.alt = m.name;
+        el.appendChild(img);
+        el.title = m.name;
+        el.onclick = () => { if (!droppedIds.has(m.id)) dropToken(m.icon_url, m.id); };
+        controls.appendChild(el);
+    });
+};
+init();
+
+// --- SAVE (with positions) ---
+document.getElementById('saveBtn').addEventListener('click', async () => {
+    const decorations = [];
+    engine.world.bodies.forEach(b => {
+        if (!b.milestoneId) return;
+        // Normalize to percentage within jar
+        const x = Math.round(((b.position.x - 20) / (JW - 80)) * 1000) / 10;
+        const y = Math.round(((b.position.y - 20) / (JH - 80)) * 1000) / 10;
+        decorations.push({
+            user_id: USER_ID,
+            milestone_id: b.milestoneId,
+            x_pos: Math.max(0, Math.min(100, x)),
+            y_pos: Math.max(0, Math.min(100, y)),
+            scale: 1,
+        });
+    });
+
+    if (!decorations.length) { showToast('Nothing to save', 'info'); return; }
+
+    const { error } = await supabase.rpc('save_jar_decorations', {
+        p_user_id: USER_ID, p_decorations: decorations
+    });
+    if (error) {
+        try {
+            localStorage.setItem(`jar_deco_${USER_ID}`, JSON.stringify(
+                decorations.map(d => ({ milestone_id: d.milestone_id, x: d.x_pos, y: d.y_pos }))
+            ));
+            showToast('Jar saved! (local)', 'success');
+        } catch { showToast('Save failed: ' + error.message, 'error'); }
+    } else showToast('Jar saved! 🏺', 'success');
+});
+
+// --- RESET ---
+document.getElementById('resetBtn').addEventListener('click', () => {
+    if (droppedIds.size === 0) return;
+    if (!confirm('Clear all tokens from the jar?')) return;
+    const toRemove = [];
+    engine.world.bodies.forEach(b => { if (b.milestoneId) toRemove.push(b); });
+    toRemove.forEach(b => Composite.remove(engine.world, b));
+    droppedIds.clear();
+    updateBadges();
+    showToast('Jar cleared', 'info');
+});
+</script>
+
+</body>
+</html>
