@@ -1,5 +1,6 @@
 // contact.js
 import { supabase } from './supabase-config.js';
+import { showToast } from './app.js';
 
 export async function handleContactSubmit(e) {
     e.preventDefault();
@@ -25,7 +26,7 @@ export async function handleContactSubmit(e) {
     const { error } = await supabase.from('contact_inquiries').insert([formData]);
 
     if (error) {
-        alert("Error sending message: " + error.message);
+        showToast("Error sending message: " + error.message, "error");
     } else {
         // Show the success feedback card and hide the form
         contactForm.classList.add('hide');

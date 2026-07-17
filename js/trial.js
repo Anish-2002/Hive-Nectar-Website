@@ -423,32 +423,38 @@ async function handleFilterClick(e, container) {
 // --------------------------------------------------------------
 async function openCategoryBottomSheet(categorySlug) {
   Loader.show("Loading content...");
-  let contentHtml;
-  let title;
-  if (categorySlug === 'briefs') {
-    const briefs = await loadBriefs();
-    title = '📄 Policy Briefs';
-    contentHtml = `<div id="hubMainContent">${renderBriefsTable(briefs)}</div>`;
-  } else {
-    const { filterHtml, mainHtml, items } = await getMediaHtml(categorySlug);
-    title = `📂 ${categorySlug.replace('-', ' ').toUpperCase()}`;
-    contentHtml = `
-      <div id="hubFilterPills">${filterHtml}</div>
-      <div id="hubMainContent">${mainHtml}</div>
-    `;
-    setTimeout(() => {
-      const sheetContent = document.querySelector('.bottom-sheet-overlay.active .bottom-sheet-content');
-      if (sheetContent) {
-        const filterDiv = sheetContent.querySelector('#hubFilterPills');
-        if (filterDiv) {
-          filterDiv._mediaItems = items;
-          attachFilterListeners(filterDiv);
+  try {
+    let contentHtml;
+    let title;
+    if (categorySlug === 'briefs') {
+      const briefs = await loadBriefs();
+      title = '📄 Policy Briefs';
+      contentHtml = `<div id="hubMainContent">${renderBriefsTable(briefs)}</div>`;
+    } else {
+      const { filterHtml, mainHtml, items } = await getMediaHtml(categorySlug);
+      title = `📂 ${categorySlug.replace('-', ' ').toUpperCase()}`;
+      contentHtml = `
+        <div id="hubFilterPills">${filterHtml}</div>
+        <div id="hubMainContent">${mainHtml}</div>
+      `;
+      setTimeout(() => {
+        const sheetContent = document.querySelector('.bottom-sheet-overlay.active .bottom-sheet-content');
+        if (sheetContent) {
+          const filterDiv = sheetContent.querySelector('#hubFilterPills');
+          if (filterDiv) {
+            filterDiv._mediaItems = items;
+            attachFilterListeners(filterDiv);
+          }
         }
-      }
-    }, 100);
+      }, 100);
+    }
+    showBottomSheet(title, contentHtml);
+  } catch (err) {
+    console.error('openCategoryBottomSheet error:', err);
+    showToast('Failed to load content', 'error');
+  } finally {
+    Loader.hide();
   }
-  showBottomSheet(title, contentHtml);
-  Loader.hide();
 }
 
 // --------------------------------------------------------------

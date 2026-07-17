@@ -293,53 +293,58 @@ export async function initCommunicationBoard() {
     }
 }
 
-export async function initHomeFeed() {
+async function initHomeFeed() {
     const container = document.getElementById('homeBuzzContainer');
     if (!container) return;
 
-    const allPosts = await fetchAllPosts();
-    const latest = allPosts.slice(0, 3);
+    try {
+        const allPosts = await fetchAllPosts();
+        const latest = allPosts.slice(0, 3);
 
-    if (latest.length === 0) {
-        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No buzz yet. Check back soon!</p>';
-        return;
-    }
+        if (latest.length === 0) {
+            container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No buzz yet. Check back soon!</p>';
+            return;
+        }
 
-    container.innerHTML = latest.map(post => `
-        <div class="post-card" data-id="${post.id}" style="margin-bottom: 16px; cursor: pointer;">
-            <div class="post-header" style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
-                <span class="post-category ${post.post_type}" style="font-size: 1.25rem; font-weight: 700; text-transform: uppercase;">
-                    ${post.post_type}
-                </span>
-                <span class="post-date" style="font-weight: 400; color: var(--muted);">${new Date(post.created_at).toLocaleDateString()}</span>
+        container.innerHTML = latest.map(post => `
+            <div class="post-card" data-id="${post.id}" style="margin-bottom: 16px; cursor: pointer;">
+                <div class="post-header" style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;">
+                    <span class="post-category ${post.post_type}" style="font-size: 1.25rem; font-weight: 700; text-transform: uppercase;">
+                        ${post.post_type}
+                    </span>
+                    <span class="post-date" style="font-weight: 400; color: var(--muted);">${new Date(post.created_at).toLocaleDateString()}</span>
+                </div>
+                <p>${(post.message || '').substring(0, 100)}${(post.message || '').length > 100 ? '...' : ''}</p>
+                <div class="post-footer">
+                    <span class="read-more">Read More →</span>
+                </div>
             </div>
-            <p>${(post.message || '').substring(0, 100)}${(post.message || '').length > 100 ? '...' : ''}</p>
-            <div class="post-footer">
-                <span class="read-more">Read More →</span>
-            </div>
-        </div>
-    `).join('');
+        `).join('');
 
-    container.querySelectorAll('.post-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const postId = card.dataset.id;
-            const post = allPosts.find(p => p.id === postId);
-            if (post) openPostModal(post);
+        container.querySelectorAll('.post-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const postId = card.dataset.id;
+                const post = allPosts.find(p => p.id === postId);
+                if (post) openPostModal(post);
+            });
         });
-    });
+    } catch (err) {
+        console.error('initHomeFeed error:', err);
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Unable to load feed.</p>';
+    }
 }
 
 // Homepage initialisation: updates badge, preview card, and feed
 export async function initHomeNotifications() {
     const container = document.getElementById('homeNotifSection');
-    if (container) {
+    try {
         const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const recentPosts = (await fetchAllPosts()).filter(p => new Date(p.created_at) >= cutoff);
         await updateMessengerBadge();
-        await updateBuzzPreview();   // 👈 fill the preview card
+        await updateBuzzPreview();
         await initHomeFeed();
 
-        if (recentPosts.length > 0) {
+        if (container && recentPosts.length > 0) {
             const latest = recentPosts[0];
             container.innerHTML = `
                 <div class="notif-banner" style="background: var(--honey-gradient); padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
@@ -350,39 +355,36 @@ export async function initHomeNotifications() {
                     <a href="board.html" class="tiny" style="color: white; font-weight: 700;">View Board →</a>
                 </div>
             `;
-        } else {
+        } else if (container) {
             container.innerHTML = '';
         }
-    } else {
-        // If no banner container, still update the messenger and preview
-        await updateMessengerBadge();
-        await updateBuzzPreview();
-        await initHomeFeed();
-    }
 
-    // Real-time updates for homepage
-    const homeSubscription = supabase
-        .channel('comm-home-changes')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'communications' }, async () => {
-            await initHomeFeed();
-            await updateBuzzPreview();
-            const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-            const freshRecent = (await fetchAllPosts()).filter(p => new Date(p.created_at) >= cutoff);
-            if (container && freshRecent.length > 0) {
-                const latest = freshRecent[0];
-                container.innerHTML = `
-                    <div class="notif-banner" style="background: var(--honey-gradient); padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <i class="fas fa-bell" style="color: white;"></i>
-                            <span class="tiny" style="color: white;">${latest.message || latest.title}</span>
+        // Real-time updates for homepage
+        const homeSubscription = supabase
+            .channel('comm-home-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'communications' }, async () => {
+                await initHomeFeed();
+                await updateBuzzPreview();
+                const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                const freshRecent = (await fetchAllPosts()).filter(p => new Date(p.created_at) >= cutoff);
+                if (container && freshRecent.length > 0) {
+                    const latest = freshRecent[0];
+                    container.innerHTML = `
+                        <div class="notif-banner" style="background: var(--honey-gradient); padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-bell" style="color: white;"></i>
+                                <span class="tiny" style="color: white;">${latest.message || latest.title}</span>
+                            </div>
+                            <a href="board.html" class="tiny" style="color: white; font-weight: 700;">View Board →</a>
                         </div>
-                        <a href="board.html" class="tiny" style="color: white; font-weight: 700;">View Board →</a>
-                    </div>
-                `;
-            } else if (container && freshRecent.length === 0) {
-                container.innerHTML = '';
-            }
-            await updateMessengerBadge();
-        })
-        .subscribe();
+                    `;
+                } else if (container && freshRecent.length === 0) {
+                    container.innerHTML = '';
+                }
+                await updateMessengerBadge();
+            })
+            .subscribe();
+    } catch (err) {
+        console.error('initHomeNotifications error:', err);
+    }
 }

@@ -121,7 +121,7 @@ export async function handleSignup(e) {
     showToast("Account created! Please log in.", "success");
     
     setTimeout(() => {
-      window.location.replace('login.html');
+      window.location.replace('profile.html');
     }, 1500);
 
   } catch (err) {

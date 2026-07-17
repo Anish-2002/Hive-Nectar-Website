@@ -1,6 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
-import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
+import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription, parseTokenMeta } from './theme-tokens.js';
 
 // ======================== HELPER FUNCTIONS ========================
 function hexToRgba(hex, alpha) {
@@ -29,6 +29,7 @@ let allTasksWithCompleted = [];
 let baseTasks = [];
 let completedNovice = new Set();
 let completedExperienced = new Set();
+let completedAtMap = {}; // { task_id: completed_at_iso }
 let loggedSigmaTasks = new Set();
 let userProfile = null;
 let userReactions = {};
@@ -96,15 +97,37 @@ async function checkAndAwardMilestones() {
     }
 }
 
+const TOKEN_THEME_NAMES = {
+    T01: 'Connecting / Belonging',
+    T02: 'Creating / Circularity',
+    T03: 'Innovation / Shift',
+    T04: 'Acting / Motivating',
+    T05: 'Reflecting / Learning',
+};
+
+// Optimistic local cache so revealed tokens stay revealed even before DB update lands
+let revealedTokens = new Set();
+
 // ======================== ACHIEVEMENTS HELPERS ========================
 async function updateAchievementsBadge() {
     if (!userProfile) return;
-    const { count, error } = await supabase
+    let count = 0;
+    const { count: mCount, error: mError } = await supabase
         .from('user_milestones')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userProfile.id)
         .eq('viewed', false);
-    if (error) return;
+    if (!mError) count += (mCount || 0);
+
+    const { count: tCount, error: tError } = await supabase
+        .from('user_tokens')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userProfile.id)
+        .eq('viewed', false);
+    // Optimistic: subtract locally-revealed tokens from DB count
+    const revealedCount = revealedTokens.size;
+    if (!tError) count += Math.max(0, (tCount || 0) - revealedCount);
+
     const badgeElements = document.querySelectorAll('.achievements-badge');
     badgeElements.forEach(el => {
         if (count > 0) {
@@ -135,14 +158,14 @@ function getUnlockCondition(milestone) {
 }
 
 async function generateAchievementsHtml() {
-    // 1. Fetch ALL milestones (not just earned ones)
+    // 1. Fetch ALL milestones
     const { data: allMilestones, error: mError } = await supabase
         .from('milestones')
         .select('*')
         .order('category', { ascending: true })
         .order('requirement_value', { ascending: true });
 
-    if (mError || !allMilestones || allMilestones.length === 0) {
+    if (mError) {
         return '<p class="tiny muted">No achievements available yet.</p>';
     }
 
@@ -152,52 +175,114 @@ async function generateAchievementsHtml() {
         .select('milestone_id, achieved_at, viewed')
         .eq('user_id', userProfile.id);
 
-    // 3. Build a map of earned milestone_id -> { viewed }
+    // 3. Build earned milestone map
     const earnedMap = new Map();
     (userM || []).forEach(um => {
         earnedMap.set(um.milestone_id, { viewed: um.viewed });
     });
 
-    // 4. Sort: earned milestones first, locked after
-    allMilestones.sort((a, b) => {
-        const aEarned = earnedMap.has(a.id) ? 0 : 1;
-        const bEarned = earnedMap.has(b.id) ? 0 : 1;
-        return aEarned - bEarned;
+    // 4. Fetch ALL token definitions
+    const { data: allTokens } = await supabase
+        .from('tokens')
+        .select('*')
+        .order('theme_id')
+        .order('stage');
+
+    // 5. Fetch user's earned tokens
+    const { data: userTokens } = await supabase
+        .from('user_tokens')
+        .select('token_id, awarded_at, viewed')
+        .eq('user_id', userProfile.id);
+
+    // 6. Build earned token map
+    const earnedTokenMap = new Map();
+    (userTokens || []).forEach(ut => {
+        earnedTokenMap.set(ut.token_id, { viewed: ut.viewed, awarded_at: ut.awarded_at });
     });
 
-    // 5. Build cards for ALL milestones — earned = full color, unearned = greyed/locked
+    // 7. Build unified item list: milestones first, then tokens
+    const allItems = [];
+
+    // Add milestones
+    allMilestones.forEach(m => {
+        const earned = earnedMap.has(m.id);
+        allItems.push({
+            type: 'milestone',
+            displayId: m.id,
+            name: m.name,
+            category: m.category,
+            requirement_value: m.requirement_value,
+            icon_url: m.icon_url || '',
+            description: m.description,
+            earned,
+            viewed: earned ? (earnedMap.get(m.id).viewed ?? false) : false,
+        });
+    });
+
+    // Add tokens
+    (allTokens || []).forEach(t => {
+        const earned = earnedTokenMap.has(t.id);
+        allItems.push({
+            type: 'token',
+            displayId: `token_${t.id}`,
+            name: t.name,
+            category: 'theme_token',
+            requirement_value: t.tasks_required,
+            icon_url: t.icon_url || '',
+            description: t.description,
+            stage: t.stage,
+            theme_id: t.theme_id,
+            earned,
+            viewed: earned ? (earnedTokenMap.get(t.id)?.viewed ?? false) || revealedTokens.has(t.id) : false,
+        });
+    });
+
+    // 8. Sort: earned first, then by type order
+    allItems.sort((a, b) => {
+        if (a.earned !== b.earned) return a.earned ? -1 : 1;
+        return 0;
+    });
+
+    if (allItems.length === 0) {
+        return '<p class="tiny muted">No achievements available yet.</p>';
+    }
+
+    // 9. Build cards
     let cardsHtml = '';
-    for (const milestone of allMilestones) {
-        const earned = earnedMap.has(milestone.id);
-        const earnedData = earnedMap.get(milestone.id);
+    for (const item of allItems) {
+        const icon = item.icon_url || '';
+        const safeIcon = icon.replace(/"/g, '%22');
+        const safeName = item.name.replace(/"/g, '&quot;');
 
-        const icon = milestone.icon_url || '';
-        const description = getMilestoneDisplayDescription(milestone);
-        const subText = getAchievementSubtext(milestone);
-        const unlockText = getUnlockCondition(milestone);
+        if (item.earned) {
+            // --- Earned card ---
+            let description, subText;
+            if (item.type === 'token') {
+                const meta = parseTokenMeta(item.description);
+                description = meta.copy || 'Great achievement!';
+                subText = `${item.stage} · ${TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token'}`;
+            } else {
+                description = getMilestoneDisplayDescription(item);
+                subText = getAchievementSubtext(item);
+            }
+            const safeDesc = description.replace(/"/g, '&quot;');
+            const safeSub = subText.replace(/"/g, '&quot;');
 
-        const safeIcon = (icon || '').replace(/"/g, '%22');
-        const safeName = milestone.name.replace(/"/g, '&quot;');
-        const safeDesc = description.replace(/"/g, '&quot;');
-        const safeSub = subText.replace(/"/g, '&quot;');
-        const safeUnlock = unlockText.replace(/"/g, '&quot;');
-
-        if (earned) {
-            // --- Earned card (full colour, clickable) ---
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img${milestone.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
                 : `<div class="no-icon-placeholder earned-placeholder">🏆</div>`;
 
             cardsHtml += `
                 <div class="achievement-container earned"
-                     data-milestone-id="${milestone.id}"
+                     data-milestone-id="${item.displayId}"
+                     data-type="${item.type}"
                      data-icon="${safeIcon}"
                      data-name="${safeName}"
                      data-sub="${safeSub}"
                      data-desc="${safeDesc}"
                      onclick="viewMilestone(this)">
                     <div class="achievement-card">
-                        ${!earnedData.viewed ? `
+                        ${!item.viewed ? `
                             <div class="mystery-overlay">
                                 <div class="reveal-msg">Click To Reveal</div>
                             </div>
@@ -206,15 +291,24 @@ async function generateAchievementsHtml() {
                             ${imgTag}
                         </div>
                         <div class="achievement-card-text">
-                            <h3 class="font-bold text-gray-800 text-xl italic">${milestone.name}</h3>
-                            <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">${subText}</p>
+                            <h3 class="font-bold text-gray-800 text-xl italic">${item.name}</h3>
+                            <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">${safeSub}</p>
                         </div>
                     </div>
                 </div>`;
         } else {
-            // --- Locked card (greyed out, shows unlock condition) ---
+            // --- Locked card ---
+            let unlockText;
+            if (item.type === 'token') {
+                const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'this theme';
+                unlockText = `Complete ${item.requirement_value} tasks in ${themeName}`;
+            } else {
+                unlockText = getUnlockCondition(item);
+            }
+            const safeUnlock = unlockText.replace(/"/g, '&quot;');
+
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img locked-img" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img locked-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
                 : `<div class="no-icon-placeholder locked-placeholder">🏆</div>`;
 
             cardsHtml += `
@@ -224,11 +318,11 @@ async function generateAchievementsHtml() {
                             ${imgTag}
                         </div>
                         <div class="achievement-card-text">
-                            <h3 class="font-bold achievement-name-locked">${milestone.name}</h3>
+                            <h3 class="font-bold achievement-name-locked">${item.name}</h3>
                         </div>
                         <div class="lock-blur-overlay">
                             <div class="lock-icon-circle"><i class="fas fa-lock"></i></div>
-                            <div class="unlock-message">${unlockText}</div>
+                            <div class="unlock-message">${safeUnlock}</div>
                         </div>
                     </div>
                 </div>`;
@@ -332,14 +426,14 @@ async function generateAchievementsHtml() {
                 object-fit: cover;
             }
             .achievement-badge-img.token-badge-img {
-                width: 100%;
-                max-width: 220px;
-                height: auto;
-                min-height: 56px;
-                border-radius: 12px;
+                width: 140px;
+                height: 140px;
+                border-radius: 50%;
                 object-fit: contain;
                 background: #fff;
                 padding: 8px;
+                border: 4px solid white;
+                box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
                 flex-shrink: 0;
                 display: block;
             }
@@ -444,6 +538,7 @@ function attachAchievement3DEffects(container) {
 
 window.viewMilestone = async (containerEl) => {
     const milestoneId = containerEl.dataset.milestoneId;
+    const type = containerEl.dataset.type || 'milestone';
     const name  = containerEl.dataset.name  || '';
     const icon  = containerEl.dataset.icon  || '';
     const sub   = containerEl.dataset.sub   || '';
@@ -453,19 +548,40 @@ window.viewMilestone = async (containerEl) => {
     if (overlay) overlay.remove();
     containerEl.dataset.viewed = 'true';
 
-    supabase.rpc('mark_milestone_viewed', {
-        p_user_id: userProfile.id,
-        p_milestone_id: milestoneId
-    }).then(async ({ error }) => {
-        if (error) {
-            await supabase
-                .from('user_milestones')
-                .update({ viewed: true })
-                .eq('user_id', userProfile.id)
-                .eq('milestone_id', milestoneId);
-        }
-        await updateAchievementsBadge();
-    }).catch(err => console.error('Error marking milestone as viewed:', err));
+    if (type === 'token') {
+        const tokenId = milestoneId.replace('token_', '');
+        // Optimistic: mark revealed locally so re-renders see it immediately
+        revealedTokens.add(tokenId);
+        // Fire-and-forget: don't block the modal (matches milestone pattern)
+        supabase
+            .from('user_tokens')
+            .update({ viewed: true })
+            .eq('user_id', userProfile.id)
+            .eq('token_id', tokenId)
+            .then(async ({ error }) => {
+                if (error) {
+                    await supabase.rpc('mark_token_viewed', {
+                        p_user_id: userProfile.id,
+                        p_token_id: tokenId,
+                    }).catch(err => console.error('RPC fallback also failed:', err));
+                }
+                await updateAchievementsBadge();
+            }).catch(err => console.error('Error marking token as viewed:', err));
+    } else {
+        supabase.rpc('mark_milestone_viewed', {
+            p_user_id: userProfile.id,
+            p_milestone_id: parseInt(milestoneId, 10)
+        }).then(async ({ error }) => {
+            if (error) {
+                await supabase
+                    .from('user_milestones')
+                    .update({ viewed: true })
+                    .eq('user_id', userProfile.id)
+                    .eq('milestone_id', parseInt(milestoneId, 10));
+            }
+            await updateAchievementsBadge();
+        }).catch(err => console.error('Error marking milestone as viewed:', err));
+    }
 
     const modal   = document.getElementById('achievementModal');
     if (!modal) return;
@@ -599,25 +715,72 @@ function attachTaskEventListeners(container) {
 
 // ======================== TASK RENDERING ========================
 async function refreshTasks() {
-    const now = new Date();
-    const joinDate = new Date(userProfile.join_date);
-    const daysSinceJoin = Math.floor((now - joinDate) / (1000 * 60 * 60 * 24));
+    // Build per-theme completion map:
+    // for each theme, which task_orders have been completed + their completion time
+    const themesCompletedOrders = {};    // { theme_id: Set<order> }
+    const themeOrderCompletedAt = {};    // { theme_id: { order: iso_date } }
+    const now = Date.now();
 
-    const tasksWithUnlock = baseTasks.map(task => {
-        const minDays = stageGuardrails[task.theme_id]?.[task.stage]?.min_days ?? 0;
-        const effectiveDays = Math.max(0, daysSinceJoin - minDays);
-        const maxAllowedOrder = effectiveDays + 1;
-        const isUnlocked = task.task_order <= maxAllowedOrder;
+    baseTasks.forEach(t => {
+        if (completedNovice.has(t.id)) {
+            // Track which orders are done per theme
+            if (!themesCompletedOrders[t.theme_id]) themesCompletedOrders[t.theme_id] = new Set();
+            themesCompletedOrders[t.theme_id].add(t.task_order);
 
-        let unlockMessage = '';
-        if (!isUnlocked) {
-            const daysNeeded = task.task_order - 1 - effectiveDays;
-            if (daysNeeded > 0) {
-                unlockMessage = `🔒 Unlocks in ${daysNeeded} day(s) (after ${minDays + task.task_order - 1} days total)`;
-            } else {
-                unlockMessage = '🔒 Unlocks soon';
+            // Track when the MOST RECENT completion was for this theme+order
+            const completedAt = completedAtMap[t.id];
+            if (completedAt) {
+                if (!themeOrderCompletedAt[t.theme_id]) themeOrderCompletedAt[t.theme_id] = {};
+                const existing = themeOrderCompletedAt[t.theme_id][t.task_order];
+                if (!existing || new Date(completedAt) > new Date(existing)) {
+                    themeOrderCompletedAt[t.theme_id][t.task_order] = completedAt;
+                }
             }
         }
+    });
+
+    const tasksWithUnlock = baseTasks.map(task => {
+        // HYBRID LOGIC:
+        //   Order 1 → always unlocked
+        //   Order N → unlocked if user completed order N-1 in this theme
+        //             AND at least 1 day has passed since that completion
+        let isUnlocked = false;
+        let unlockMessage = '';
+        const themeName = task.core_theme || task.theme_id;
+
+        if (task.task_order === 1) {
+            isUnlocked = true;
+        } else {
+            const prevOrder = task.task_order - 1;
+            const prevCompleted = themesCompletedOrders[task.theme_id]?.has(prevOrder) ?? false;
+
+            if (!prevCompleted) {
+                // Find the name of the prerequisite task in this theme
+                const prevTask = baseTasks.find(t => t.theme_id === task.theme_id && t.task_order === prevOrder);
+                const prevTaskName = prevTask?.task_title || `order ${prevOrder}`;
+                unlockMessage = `🔒 Complete "${prevTaskName}" in ${themeName} first`;
+            } else {
+                // Check 1-day delay: must have completed prev order at least 1 day ago
+                const prevCompletedAt = themeOrderCompletedAt[task.theme_id]?.[prevOrder];
+                if (prevCompletedAt) {
+                    const msSince = now - new Date(prevCompletedAt).getTime();
+                    const daysSince = msSince / (1000 * 60 * 60 * 24);
+                    if (daysSince >= 1) {
+                        isUnlocked = true;
+                    } else {
+                        const hoursLeft = Math.ceil((1 - daysSince) * 24);
+                        // Find the completed task name for the message
+                        const prevTask = baseTasks.find(t => t.theme_id === task.theme_id && t.task_order === prevOrder);
+                        const prevTaskName = prevTask?.task_title || `order ${prevOrder}`;
+                        unlockMessage = `🔒 Unlocks in ${hoursLeft}h (1 day after "${prevTaskName}")`;
+                    }
+                } else {
+                    // Completed but no timestamp (legacy data) — treat as unlocked
+                    isUnlocked = true;
+                }
+            }
+        }
+
         return { ...task, is_unlocked: isUnlocked, unlock_message: unlockMessage };
     });
 
@@ -846,6 +1009,7 @@ async function handleDone(checkbox) {
 
         if (version === 'novice') completedNovice.add(taskId);
         else completedExperienced.add(taskId);
+        completedAtMap[taskId] = new Date().toISOString();
 
         const pointsEarned = result.points_earned;
         userProfile.total_points = (userProfile.total_points || 0) + pointsEarned;
@@ -2784,15 +2948,21 @@ export async function initProfile() {
 
         const { data: userTasks, error: userTasksError } = await supabase
             .from('user_tasks')
-            .select('task_id, version')
+            .select('task_id, version, completed_at')
             .eq('user_id', user.id);
         if (userTasksError) throw userTasksError;
 
         completedNovice.clear();
         completedExperienced.clear();
+        completedAtMap = {};
         userTasks.forEach(t => {
-            if (t.version === 'novice') completedNovice.add(t.task_id);
-            else if (t.version === 'experienced') completedExperienced.add(t.task_id);
+            if (t.version === 'novice') {
+                completedNovice.add(t.task_id);
+                if (t.completed_at) completedAtMap[t.task_id] = t.completed_at;
+            } else if (t.version === 'experienced') {
+                completedExperienced.add(t.task_id);
+                if (t.completed_at) completedAtMap[t.task_id] = t.completed_at;
+            }
         });
 
         const { data: progressData, error: progressError } = await supabase

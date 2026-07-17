@@ -13,8 +13,7 @@ form.addEventListener('submit', async (e) => {
     btn.disabled = true;
 
     // Production domain — reset link in email must point here regardless of dev/test origin
-    const PRODUCTION_DOMAIN = 'https://www.hivenectar.earth';
-    const redirectUrl = `${PRODUCTION_DOMAIN}/reset-password.html`;
+    const redirectUrl = `${window.location.origin}/reset-password.html`;
 
     try {
         console.log("Requesting password reset for:", emailInput);

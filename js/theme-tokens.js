@@ -2,56 +2,11 @@ import { supabase } from './supabase-config.js';
 import { showToast } from './app.js';
 
 /**
- * Theme token definitions – icons live in /assets/tokens/
- * First token unlocks at 5 completed tasks per theme, then 15 and 30.
+ * Theme token award system.
+ * Tokens reference data lives in the `tokens` table (seeded by SQL).
+ * Earned tokens are stored in `user_tokens`.
+ * Award logic runs server-side via `award_theme_tokens` RPC (called from `complete_task`).
  */
-export const THEME_TOKEN_DEFINITIONS = [
-    {
-        core_theme: '🌱 Connecting / Belonging',
-        theme_slug: 'connecting-belonging',
-        tokens: [
-            { code: 'TE-001', name: 'Roots Seed', stage: 'Seeds', tasks_required: 5, icon: 'assets/tokens/Connecting-Belonging/TE-001_RootsSeed.svg', description: 'You showed up for belonging — five roots planted.' },
-            { code: 'TE-006', name: 'Roots Sprout', stage: 'Sprout', tasks_required: 15, icon: 'assets/tokens/Connecting-Belonging/TE-006_RootsSprout.svg', description: 'Connection is growing — your roots are sprouting.' },
-            { code: 'TE-011', name: 'Roots Bloom', stage: 'Bloom', tasks_required: 30, icon: 'assets/tokens/Connecting-Belonging/TE-011_RootsBloom.svg', description: 'Belonging in full bloom — sustained presence.' }
-        ]
-    },
-    {
-        core_theme: '✨ Creating / Circularity',
-        theme_slug: 'creative',
-        tokens: [
-            { code: 'TE-002', name: 'Forge Hands', stage: 'Seeds', tasks_required: 5, icon: 'assets/tokens/Creative/TE-002_ForgeHands.svg', description: 'Five acts of making — hands on the forge.' },
-            { code: 'TE-007', name: 'Forge Shape', stage: 'Sprout', tasks_required: 15, icon: 'assets/tokens/Creative/TE-007_ForgeShape.svg', description: 'Your craft is taking shape.' },
-            { code: 'TE-012', name: 'Forge Craft', stage: 'Bloom', tasks_required: 30, icon: 'assets/tokens/Creative/TE-012_ForgeCraft.svg', description: 'Circularity mastered through repeated creation.' }
-        ]
-    },
-    {
-        core_theme: '💡 Innovation / Shift',
-        theme_slug: 'innovation',
-        tokens: [
-            { code: 'TE-003', name: 'Shift Nudge', stage: 'Seeds', tasks_required: 5, icon: 'assets/tokens/Innovation/TE-003_ShiftNudge.svg', description: 'Five small shifts — innovation begins with a nudge.' },
-            { code: 'TE-008', name: 'Shift Angle', stage: 'Sprout', tasks_required: 15, icon: 'assets/tokens/Innovation/TE-008_ShiftAngle.svg', description: 'A new angle on familiar problems.' },
-            { code: 'TE-013', name: 'Shift Current', stage: 'Bloom', tasks_required: 30, icon: 'assets/tokens/Innovation/TE-013_ShiftCurrent.svg', description: 'You ride the current of change.' }
-        ]
-    },
-    {
-        core_theme: '⚡ Acting / Motivating',
-        theme_slug: 'action-motivating',
-        tokens: [
-            { code: 'TE-005', name: 'Rhythm Beat', stage: 'Seeds', tasks_required: 5, icon: 'assets/tokens/Action-Motivating/TE-005_RhythmBeat.svg', description: 'Five beats of action — momentum starts here.' },
-            { code: 'TE-010', name: 'Rhythm Groove', stage: 'Sprout', tasks_required: 15, icon: 'assets/tokens/Action-Motivating/TE-010_RhythmGroove.svg', description: 'Action has found its groove.' },
-            { code: 'TE-015', name: 'Rhythm Ensemble', stage: 'Bloom', tasks_required: 30, icon: 'assets/tokens/Action-Motivating/TE-015_RhythmEnsemble.svg', description: 'Sustained motivation — leading the ensemble.' }
-        ]
-    },
-    {
-        core_theme: '🌙 Reflecting / Learning',
-        theme_slug: 'reflective',
-        tokens: [
-            { code: 'TE-004', name: 'Echo Signal', stage: 'Seeds', tasks_required: 5, icon: 'assets/tokens/Reflective/TE-004_EchoSignal.svg', description: 'Five moments of reflection — a signal received.' },
-            { code: 'TE-009', name: 'Echo Resonance', stage: 'Sprout', tasks_required: 15, icon: 'assets/tokens/Reflective/TE-009_EchoResonance.svg', description: 'Learning resonates deeper.' },
-            { code: 'TE-014', name: 'Echo Still', stage: 'Bloom', tasks_required: 30, icon: 'assets/tokens/Reflective/TE-014_EchoStill.svg', description: 'Stillness earned through sustained reflection.' }
-        ]
-    }
-];
 
 export function parseTokenMeta(description) {
     if (!description) return {};
@@ -63,82 +18,121 @@ export function parseTokenMeta(description) {
     }
 }
 
-export async function getThemeCompletionCounts(userId) {
+/**
+ * Fetch all token definitions from the `tokens` table
+ */
+export async function getAllTokenDefs() {
     const { data, error } = await supabase
-        .from('user_tasks')
-        .select('task_id, tasks ( core_theme, theme_id )')
-        .eq('user_id', userId);
-
-    if (error) throw error;
-
-    const counts = {};
-    (data || []).forEach((row) => {
-        const coreTheme = row.tasks?.core_theme;
-        if (!coreTheme) return;
-        counts[coreTheme] = (counts[coreTheme] || 0) + 1;
-    });
-    return counts;
+        .from('tokens')
+        .select('*')
+        .order('theme_id')
+        .order('stage');
+    if (error) {
+        console.warn('Could not fetch token defs:', error.message);
+        return [];
+    }
+    return data || [];
 }
 
 /**
- * Awards theme tokens via milestones table (category = theme_token).
- * Run the SQL seed in supabase/seed_theme_tokens.sql first.
+ * Fetch tokens the user has earned
+ */
+export async function getUserTokens(userId) {
+    const { data, error } = await supabase
+        .from('user_tokens')
+        .select('token_id, awarded_at, viewed')
+        .eq('user_id', userId);
+    if (error) {
+        console.warn('Could not fetch user tokens:', error.message);
+        return [];
+    }
+    return data || [];
+}
+
+/**
+ * Build a map of earned token_ids for quick lookup
+ */
+export async function getEarnedTokenMap(userId) {
+    const tokens = await getUserTokens(userId);
+    const map = {};
+    tokens.forEach(t => { map[t.token_id] = { viewed: t.viewed, awarded_at: t.awarded_at }; });
+    return map;
+}
+
+/**
+ * Server-side token award check — runs the RPC that the complete_task
+ * RPC already calls internally. Use this for initial-page-load catch-up.
+ * Returns array of newly awarded token objects.
  */
 export async function checkAndAwardThemeTokens(userId, updateBadgeFn) {
     if (!userId) return [];
 
-    const awarded = [];
+    const { data, error } = await supabase.rpc('award_theme_tokens', {
+        p_user_id: userId
+    });
 
-    try {
-        const [counts, milestonesRes, userMilestonesRes] = await Promise.all([
-            getThemeCompletionCounts(userId),
-            supabase.from('milestones').select('*').eq('category', 'theme_token'),
-            supabase.from('user_milestones').select('milestone_id').eq('user_id', userId)
-        ]);
-
-        if (milestonesRes.error) {
-            console.warn('Theme token milestones not loaded:', milestonesRes.error.message);
-            return awarded;
-        }
-
-        const earnedIds = new Set((userMilestonesRes.data || []).map((row) => row.milestone_id));
-        const milestones = milestonesRes.data || [];
-
-        for (const milestone of milestones) {
-            const meta = parseTokenMeta(milestone.description);
-            const coreTheme = meta.core_theme;
-            const tasksRequired = milestone.requirement_value || meta.tasks_required || 5;
-            if (!coreTheme) continue;
-
-            const completed = counts[coreTheme] || 0;
-            if (completed < tasksRequired || earnedIds.has(milestone.id)) continue;
-
-            const { error: insertError } = await supabase.from('user_milestones').insert({
-                user_id: userId,
-                milestone_id: milestone.id,
-                viewed: false
-            });
-
-            if (insertError) {
-                console.warn('Could not award theme token:', insertError.message);
-                continue;
-            }
-
-            earnedIds.add(milestone.id);
-            awarded.push(milestone);
-            showToast(`🏆 Token unlocked: ${milestone.name}`, 'success');
-        }
-
-        if (awarded.length && updateBadgeFn) {
-            await updateBadgeFn();
-        }
-    } catch (err) {
-        console.error('Theme token award failed:', err);
+    if (error) {
+        console.warn('Theme token award RPC failed:', error.message);
+        return [];
     }
 
+    const awarded = data || [];
+    if (awarded.length) {
+        awarded.forEach(t => {
+            showToast(`🎁 New token: ${t.token_name} (${t.stage})`, 'success');
+        });
+        if (updateBadgeFn) await updateBadgeFn();
+    }
     return awarded;
 }
 
+/**
+ * Get per-theme task completion counts from user_tasks
+ */
+export async function getThemeCompletionCounts(userId) {
+    const { data, error } = await supabase
+        .from('user_tasks')
+        .select('task_id, tasks ( core_theme, theme_id, stage )')
+        .eq('user_id', userId);
+
+    if (error) throw error;
+
+    // Count per (theme_id, stage)
+    const counts = {};
+    (data || []).forEach((row) => {
+        const themeId = row.tasks?.theme_id;
+        const stage = row.tasks?.stage;
+        if (!themeId) return;
+        const key = `${themeId}::${stage}`;
+        counts[key] = (counts[key] || 0) + 1;
+    });
+    return counts;
+}
+
+// ======================== DISPLAY HELPERS ========================
+
+/**
+ * Build a combined view: token definitions + user's earned status
+ * Returns array of { id, name, theme_id, stage, tasks_required, icon_url,
+ *                      description, earned, viewed, awarded_at }
+ */
+export async function buildTokenDisplayList(userId) {
+    const [allTokens, earnedMap] = await Promise.all([
+        getAllTokenDefs(),
+        getEarnedTokenMap(userId)
+    ]);
+
+    return allTokens.map(t => ({
+        ...t,
+        earned: !!earnedMap[t.id],
+        viewed: earnedMap[t.id]?.viewed ?? false,
+        awarded_at: earnedMap[t.id]?.awarded_at ?? null
+    }));
+}
+
+/**
+ * Legacy display helpers for milestone-based achievements (unchanged)
+ */
 export function getAchievementSubtext(milestone) {
     if (milestone.category === 'theme_token') {
         const meta = parseTokenMeta(milestone.description);
