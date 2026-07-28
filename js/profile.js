@@ -1,6 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
-import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription, parseTokenMeta } from './theme-tokens.js';
+import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
 
 // ======================== HELPER FUNCTIONS ========================
 function hexToRgba(hex, alpha) {
@@ -29,7 +29,7 @@ let allTasksWithCompleted = [];
 let baseTasks = [];
 let completedNovice = new Set();
 let completedExperienced = new Set();
-let completedAtMap = {}; // { task_id: completed_at_iso }
+let completedAtMap = {};
 let loggedSigmaTasks = new Set();
 let userProfile = null;
 let userReactions = {};
@@ -97,17 +97,6 @@ async function checkAndAwardMilestones() {
     }
 }
 
-const TOKEN_THEME_NAMES = {
-    T01: 'Connecting / Belonging',
-    T02: 'Creating / Circularity',
-    T03: 'Innovation / Shift',
-    T04: 'Acting / Motivating',
-    T05: 'Reflecting / Learning',
-};
-
-// Optimistic local cache so revealed tokens stay revealed even before DB update lands
-let revealedTokens = new Set();
-
 // ======================== ACHIEVEMENTS HELPERS ========================
 async function updateAchievementsBadge() {
     if (!userProfile) return;
@@ -124,7 +113,6 @@ async function updateAchievementsBadge() {
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userProfile.id)
         .eq('viewed', false);
-    // Optimistic: subtract locally-revealed tokens from DB count
     const revealedCount = revealedTokens.size;
     if (!tError) count += Math.max(0, (tCount || 0) - revealedCount);
 
@@ -140,6 +128,16 @@ async function updateAchievementsBadge() {
     window.unviewedMilestoneCount = count;
 }
 
+const TOKEN_THEME_NAMES = {
+    T01: 'Connecting / Belonging',
+    T02: 'Creating / Circularity',
+    T03: 'Innovation / Shift',
+    T04: 'Acting / Motivating',
+    T05: 'Reflecting / Learning',
+};
+
+let revealedTokens = new Set();
+
 function getUnlockCondition(milestone) {
     const val = milestone.requirement_value;
     switch (milestone.category) {
@@ -149,9 +147,11 @@ function getUnlockCondition(milestone) {
         case 'sigma': return `Complete ${val} improvement logs`;
         case 'referrals': return `Refer ${val} friends`;
         case 'theme_token': {
-            const meta = parseTokenMeta(milestone.description);
-            const theme = meta.core_theme || '';
-            return `Complete ${val} tasks in ${theme || 'this theme'}`;
+            try {
+                const meta = JSON.parse(milestone.description);
+                const theme = meta.core_theme || '';
+                return `Complete ${val} tasks in ${theme || 'this theme'}`;
+            } catch { return `Complete ${val} tasks in this theme`; }
         }
         default: return `Reach milestone`;
     }
@@ -162,6 +162,7 @@ async function generateAchievementsHtml() {
     const { data: allMilestones, error: mError } = await supabase
         .from('milestones')
         .select('*')
+        .eq('active', true)
         .order('category', { ascending: true })
         .order('requirement_value', { ascending: true });
 
@@ -181,10 +182,11 @@ async function generateAchievementsHtml() {
         earnedMap.set(um.milestone_id, { viewed: um.viewed });
     });
 
-    // 4. Fetch ALL token definitions
+    // 4. Fetch ALL token definitions (only active)
     const { data: allTokens } = await supabase
         .from('tokens')
         .select('*')
+        .eq('active', true)
         .order('theme_id')
         .order('stage');
 
@@ -203,7 +205,6 @@ async function generateAchievementsHtml() {
     // 7. Build unified item list: milestones first, then tokens
     const allItems = [];
 
-    // Add milestones
     allMilestones.forEach(m => {
         const earned = earnedMap.has(m.id);
         allItems.push({
@@ -219,7 +220,6 @@ async function generateAchievementsHtml() {
         });
     });
 
-    // Add tokens
     (allTokens || []).forEach(t => {
         const earned = earnedTokenMap.has(t.id);
         allItems.push({
@@ -237,7 +237,7 @@ async function generateAchievementsHtml() {
         });
     });
 
-    // 8. Sort: earned first, then by type order
+    // 8. Sort: earned first
     allItems.sort((a, b) => {
         if (a.earned !== b.earned) return a.earned ? -1 : 1;
         return 0;
@@ -255,10 +255,10 @@ async function generateAchievementsHtml() {
         const safeName = item.name.replace(/"/g, '&quot;');
 
         if (item.earned) {
-            // --- Earned card ---
             let description, subText;
             if (item.type === 'token') {
-                const meta = parseTokenMeta(item.description);
+                let meta = {};
+                try { meta = JSON.parse(item.description); } catch {}
                 description = meta.copy || 'Great achievement!';
                 subText = `${item.stage} · ${TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token'}`;
             } else {
@@ -297,7 +297,6 @@ async function generateAchievementsHtml() {
                     </div>
                 </div>`;
         } else {
-            // --- Locked card ---
             let unlockText;
             if (item.type === 'token') {
                 const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'this theme';
@@ -346,14 +345,8 @@ async function generateAchievementsHtml() {
                 box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2);
                 margin-bottom: 48px;
             }
-            .achievement-container {
-                perspective: 1200px;
-                margin-bottom: 24px;
-                min-height: 380px;
-            }
-            .achievement-container.earned {
-                cursor: pointer;
-            }
+            .achievement-container { perspective: 1200px; margin-bottom: 24px; min-height: 380px; }
+            .achievement-container.earned { cursor: pointer; }
             .achievement-card {
                 position: relative;
                 background: white;
@@ -370,141 +363,41 @@ async function generateAchievementsHtml() {
                 justify-content: flex-start;
                 gap: 20px;
             }
-            .badge-icon-wrap {
-                width: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-shrink: 0;
-                margin-top: 10px;
-            }
-            .achievement-card-text {
-                width: 100%;
-                text-align: center;
-                margin-top: auto;
-                padding-bottom: 4px;
-            }
+            .badge-icon-wrap { width: 100%; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin-top: 10px; }
+            .achievement-card-text { width: 100%; text-align: center; margin-top: auto; padding-bottom: 4px; }
             .achievement-container.earned .achievement-card:hover {
                 transform: translateY(-12px) rotateX(4deg) rotateY(4deg);
                 box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.2);
             }
             .mystery-overlay {
-                position: absolute;
-                inset: 0;
-                z-index: 20;
+                position: absolute; inset: 0; z-index: 20;
                 background: rgba(255, 255, 255, 0.1);
                 backdrop-filter: blur(12px) saturate(180%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.5s ease;
-                border-radius: 32px;
+                display: flex; align-items: center; justify-content: center;
+                transition: all 0.5s ease; border-radius: 32px;
             }
             .reveal-msg {
-                background: white;
-                color: var(--honey-amber);
-                padding: 8px 16px;
-                border-radius: 100px;
-                font-size: 0.7rem;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 1.5px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                background: white; color: var(--honey-amber);
+                padding: 8px 16px; border-radius: 100px;
+                font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+                letter-spacing: 1.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
-            .achievement-container.earned .achievement-card:hover .reveal-msg {
-                transform: scale(1.05);
-                box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-            }
-            .achievement-badge-img {
-                width: 140px;
-                height: 140px;
-                margin: 0 auto;
-                transform: translateZ(30px);
-                border-radius: 50%;
-                border: 4px solid white;
-                box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
-                object-fit: cover;
-            }
-            .achievement-badge-img.token-badge-img {
-                width: 140px;
-                height: 140px;
-                border-radius: 50%;
-                object-fit: contain;
-                background: #fff;
-                padding: 8px;
-                border: 4px solid white;
-                box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2);
-                flex-shrink: 0;
-                display: block;
-            }
-            .grid-achievements {
-                display: grid;
-                grid-template-columns: repeat(1, 1fr);
-                gap: 32px;
-                max-width: 1280px;
-                margin: 0 auto;
-                padding: 0 32px;
-            }
-            @media (min-width: 640px) {
-                .grid-achievements { grid-template-columns: repeat(2, 1fr); }
-            }
-            @media (min-width: 1024px) {
-                .grid-achievements { grid-template-columns: repeat(3, 1fr); }
-            }
-            /* ---- Locked (unearned) card styles ---- */
-            .achievement-container.locked {
-                cursor: default;
-                opacity: 0.85;
-            }
-            .achievement-card.locked-card {\n                background: #f5f5f4;\n                border-color: #e5e5e4;\n                position: relative;\n                overflow: hidden;\n            }\n            .achievement-card.locked-card .badge-icon-wrap {\n                filter: blur(5px) brightness(0.75);\n            }\n            .achievement-badge-img.locked-img {\n                box-shadow: none;\n                border-color: #d4d4d4;\n            }\n            .achievement-card.locked-card .achievement-card-text {\n                filter: blur(3px);\n                pointer-events: none;\n            }\n            /* --- Locked blur overlay --- */\n            .lock-blur-overlay {\n                position: absolute;\n                inset: 0;\n                z-index: 10;\n                display: flex;\n                flex-direction: column;\n                align-items: center;\n                justify-content: center;\n                gap: 8px;\n                pointer-events: none;\n            }\n            .lock-blur-overlay .lock-icon-circle {\n                background: rgba(255,255,255,0.85);\n                backdrop-filter: blur(6px);\n                width: 48px;\n                height: 48px;\n                border-radius: 50%;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n                font-size: 1.2rem;\n                color: #a3a3a3;\n                box-shadow: 0 4px 12px rgba(0,0,0,0.08);\n            }\n            .lock-blur-overlay .unlock-message {\n                background: rgba(255,255,255,0.9);\n                backdrop-filter: blur(6px);\n                padding: 8px 16px;\n                border-radius: 100px;\n                font-size: 0.65rem;\n                font-weight: 800;\n                text-transform: uppercase;\n                letter-spacing: 1.5px;\n                color: #78716c;\n                text-align: center;\n                max-width: 180px;\n                box-shadow: 0 4px 12px rgba(0,0,0,0.08);\n            }
-            .achievement-name-locked {
-                color: #a3a3a3 !important;
-                font-size: 1.25rem;
-                font-style: italic;
-            }
-            .unlock-condition-text {
-                font-size: 0.75rem;
-                color: #78716c;
-                font-weight: 600;
-                margin-top: 8px;
-                padding: 6px 12px;
-                background: rgba(120, 113, 108, 0.08);
-                border-radius: 100px;
-                display: inline-block;
-                letter-spacing: 0.3px;
-            }
-            .lock-overlay-icon {
-                position: absolute;
-                top: 16px;
-                right: 16px;
-                z-index: 5;
-                width: 36px;
-                height: 36px;
-                background: rgba(168, 162, 158, 0.25);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #a8a29e;
-                font-size: 1rem;
-                backdrop-filter: blur(4px);
-            }
-            .no-icon-placeholder {
-                width: 140px;
-                height: 140px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 3rem;
-                background: #fef3c7;
-                border: 4px solid white;
-            }
-            .no-icon-placeholder.locked-placeholder {
-                background: #e5e5e4;
-                filter: grayscale(1);
-                opacity: 0.5;
-            }
+            .achievement-badge-img { width: 140px; height: 140px; margin: 0 auto; transform: translateZ(30px); border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); object-fit: cover; }
+            .achievement-badge-img.token-badge-img { width: 140px; height: 140px; border-radius: 50%; object-fit: contain; background: #fff; padding: 8px; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); flex-shrink: 0; display: block; }
+            .grid-achievements { display: grid; grid-template-columns: repeat(1, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+            @media (min-width: 640px) { .grid-achievements { grid-template-columns: repeat(2, 1fr); } }
+            @media (min-width: 1024px) { .grid-achievements { grid-template-columns: repeat(3, 1fr); } }
+            .achievement-container.locked { cursor: default; opacity: 0.85; }
+            .achievement-card.locked-card { background: #f5f5f4; border-color: #e5e5e4; position: relative; overflow: hidden; }
+            .achievement-card.locked-card .badge-icon-wrap { filter: blur(5px) brightness(0.75); }
+            .achievement-badge-img.locked-img { box-shadow: none; border-color: #d4d4d4; }
+            .achievement-card.locked-card .achievement-card-text { filter: blur(3px); pointer-events: none; }
+            .lock-blur-overlay { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; pointer-events: none; }
+            .lock-blur-overlay .lock-icon-circle { background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #a3a3a3; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+            .lock-blur-overlay .unlock-message { background: rgba(255,255,255,0.9); backdrop-filter: blur(6px); padding: 8px 16px; border-radius: 100px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #78716c; text-align: center; }
+            .achievement-name-locked { color: #a3a3a3 !important; font-size: 1.25rem; font-style: italic; }
+            .no-icon-placeholder { width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: #fef3c7; border: 4px solid white; }
+            .no-icon-placeholder.locked-placeholder { background: #e5e5e4; filter: grayscale(1); opacity: 0.5; }
         </style>
         <div class="profile-hero-mini">
             <h1 class="text-4xl font-black uppercase tracking-tighter italic">Nectar Artefacts</h1>
@@ -518,7 +411,7 @@ async function generateAchievementsHtml() {
 
 function attachAchievement3DEffects(container) {
     if (!container) return;
-    const cards = container.querySelectorAll('.achievement-container.earned .achievement-card');
+    const cards = container.querySelectorAll('.achievement-card');
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
@@ -538,7 +431,6 @@ function attachAchievement3DEffects(container) {
 
 window.viewMilestone = async (containerEl) => {
     const milestoneId = containerEl.dataset.milestoneId;
-    const type = containerEl.dataset.type || 'milestone';
     const name  = containerEl.dataset.name  || '';
     const icon  = containerEl.dataset.icon  || '';
     const sub   = containerEl.dataset.sub   || '';
@@ -548,40 +440,19 @@ window.viewMilestone = async (containerEl) => {
     if (overlay) overlay.remove();
     containerEl.dataset.viewed = 'true';
 
-    if (type === 'token') {
-        const tokenId = milestoneId.replace('token_', '');
-        // Optimistic: mark revealed locally so re-renders see it immediately
-        revealedTokens.add(tokenId);
-        // Fire-and-forget: don't block the modal (matches milestone pattern)
-        supabase
-            .from('user_tokens')
-            .update({ viewed: true })
-            .eq('user_id', userProfile.id)
-            .eq('token_id', tokenId)
-            .then(async ({ error }) => {
-                if (error) {
-                    await supabase.rpc('mark_token_viewed', {
-                        p_user_id: userProfile.id,
-                        p_token_id: tokenId,
-                    }).catch(err => console.error('RPC fallback also failed:', err));
-                }
-                await updateAchievementsBadge();
-            }).catch(err => console.error('Error marking token as viewed:', err));
-    } else {
-        supabase.rpc('mark_milestone_viewed', {
-            p_user_id: userProfile.id,
-            p_milestone_id: parseInt(milestoneId, 10)
-        }).then(async ({ error }) => {
-            if (error) {
-                await supabase
-                    .from('user_milestones')
-                    .update({ viewed: true })
-                    .eq('user_id', userProfile.id)
-                    .eq('milestone_id', parseInt(milestoneId, 10));
-            }
-            await updateAchievementsBadge();
-        }).catch(err => console.error('Error marking milestone as viewed:', err));
-    }
+    supabase.rpc('mark_milestone_viewed', {
+        p_user_id: userProfile.id,
+        p_milestone_id: milestoneId
+    }).then(async ({ error }) => {
+        if (error) {
+            await supabase
+                .from('user_milestones')
+                .update({ viewed: true })
+                .eq('user_id', userProfile.id)
+                .eq('milestone_id', milestoneId);
+        }
+        await updateAchievementsBadge();
+    }).catch(err => console.error('Error marking milestone as viewed:', err));
 
     const modal   = document.getElementById('achievementModal');
     if (!modal) return;
@@ -705,83 +576,56 @@ function attachTaskEventListeners(container) {
     container.querySelectorAll('.comment-btn:not([disabled])').forEach(el => {
         el.onclick = (e) => handleComment(e.target);
     });
-    container.querySelectorAll('.edit-comment-btn').forEach(el => {
-        el.onclick = (e) => handleEditComment(e.target);
-    });
-    container.querySelectorAll('.delete-comment-btn').forEach(el => {
-        el.onclick = (e) => handleDeleteComment(e.target);
-    });
 }
 
 // ======================== TASK RENDERING ========================
 async function refreshTasks() {
-    // Build per-theme completion map:
-    // for each theme, which task_orders have been completed + their completion time
-    const themesCompletedOrders = {};    // { theme_id: Set<order> }
-    const themeOrderCompletedAt = {};    // { theme_id: { order: iso_date } }
-    const now = Date.now();
+    const now = new Date();
 
-    baseTasks.forEach(t => {
-        if (completedNovice.has(t.id)) {
-            // Track which orders are done per theme
-            if (!themesCompletedOrders[t.theme_id]) themesCompletedOrders[t.theme_id] = new Set();
-            themesCompletedOrders[t.theme_id].add(t.task_order);
-
-            // Track when the MOST RECENT completion was for this theme+order
-            const completedAt = completedAtMap[t.id];
-            if (completedAt) {
-                if (!themeOrderCompletedAt[t.theme_id]) themeOrderCompletedAt[t.theme_id] = {};
-                const existing = themeOrderCompletedAt[t.theme_id][t.task_order];
-                if (!existing || new Date(completedAt) > new Date(existing)) {
-                    themeOrderCompletedAt[t.theme_id][t.task_order] = completedAt;
-                }
-            }
-        }
+    // Group tasks by theme and sort by order within each theme
+    const themeGroups = {};
+    baseTasks.forEach(task => {
+        if (!themeGroups[task.theme_id]) themeGroups[task.theme_id] = [];
+        themeGroups[task.theme_id].push(task);
     });
+    Object.values(themeGroups).forEach(group => group.sort((a, b) => a.task_order - b.task_order));
 
+    // Determine unlock status per task: sequential per-theme with 24h cooldown
     const tasksWithUnlock = baseTasks.map(task => {
-        // HYBRID LOGIC:
-        //   Order 1 → always unlocked
-        //   Order N → unlocked if user completed order N-1 in this theme
-        //             AND at least 1 day has passed since that completion
-        let isUnlocked = false;
-        let unlockMessage = '';
-        const themeName = task.core_theme || task.theme_id;
+        const group = themeGroups[task.theme_id] || [];
+        const idx = group.indexOf(task);
+        const completedSet = showingExperienced ? completedExperienced : completedNovice;
 
-        if (task.task_order === 1) {
-            isUnlocked = true;
-        } else {
-            const prevOrder = task.task_order - 1;
-            const prevCompleted = themesCompletedOrders[task.theme_id]?.has(prevOrder) ?? false;
-
-            if (!prevCompleted) {
-                // Find the name of the prerequisite task in this theme
-                const prevTask = baseTasks.find(t => t.theme_id === task.theme_id && t.task_order === prevOrder);
-                const prevTaskName = prevTask?.task_title || `order ${prevOrder}`;
-                unlockMessage = `🔒 Complete "${prevTaskName}" in ${themeName} first`;
-            } else {
-                // Check 1-day delay: must have completed prev order at least 1 day ago
-                const prevCompletedAt = themeOrderCompletedAt[task.theme_id]?.[prevOrder];
-                if (prevCompletedAt) {
-                    const msSince = now - new Date(prevCompletedAt).getTime();
-                    const daysSince = msSince / (1000 * 60 * 60 * 24);
-                    if (daysSince >= 1) {
-                        isUnlocked = true;
-                    } else {
-                        const hoursLeft = Math.ceil((1 - daysSince) * 24);
-                        // Find the completed task name for the message
-                        const prevTask = baseTasks.find(t => t.theme_id === task.theme_id && t.task_order === prevOrder);
-                        const prevTaskName = prevTask?.task_title || `order ${prevOrder}`;
-                        unlockMessage = `🔒 Unlocks in ${hoursLeft}h (1 day after "${prevTaskName}")`;
-                    }
-                } else {
-                    // Completed but no timestamp (legacy data) — treat as unlocked
-                    isUnlocked = true;
-                }
-            }
+        // First task in a theme is always unlocked if not completed
+        if (idx === 0) {
+            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '' };
         }
 
-        return { ...task, is_unlocked: isUnlocked, unlock_message: unlockMessage };
+        // Check if the immediately previous task in this theme is completed
+        const prevTask = group[idx - 1];
+        const prevCompleted = completedSet.has(prevTask.id);
+        const prevCompletedAt = prevCompleted ? completedAtMap[prevTask.id] : null;
+
+        if (!prevCompleted) {
+            return { ...task, is_unlocked: false, unlock_message: `🔒 Complete "${prevTask.task_title}" to unlock` };
+        }
+
+        // Previous task completed — check 24h cooldown
+        const hoursSincePrev = prevCompletedAt
+            ? (now - new Date(prevCompletedAt)) / (1000 * 60 * 60)
+            : 999;
+        const cooldownHours = 24;
+        const hoursLeft = Math.ceil(cooldownHours - hoursSincePrev);
+
+        if (hoursSincePrev >= cooldownHours) {
+            // Check if this task itself is already completed
+            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '' };
+        } else {
+            const lockMsg = hoursLeft > 1
+                ? `🔒 "${prevTask.task_title}" completed — ${hoursLeft}h until unlocked`
+                : `🔒 "${prevTask.task_title}" completed — ${Math.ceil(hoursLeft * 60)}m until unlocked`;
+            return { ...task, is_unlocked: false, unlock_message: lockMsg };
+        }
     });
 
     let filteredTasks = tasksWithUnlock;
@@ -832,6 +676,8 @@ async function applyFiltersAndRender() {
     completedVisibleTasks = unlockedAll.filter(t => completedSet.has(t.id)).length;
 
     const tasksToShow = [...unlockedShown, ...lockedTasks];
+    // Sort each group by task_order ascending
+    tasksToShow.sort((a, b) => a.task_order - b.task_order);
     renderTaskList(tasksToShow);
 
     const pct = totalVisibleTasks ? Math.min(Math.round((completedVisibleTasks / totalVisibleTasks) * 100), 100) : 0;
@@ -931,7 +777,7 @@ function createTaskCard(task) {
                     </div>
                     <div style="font-size: 0.8rem; font-style: italic; color: var(--fg-muted);">
                         <strong>Impact :</strong> ${task.impact_value || 'N/A'}. 
-                        ${isLocked ? '<span class="tiny muted">(Locked – complete previous tasks first)</span>' : ''}
+                        ${isLocked ? `<span class="tiny muted">${task.unlock_message}</span>` : ''}
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -944,9 +790,9 @@ function createTaskCard(task) {
             <div style="padding: 0 20px 20px 68px; border-top: 1px solid ${rgbaBorder};">
                 <div class="comments-list">${taskComments.map(c => `
                     <div id="comment-box-${c.id}" style="background: rgba(255,255,255,0.5); padding:8px 12px; border-radius:12px; margin-bottom:8px;">
-                        <div>${escapeHtml(c.comment_text)}</div>
-                        <div><button style="background:none;border:none;color:var(--cta);cursor:pointer;font-size:0.8rem;" data-comment-id="${c.id}" class="edit-comment-btn">Edit</button>
-                        <button style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:0.8rem;" data-comment-id="${c.id}" class="delete-comment-btn">Delete</button></div>
+                        <div>${c.comment_text}</div>
+                        <div><button onclick="window.startEditComment('${c.id}', '${c.comment_text.replace(/'/g, "\\'")}')">Edit</button>
+                        <button onclick="window.deleteComment('${c.id}')">Delete</button></div>
                     </div>
                 `).join('')}</div>
                 <div style="display: flex; gap: 10px; margin-top: 8px;">
@@ -1007,9 +853,13 @@ async function handleDone(checkbox) {
 
         if (error) throw error;
 
-        if (version === 'novice') completedNovice.add(taskId);
-        else completedExperienced.add(taskId);
-        completedAtMap[taskId] = new Date().toISOString();
+        if (version === 'novice') {
+            completedNovice.add(taskId);
+            completedAtMap[taskId] = new Date().toISOString();
+        } else {
+            completedExperienced.add(taskId);
+            completedAtMap[taskId] = new Date().toISOString();
+        }
 
         const pointsEarned = result.points_earned;
         userProfile.total_points = (userProfile.total_points || 0) + pointsEarned;
@@ -1027,6 +877,20 @@ async function handleDone(checkbox) {
             result.awarded_tokens.forEach(t => {
                 showToast(`🎁 New token: ${t.token_name} (${t.stage})`, 'success');
             });
+        }
+        // Refresh achievement badge count after any awards
+        await updateAchievementsBadge();
+
+        // Find next locked task in same theme and show unlock ETA
+        const completedTask = baseTasks.find(t => t.id === taskId);
+        if (completedTask) {
+            const nextInTheme = baseTasks
+                .filter(t => t.theme_id === completedTask.theme_id && t.task_order > completedTask.task_order)
+                .sort((a, b) => a.task_order - b.task_order)[0];
+            if (nextInTheme) {
+                const completedSet = showingExperienced ? completedExperienced : completedNovice;
+                showToast(`✅ "${completedTask.task_title}" done! "${nextInTheme.task_title}" unlocks in 24h`, 'success');
+            }
         }
 
         const { data: progressData, error: progressError } = await supabase
@@ -1142,26 +1006,6 @@ async function handleComment(btn) {
     refreshTasks();
 }
 
-async function handleEditComment(btn) {
-    const commentId = btn.dataset.commentId;
-    const commentDiv = document.getElementById(`comment-box-${commentId}`);
-    const textDiv = commentDiv?.querySelector('div:first-child');
-    if (!textDiv) return;
-    const newText = prompt('Edit your comment:', textDiv.textContent);
-    if (!newText || newText.trim() === '') return;
-    const { error } = await supabase.from('task_comments').update({ comment_text: newText.trim() }).eq('id', commentId).eq('user_id', userProfile.id);
-    if (error) { showToast('Failed to edit comment', 'error'); return; }
-    refreshTasks();
-}
-
-async function handleDeleteComment(btn) {
-    const commentId = btn.dataset.commentId;
-    if (!confirm('Delete this comment?')) return;
-    const { error } = await supabase.from('task_comments').delete().eq('id', commentId).eq('user_id', userProfile.id);
-    if (error) { showToast('Failed to delete comment', 'error'); return; }
-    refreshTasks();
-}
-
 // ======================== UI UPDATES ========================
 function updateProfileUI() {
     const totalPoints = userProfile.total_points || 0;
@@ -1234,15 +1078,10 @@ function showCustomLevelModal(newLevel) {
 }
 
 // ======================== FILTERS ========================
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
-
 function buildFilterOptionHtml(val, checked = false) {
     return `<label class="filter-item">
-        <input type="checkbox" value="${escapeHtml(val)}" ${checked ? 'checked' : ''}>
-        <span>${escapeHtml(val)}</span>
+        <input type="checkbox" value="${val}" ${checked ? 'checked' : ''}>
+        <span>${val}</span>
     </label>`;
 }
 
@@ -2449,7 +2288,7 @@ async function upgradeTier(newTier) {
         showingExperienced = false;
         upgradeModalShown = false;
         deadEndModalShown = false;
-        sessionStorage.setItem('meadow_toast', JSON.stringify({message: `Tier updated to ${newTier}`, type: 'success'}));
+        showToast(`Tier updated to ${newTier}`, 'success');
         const newBaseTasks = await fetchBaseTasksForTier(newMemberTier);
         if (newBaseTasks.length) {
             baseTasks = newBaseTasks;
@@ -2907,16 +2746,6 @@ function setThemeFromTier() {
 
 // ======================== INIT ========================
 export async function initProfile() {
-    // Show any toast persisted across page reload (e.g. tier upgrade)
-    const pendingToast = sessionStorage.getItem('meadow_toast');
-    if (pendingToast) {
-        try {
-            const { message, type } = JSON.parse(pendingToast);
-            showToast(message, type || 'success');
-        } catch(e) {}
-        sessionStorage.removeItem('meadow_toast');
-    }
-
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
         window.location.replace(getBaseURL() + 'login.html');
@@ -2933,13 +2762,6 @@ export async function initProfile() {
             .single();
         if (profileError) throw profileError;
         userProfile = profile;
-        // Initialize decorator jar module
-        try {
-            const { initDecorator } = await import('./decorator.js');
-            await initDecorator(userProfile);
-        } catch (e) {
-            console.warn('Decorator init skipped:', e.message);
-        }
         if (!userProfile.tier) userProfile.tier = 'free';
         userProfile.total_points = userProfile.nectar_points;
         userProfile.experience = userProfile.total_points % 100;
@@ -2948,21 +2770,15 @@ export async function initProfile() {
 
         const { data: userTasks, error: userTasksError } = await supabase
             .from('user_tasks')
-            .select('task_id, version, completed_at')
+            .select('task_id, version')
             .eq('user_id', user.id);
         if (userTasksError) throw userTasksError;
 
         completedNovice.clear();
         completedExperienced.clear();
-        completedAtMap = {};
         userTasks.forEach(t => {
-            if (t.version === 'novice') {
-                completedNovice.add(t.task_id);
-                if (t.completed_at) completedAtMap[t.task_id] = t.completed_at;
-            } else if (t.version === 'experienced') {
-                completedExperienced.add(t.task_id);
-                if (t.completed_at) completedAtMap[t.task_id] = t.completed_at;
-            }
+            if (t.version === 'novice') completedNovice.add(t.task_id);
+            else if (t.version === 'experienced') completedExperienced.add(t.task_id);
         });
 
         const { data: progressData, error: progressError } = await supabase
@@ -3158,11 +2974,7 @@ export async function initProfile() {
 
     } catch (err) {
         console.error("Profile initialization failed:", err);
-        let msg = "Failed to load profile data.";
-        if (err.message?.includes("type")) msg = "Data type error — ensure the database schema matches the application.";
-        else if (err.message?.includes("relation") || err.message?.includes("does not exist")) msg = "Database table not found — run the schema setup.";
-        else if (err.message?.includes("JWT") || err.message?.includes("auth")) msg = "Authentication error — please log out and back in.";
-        showToast(msg, "error");
+        showToast("Failed to load profile data.", "error");
     } finally {
         Loader.hide();
     }
@@ -3188,3 +3000,26 @@ window.closeAchievementsModal = () => {
     document.getElementById('achievementsModal').style.display = 'none';
 };
 window.closeUpgradePromptModal = closeUpgradePromptModal;
+window.startEditComment = (id, oldText) => {
+    const box = document.getElementById(`comment-box-${id}`);
+    box.innerHTML = `
+        <input type="text" id="edit-input-${id}" value="${oldText}" style="width:100%; padding:5px; border:1px solid #3b82f6; border-radius:4px;">
+        <div style="margin-top:5px;">
+            <button onclick="window.saveEditComment('${id}')" style="background:#22c55e; color:white; border:none; padding:3px 8px; border-radius:4px;">Save</button>
+            <button onclick="window.cancelEditComment('${id}')" style="background:#64748b; color:white; border:none; padding:3px 8px; border-radius:4px;">Cancel</button>
+        </div>
+    `;
+};
+window.saveEditComment = async (id) => {
+    const newText = document.getElementById(`edit-input-${id}`).value;
+    if (!newText.trim()) return;
+    await supabase.from('task_comments').update({ comment_text: newText }).eq('id', id);
+    refreshTasks();
+};
+window.cancelEditComment = (id) => { refreshTasks(); };
+window.deleteComment = async (id) => {
+    if (confirm("Delete this comment?")) {
+        await supabase.from('task_comments').delete().eq('id', id);
+        refreshTasks();
+    }
+};

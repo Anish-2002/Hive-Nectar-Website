@@ -1,11 +1,10 @@
-import { supabase } from './supabase-config.js'; // Added relative path for js folder
+import { supabase } from './supabase-config.js';
 
 async function checkLiveBuzz() {
     try {
         const now = new Date();
         const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000)).toISOString();
         
-        // Fetch from Supabase instead of LocalStorage
         const { data: activePosts, error } = await supabase
             .from('communications')
             .select('*')
@@ -16,12 +15,12 @@ async function checkLiveBuzz() {
 
         if (activePosts && activePosts.length > 0) {
             const oldBadge = document.getElementById('messenger-buzz');
-            if(oldBadge) oldBadge.remove();
+            if (oldBadge) oldBadge.remove();
             
             renderMessengerBadge(activePosts);
         }
     } catch (e) { 
-        console.log("Error checking for buzz:", e); 
+        // Silently ignore — buzz is non-critical
     }
 }
 
@@ -29,11 +28,10 @@ function renderMessengerBadge(posts) {
     const container = document.createElement('div');
     container.id = 'messenger-buzz';
     
-    // Logic: Redirect to board.html with the specific postId in the URL
     const postsHtml = posts.map(post => `
         <div class="preview-item">
-            <h4>${post.post_type.toUpperCase()}</h4>
-            <p>${post.message.substring(0, 60)}...</p>
+            <h4>${(post.post_type || 'Announcement').toUpperCase()}</h4>
+            <p>${(post.message || '').substring(0, 60)}...</p>
             <a href="board.html?postId=${post.id}" class="preview-link">Read More →</a>
             <hr class="preview-divider">
         </div>
@@ -65,5 +63,5 @@ function renderMessengerBadge(posts) {
     document.body.appendChild(container);
 }
 
-setInterval(checkLiveBuzz, 10000); // Check every 10s
+setInterval(checkLiveBuzz, 10000);
 document.addEventListener('DOMContentLoaded', checkLiveBuzz);

@@ -5,11 +5,11 @@ import { showToast, Loader } from './app.js';
 // BOTTOM SHEET HELPER
 // --------------------------------------------------------------
 function showBottomSheet(title, contentHtml, onClose) {
-  const existing = document.querySelector('.bottom-sheet-overlay');
-  if (existing) existing.remove();
-
-  const overlay = document.createElement('div');
-  overlay.className = 'bottom-sheet-overlay';
+\n  const existing = document.querySelector('.bottom-sheet-overlay:not([data-static])');
+\n  if (existing) existing.remove();
+\n
+\n  const overlay = document.createElement('div');
+\n  overlay.className = 'bottom-sheet-overlay';
   overlay.innerHTML = `
     <div class="bottom-sheet">
       <div class="bottom-sheet-header">

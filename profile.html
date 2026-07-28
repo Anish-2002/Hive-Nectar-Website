@@ -218,7 +218,7 @@
 </div>
 
 <!-- Edit Profile Bottom Sheet -->
-<div id="editProfileSheet" class="bottom-sheet-overlay" style="visibility: hidden; opacity: 0;">
+<div id="editProfileSheet" class="bottom-sheet-overlay" data-static="true" style="visibility: hidden; opacity: 0;">
   <div class="bottom-sheet">
     <div class="bottom-sheet-header"><h3>Edit Profile</h3><button class="bottom-sheet-close" onclick="closeEditProfileSheet()">&times;</button></div>
     <div class="bottom-sheet-content">
@@ -240,7 +240,7 @@
 </div>
 
 <!-- Upgrade Tier Bottom Sheet -->
-<div id="upgradeTierSheet" class="bottom-sheet-overlay" style="visibility: hidden; opacity: 0;">
+<div id="upgradeTierSheet" class="bottom-sheet-overlay" data-static="true" style="visibility: hidden; opacity: 0;">
   <div class="bottom-sheet">
     <div class="bottom-sheet-header"><h3>Upgrade Your Tier</h3><button class="bottom-sheet-close" onclick="closeUpgradeTierSheet()">&times;</button></div>
     <!-- Active Subscription Info -->
@@ -463,12 +463,19 @@ window.closeEditProfileSheet = () => {
 
   // ========== UPGRADE TIER ==========
   window.openUpgradeTierSheet = () => {
-    console.log('Opening upgrade tier sheet');
+    // Close any open bottom sheets first (theme selector, missions, etc.)
+    document.querySelectorAll('.bottom-sheet-overlay').forEach(el => {
+      el.classList.remove('active');
+      el.style.visibility = 'hidden';
+      el.style.opacity = '0';
+    });
+    const loader = document.getElementById('global-loader');
+    if (loader) loader.style.display = 'none';
     const sheet = document.getElementById('upgradeTierSheet');
     if (sheet) { sheet.style.visibility = 'visible'; sheet.style.opacity = '1'; sheet.classList.add('active'); }
+    else { console.error('upgradeTierSheet not found'); }
   };
   window.closeUpgradeTierSheet = () => {
-    console.log('Closing upgrade tier sheet');
     const sheet = document.getElementById('upgradeTierSheet');
     if (sheet) { sheet.classList.remove('active'); sheet.style.visibility = 'hidden'; sheet.style.opacity = '0'; }
   };

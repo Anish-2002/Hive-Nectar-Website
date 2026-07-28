@@ -33,15 +33,6 @@ window.openDecoratorSheet = async function () {
   setTimeout(() => {
     renderUI();
     initPhysics();
-    // Re-populate coin pile for already-placed tokens
-    setTimeout(() => {
-      const pile = document.getElementById('coinPile');
-      if (pile) pile.innerHTML = '';
-      placedTokens.forEach(id => {
-        const m = earnedMilestones.find(m => m.id === id);
-        if (m) addCoinToPile(m.id, m.icon_url);
-      });
-    }, 200);
   }, 100);
 };
 
@@ -100,12 +91,8 @@ function renderUI() {
       <div class="physics-token-source" id="physicsTokenSource"></div>
 
       <!-- Jar -->
-      <div class="physics-jar-wrapper" style="position:relative;">
-        <div class="physics-jar" id="physicsJar">
-          <div class="glass-reflection"></div>
-        </div>
-        <!-- Coin pile — foreground, overlaps bottom-left edge of jar -->
-        <div class="coin-pile" id="coinPile"></div>
+      <div class="physics-jar" id="physicsJar">
+        <div class="glass-reflection"></div>
       </div>
       <div class="firefly" style="top:10%; left:-15%; animation-delay:0s;"></div>
       <div class="firefly" style="top:40%; right:-12%; animation-delay:1.5s;"></div>
@@ -185,7 +172,7 @@ function initPhysics() {
 
   const { Engine, Render, Runner, Bodies, Body, Composite, Mouse, MouseConstraint, Events } = Matter;
 
-  engine = Engine.create({ gravity: { x: 0, y: 1.2 }, enableSleeping: true });
+  engine = Engine.create({ gravity: { x: 0, y: 1.2 } });
 
   renderer = Render.create({
     element: jarEl,
@@ -225,19 +212,6 @@ function initPhysics() {
   Runner.run(runner, engine);
   physicsReady = true;
 
-  // Aggressive damping — kill coin movement every frame
-  Events.on(engine, 'beforeUpdate', () => {
-    const bodies = Composite.allBodies(engine.world);
-    for (let i = 0; i < bodies.length; i++) {
-      const b = bodies[i];
-      if (b.isStatic || !b.milestoneId) continue;
-      // Heavy damping: kill velocity and rotation every frame
-      b.angularVelocity *= 0.5;
-      b.velocity.x *= 0.85;
-      b.velocity.y *= 0.85;
-    }
-  });
-
   // Handle resize
   window.addEventListener('resize', onPhysicsResize);
 }
@@ -270,21 +244,19 @@ function dropToken(milestoneId, iconUrl) {
 
   const jarEl = document.getElementById('physicsJar');
   const w = jarEl.offsetWidth || 320;
-  const h = jarEl.offsetHeight || 450;
 
-  const { Bodies, Composite, Body } = Matter;
+  const { Bodies, Composite } = Matter;
 
-  const size = 24;
-  const visualScale = 0.12;
+  const size = 24; // body radius
+  const visualScale = 0.12; // sprite scale (for ~200px source images)
   const x = 60 + Math.random() * (w - 120);
-  const y = -40;
+  const y = -30 - Math.random() * 20;
 
   const token = Bodies.circle(x, y, size, {
-    restitution: 0.01,
-    friction: 0.9,
-    frictionStatic: 0.9,
-    frictionAir: 0.15,
-    density: 0.01,
+    restitution: 0.5,
+    friction: 0.3,
+    frictionAir: 0.01,
+    density: 0.003,
     render: {
       sprite: {
         texture: iconUrl,
@@ -300,59 +272,10 @@ function dropToken(milestoneId, iconUrl) {
   isDirty = true;
   renderTokenBadges();
 
-  // Freeze coin after a short fall — no fighting
+  // Auto-detect when token settles and mark placed
   setTimeout(() => {
-    if (!engine || !token) return;
-    Body.setVelocity(token, { x: 0, y: 0 });
-    Body.setAngularVelocity(token, 0);
-    Body.setStatic(token, true);
-  }, 800);
-
-  // Also add a coin to the foreground coin pile (bottom-left, overlapping jar edge)
-  addCoinToPile(milestoneId, iconUrl);
-}
-
-function addCoinToPile(milestoneId, iconUrl) {
-  const pile = document.getElementById('coinPile');
-  if (!pile) return;
-
-  // Remove existing coin for this milestone if re-dropping
-  const existing = pile.querySelector(`[data-id="${milestoneId}"]`);
-  if (existing) existing.remove();
-
-  const coin = document.createElement('div');
-  coin.className = 'pile-coin';
-  coin.dataset.id = milestoneId;
-
-  const count = pile.children.length;
-  // Stack coins with slight offset so they pile at bottom-left jar edge
-  const offsetX = count * 8;
-  const offsetY = count * -5;
-
-  if (iconUrl) {
-    const img = document.createElement('img');
-    img.src = iconUrl;
-    img.alt = 'coin';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'contain';
-    coin.appendChild(img);
-  } else {
-    coin.textContent = '🪙';
-    coin.style.fontSize = '1.2rem';
-  }
-
-  coin.style.position = 'absolute';
-  coin.style.bottom = `${-20 + offsetY}px`;
-  coin.style.left = `${-24 + offsetX}px`;
-  coin.style.width = '40px';
-  coin.style.height = '40px';
-  coin.style.zIndex = '10';
-  coin.style.pointerEvents = 'none';
-  coin.style.filter = 'drop-shadow(0 2px 6px rgba(0,0,0,0.4))';
-  coin.style.borderRadius = '50%';
-
-  pile.appendChild(coin);
+    // Token is in the jar — it stays
+  }, 2000);
 }
 
 // ============ SAVE / CLEAR ============
@@ -415,9 +338,6 @@ window.clearJarDecoration = function () {
   toRemove.forEach(b => Composite.remove(engine.world, b));
 
   placedTokens.clear();
-  // Clear coin pile too
-  const pile = document.getElementById('coinPile');
-  if (pile) pile.innerHTML = '';
   renderTokenBadges();
   isDirty = true;
   showToast('Jar cleared', 'info');

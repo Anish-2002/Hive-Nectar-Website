@@ -93,7 +93,6 @@ function subscribeToThemeChanges() {
                 filter: 'id=eq.1'
             },
             (payload) => {
-                console.log('🎨 Theme updated in realtime:', payload.new);
                 // Apply new colors immediately
                 applyTheme(payload.new);
                 // Update cache with new colors
@@ -110,9 +109,7 @@ function subscribeToThemeChanges() {
             }
         )
         .subscribe((status) => {
-            if (status === 'SUBSCRIBED') {
-                console.log('✅ Listening for theme changes');
-            }
+            // Connected
         });
 }
 // Main theme loader – applies cached theme instantly, then updates in background
@@ -199,7 +196,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const path = window.location.pathname;
 
     if (path.includes('profile.html')) {
-        console.log("Initializing Profile...");
         initProfile();
     }
 

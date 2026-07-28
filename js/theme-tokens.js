@@ -25,6 +25,7 @@ export async function getAllTokenDefs() {
     const { data, error } = await supabase
         .from('tokens')
         .select('*')
+        .eq('active', true)
         .order('theme_id')
         .order('stage');
     if (error) {
@@ -92,7 +93,7 @@ export async function checkAndAwardThemeTokens(userId, updateBadgeFn) {
 export async function getThemeCompletionCounts(userId) {
     const { data, error } = await supabase
         .from('user_tasks')
-        .select('task_id, tasks ( core_theme, theme_id, stage )')
+        .select('task_id, tasks(core_theme, theme_id, stage)')
         .eq('user_id', userId);
 
     if (error) throw error;
