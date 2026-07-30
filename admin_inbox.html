@@ -1,0 +1,82 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <title>Admin Inbox | The Meadow</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="page-admin"data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+    <i class="fas fa-bars"></i>
+  </button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
+  </nav>
+</header>
+
+  <main class="wrap">
+    <h1>Inquiry Inbox</h1>
+    <div id="inboxContainer"></div>
+  </main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+  <script>
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+    function renderInbox() {
+        const container = document.getElementById('inboxContainer');
+        const inquiries = JSON.parse(localStorage.getItem('hive_inquiries')) || [];
+        
+        if (inquiries.length === 0) {
+            container.innerHTML = '<p>No messages received yet.</p>';
+            return;
+        }
+
+        container.innerHTML = inquiries.map(iq => `
+            <div class="card" style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>${escapeHtml(iq.category)}</strong>
+                    <span class="tiny muted">${escapeHtml(iq.timestamp)}</span>
+                </div>
+                <h3 style="margin: 10px 0;">From: ${escapeHtml(iq.name)}</h3>
+                <p class="muted">${escapeHtml(iq.message)}</p>
+                <div class="tiny" style="color: var(--cta)">${escapeHtml(iq.email)}</div>
+            </div>
+        `).join('');
+            }
+    renderInbox();
+  }
+  </script>
+<script>
+  (async () => {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const supabase = createClient('https://gxboojbfmpejbjolfmjq.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4Ym9vamJmbXBlamJqb2xmbWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNjU3ODMsImV4cCI6MjA4ODk0MTc4M30.huabAJX_-DYFy06yrvjyBMR_bo6XC43B2O12zHt7Xos');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) window.location.href = 'login.html';
+  })();
+</script>
+</body>
+</html>

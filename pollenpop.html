@@ -1,79 +1,120 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PollenPop | Hive Nectar</title>
+  <title>PollenPop | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
- <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-    <span class="brand-title">HIVE NECTAR</span>
-  </div>
+<body class="page-pollenpop" data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
+    <div class="brandmark">
+      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
+    </div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks">
     <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
-    <a href="about.html">About</a>
+    <a href="pollenpop.html" class="active">PollenPop</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
   </nav>
 </header>
 
-  <main class="wrap">
-    <section class="hero-card" style="background: var(--cta);">
-      <h1>PollenPop</h1>
-      <p>[Product Intro Placeholder: Description of our flagship solution.]</p>
-    </section>
+<main class="wrap">
+  <section class="hero-card">
+    <h1>PollenPop</h1>
+    <p>PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>
+  </section>
 
-    <div class="grid-main">
-      <div class="main-column">
-        <section class="card">
-          <h2>How it Works</h2>
-          <div class="placeholder-box">[Placeholder: Technical or process explanation.]</div>
-        </section>
+  <div class="grid-main">
+    <div class="main-column">
+      <!-- How it Works -->
+      <section class="card">
+        <h2><i class="fas fa-cogs" style="color: var(--primary); margin-right: 8px;"></i> How it Works</h2>
+        <div style="margin-top: 16px;">
+          <p>The tasks inside are small and practical. They are designed to be achievable, repeatable, and visible.</p>
+          <p style="margin-top: 16px;">Every element in this space reflects a simple truth: humans are part of nature. Each task belongs to one of five core themes, representing five dimensions of a resilient and sustainable everyday life, such as planting herbs, shortening your shower, and finding new uses for things you no longer need.</p>
+          <p style="margin-top: 16px;">Each theme evolves through stages that echo nature's own cycles. This is not a challenge or a competition. It is a seed. One you can plant, tend, and let grow into your own way of operating.</p>
+        </div>
+      </section>
 
-        <section class="card">
-          <h2>What's Included</h2>
-          <div class="placeholder-box">[Placeholder: List of features and items.]</div>
-        </section>
+      <!-- What You Receive -->
+      <section class="card">
+        <h2><i class="fas fa-gift" style="color: var(--primary); margin-right: 8px;"></i> What You Receive</h2>
+        <div style="margin-top: 16px;">
+          <h4>The Physical Experience</h4>
+          <p>A jar with handcrafted tokens and a small prompt card. Each token reflects one of the themes. The prompt card is a quiet reminder of what this journey means to you, and to us.</p>
+          <p>The connection between objects and meaning may not always be obvious. You can interpret them, or not. Over time, they become a visual anchor you don't have to think about.</p>
+          
+          <h4 style="margin-top: 20px;">The Digital Experience</h4>
+          <ul style="list-style: none; padding-left: 0;">
+            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A themed task library with embedded growth stages</li>
+            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Nectar tracking</li>
+            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A personal reflection space</li>
+            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A communication board for updates, notices, and optional conversation. This is also where we display real-time reference metrics from established global monitoring organisations. Total Honey earned across The Meadow is converted into indicative real-world comparisons.</li>
+          </ul>
+          <p>Together, the digital structure holds the logic while physical tokens hold the memory.</p>
+          <p class="tiny muted" style="margin-top: 16px;"><i class="fas fa-info-circle"></i> Note: Data displayed for awareness only. The Meadow does not generate or control these measurements.</p>
+        </div>
+      </section>
 
-        <section class="card">
-          <h2>Product FAQ</h2>
-          <div class="placeholder-box">[Placeholder: Specific questions regarding PollenPop.]</div>
-        </section>
-      </div>
-
-      <aside class="side-column">
-        <section class="card highlight-card">
-          <h3>Benefits</h3>
-          <div class="placeholder-box">[Placeholder: Benefits List]</div>
-        </section>
-
-        <section class="card">
-          <h3>Early Access</h3>
-          <p class="placeholder-box"><strong>Note:</strong> [Placeholder: Details about early-access availability.]</p>
-          <a href="join.html" class="btn">Register Now</a>
-        </section>
-      </aside>
+      <!-- Step-by-Step -->
+      <section class="card">
+        <h2><i class="fas fa-list-ol" style="color: var(--primary); margin-right: 8px;"></i> Step-by-Step</h2>
+        <ol style="margin-top: 16px; padding-left: 1.5rem;">
+          <li>Join The Meadow</li>
+          <li>Choose your reference theme(s) (optional)</li>
+          <li>Pick a task</li>
+          <li>Complete the action</li>
+          <li>Share evidence</li>
+          <li>Collect Nectar</li>
+          <li>Repeat</li>
+        </ol>
+      </section>
     </div>
-  </main>
 
-  <footer class="footer">
-  <div class="footer-links">
-    <a href="profile.html">My Profile</a>
-    <span>|</span>
-    <a href="board.html">Communication Board</a>
+    <aside class="side-column">
+      <!-- Nectar -> Honey -->
+      <section class="card highlight-card">
+        <h3><i class="fas fa-exchange-alt" style="margin-right: 8px;"></i> Nectar → Bloom</h3>
+        <div style="margin-top: 12px;">
+          <p>In a Meadow ecosystem, pollinators carry nectar back to the nest. This is the smallest unit of effort before it becomes the Meadow's most valuable resource: <strong>Bloom</strong>.</p>
+          <p style="margin-top: 12px;">The Meadow works the same way. Every completed task generates Nectar. Over time, Nectar consolidates into Bloom.</p>
+          <p style="margin-top: 12px;">Bloom represents your stored effort, your established routines, and the collective energy of The Meadow. It does not expire. It reflects your growth, and the more consistent your habits become, the steadier and more predictable your Bloom also becomes.</p>
+        </div>
+      </section>
+
+      <!-- Early Access -->
+      <section class="card">
+        <h3><i class="fas fa-clock" style="color: var(--primary); margin-right: 8px;"></i> Early Access</h3>
+        <p style="margin: 16px 0;">The first PollenPop jar is a visible record of the decision to begin. As you participate, show up consistently, and grow, that contribution becomes layered and visible inside the jar itself.</p>
+        <a href="login.html" class="btn">Login to Pollen Pop</a>
+        <div style="text-align: center; margin-top: 15px;">
+          <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 5px;">New to The Meadow?</p>
+          <a href="the-meadow.html" style="color: var(--cta); font-weight: 700; text-decoration: underline; font-size: 0.9rem;">Join The Meadow</a>
+        </div>
+      </section>
+    </aside>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-  <script src="app.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

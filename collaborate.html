@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaboration Invite | The Meadow</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="page-generic">
+  <header class="header">
+    <a href="index.html" class="logo-area">
+      <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+      <span class="brand-title">THE MEADOW</span>
+    </a>
+  </header>
+
+  <main class="wrap" style="text-align:center;padding-top:60px;">
+    <div id="inviteStatus" style="max-width:400px;margin:0 auto;">
+      <div style="font-size:4rem;margin-bottom:16px;">🤝</div>
+      <h2>Collaboration Invite</h2>
+      <p id="inviteMessage" style="color:var(--fg-muted);">Checking invite...</p>
+      <div id="inviteActions" style="display:none;margin-top:20px;">
+        <button id="acceptInviteBtn" class="btn btn-success" style="width:100%;margin-bottom:8px;">Accept Invite</button>
+        <a href="profile.html" class="btn btn-secondary" style="display:block;text-align:center;">Go to Profile</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase } from './js/supabase-config.js';
+    import { showToast } from './js/app.js';
+
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const msg = document.getElementById('inviteMessage');
+    const actions = document.getElementById('inviteActions');
+    const acceptBtn = document.getElementById('acceptInviteBtn');
+
+    if (!code) {
+      msg.textContent = 'No invite code found. The link may be invalid.';
+      actions.style.display = 'none';
+    } else {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        msg.textContent = 'You need to log in first to accept this invite.';
+        actions.innerHTML = '<a href="login.html?redirect=' + encodeURIComponent(window.location.href) + '" class="btn" style="display:block;text-align:center;margin-bottom:8px;">Log In</a><a href="signup.html" class="btn btn-secondary" style="display:block;text-align:center;">Sign Up</a>';
+        actions.style.display = 'block';
+      } else {
+        msg.textContent = 'Someone has invited you to collaborate on The Meadow! Accept to track each other\'s progress.';
+        actions.style.display = 'block';
+
+        acceptBtn.onclick = async () => {
+          acceptBtn.disabled = true;
+          acceptBtn.textContent = 'Accepting...';
+          const { data, error } = await supabase.rpc('accept_collab_invite', { p_code: code });
+          if (error) {
+            showToast(error.message, 'error');
+            msg.textContent = error.message;
+            acceptBtn.disabled = false;
+            acceptBtn.textContent = 'Accept Invite';
+          } else if (data.success) {
+            msg.textContent = 'You\'re now connected! 🎉';
+            acceptBtn.textContent = 'Connected!';
+            showToast('Collaboration started!', 'success');
+            setTimeout(() => { window.location.href = 'profile.html'; }, 1500);
+          } else {
+            msg.textContent = data.error || 'Failed to accept invite';
+            acceptBtn.disabled = false;
+            acceptBtn.textContent = 'Accept Invite';
+          }
+        };
+      }
+    }
+  </script>
+</body>
+</html>

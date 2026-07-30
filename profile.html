@@ -3,151 +3,546 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>My Profile | Hive Nectar</title>
+  <title>My Profile | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tester.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
+<body class="page-profile" data-theme="classic">
 
-  <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-    <span class="brand-title">HIVE NECTAR</span>
-  </div>
+<canvas id="shareCanvas" width="600" height="400" style="display:none;"></canvas>
+
+<header class="header">
+  <a href="index.html" class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks">
     <a href="index.html">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
-    <a href="about.html">About</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
   </nav>
 </header>
 
-  <main class="wrap">
-    <div class="grid-container">
-      
-      <aside class="side-column">
-        <section class="card profile-card-compact">
-          <div class="profile-avatar">
-            <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Avatar">
-          </div>
-          <h2 id="userNameDisplay">Busy Bee</h2>
-          <p class="tiny muted">bee@hivenectar.com</p>
-          <a href="index.html" class="btn logout-btn-small">Logout</a>
-        </section>
-
-        <section class="card">
-          <h3 class="tiny-title">Stats</h3>
-          <div class="stat-row">
-            <div class="stat-icon"><i class="fas fa-thin fa-honey-pot" style="color:#f59e0b"></i></div>
-            <div class="stat-content">
-              <span class="tiny muted">Points Earned</span>
-              <p><strong>1,250</strong> <span class="tiny">pts</span></p>
-            </div>
-          </div>
-          <div class="stat-row">
-            <div class="stat-icon"><i class="fas fa-check-double" style="color:var(--success)"></i></div>
-            <div class="stat-content">
-              <span class="tiny muted">Tasks Completed</span>
-              <p><strong>45</strong></p>
-            </div>
-          </div>
-        </section>
-
-        <section class="card quote-card">
-            <h3 class="tiny-title">Daily Motivation</h3>
-            <p class="tiny italic">"The journey of a thousand miles begins with a single step. Keep going!"</p>
-        </section>
-      </aside>
-
-      <div class="main-content">
-        
-        <section class="card">
-          <div class="section-header">
-            <h3 class="section-title">Daily Hive Habits</h3>
-            <div class="filter-pills">
-                <span class="pill active">This Week</span>
-                <span class="pill">Today</span>
-            </div>
-          </div>
-
-          <div class="habit-cards-row">
-            <div class="habit-mini-card">
-                <h4>Monday</h4>
-                <p class="tiny"><i class="fas fa-droplet"></i> Water intake</p>
-                <div class="progress-bar-small"><div class="fill" style="width: 70%;"></div></div>
-            </div>
-            <div class="habit-mini-card">
-                <h4>Tuesday</h4>
-                <p class="tiny"><i class="fas fa-dumbbell"></i> 30 Min Exercise</p>
-                <div class="progress-bar-small"><div class="fill" style="width: 40%;"></div></div>
-            </div>
-            <div class="habit-mini-card muted-card">
-                <h4>Wednesday</h4>
-                <p class="tiny">Read 10 Pages</p>
-                <div class="progress-bar-small"><div class="fill" style="width: 0%;"></div></div>
-            </div>
-          </div>
-        </section>
-
-        <div class="dashboard-inner-grid">
-            <section class="card">
-                <h3 class="section-title"><i class="fas fa-chart-line"></i> Weekly Progress</h3>
-                <div class="progress-item">
-                    <span class="tiny">This Week</span>
-                    <div class="progress-bar-large"><div class="fill" style="width: 65%;"></div></div>
-                </div>
-                <div class="progress-item">
-                    <span class="tiny">Month (30%)</span>
-                    <div class="progress-bar-large"><div class="fill" style="width: 30%;"></div></div>
-                </div>
-            </section>
-
-            <section class="card">
-                <h3 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
-                <div class="action-chips">
-                    <span class="chip"><i class="fas fa-bed"></i> 6-7 Hr Sleep</span>
-                    <span class="chip"><i class="fas fa-utensils"></i> Eat Healthy</span>
-                    <span class="chip"><i class="fas fa-book"></i> Read</span>
-                </div>
-            </section>
+<main class="wrap">
+  <!-- Compact Profile Header (no card background) -->
+  <div class="profile-header-row">
+    <button class="btn tiny" onclick="shareStats()"><i class="fas fa-share-nodes"></i> Share</button>
+    <button class="btn tiny" onclick="invitePartner()" style="background:var(--honey-gradient);color:#fff;"><i class="fas fa-user-plus"></i> Invite</button>
+    <div class="user-info-row">
+      <div class="avatar-dropdown" id="profileAvatarDropdown">
+        <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="User" class="avatar-large" id="profileAvatar">
+        <span class="user-name" id="userNameDisplayShort">Busy Bee</span>
+        <i class="fas fa-chevron-down"></i>
+        <div class="dropdown-menu" id="avatarDropdownMenu">
+          <a href="#" id="editProfileBtn"><i class="fas fa-user-edit"></i> Edit Profile</a>
+          <a href="#" id="logoutBtnHeader"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
-
-        <section class="card icon-toolbar">
-            <div class="tool-item">
-                <div class="tool-icon"><i class="fas fa-utensils"></i></div>
-                <span class="tiny">Log Food</span>
-            </div>
-            <div class="tool-item">
-                <div class="tool-icon"><i class="fas fa-tasks"></i></div>
-                <span class="tiny">New Task</span>
-            </div>
-            <div class="tool-item">
-                <div class="tool-icon active"><i class="fas fa-pen"></i></div>
-                <span class="tiny">Journal</span>
-            </div>
-            <div class="tool-item">
-                <div class="tool-icon"><i class="fas fa-users"></i></div>
-                <span class="tiny">Connect</span>
-            </div>
-        </section>
-
-      </div> </div>
-  </main>
-
- <footer class="footer">
-  <div class="footer-links">
-    <a href="profile.html">My Profile</a>
-    <span>|</span>
-    <a href="board.html">Communication Board</a>
+      </div>
+      <div class="rank-badge" id="rankNameDisplayCompact">Meadow Novice</div>
+    </div>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+
+  <!-- Stats Compact Card -->
+  <div class="stats-compact-card">
+    <div class="stat-item"><span class="stat-label">Total Nectar</span><span class="stat-value" id="pointsVal">0</span></div>
+    <div class="stat-item"><span class="stat-label">Status</span><span class="stat-value">Active</span></div>
+    <div class="stat-item"><span class="stat-label">Meadow Rank</span><span class="stat-value" id="rankLevel">#--</span></div>
+    <div class="stat-item"><span class="stat-label">Tier</span><span class="stat-value" id="userTierBadgeCompact">Free</span></div>
+  </div>
+
+  <!-- Progress Compact Card -->
+  <div class="progress-compact-card">
+  <div class="progress-header">
+    <span><i class="fas fa-honey-pot"></i> Nectar Progress</span>
+    <span id="expText">0/100</span>
+  </div>
+  <div class="custom-progress-wrapper">
+    <progress id="experienceBar" value="0" max="100"></progress>
+    
+  </div>
+  <div class="progress-footer">
+    <span class="tiny">Experience points</span>
+    <span class="tiny">Nectar: <span id="nectarPointsDisplay">0</span></span>
+  </div>
+</div>
+
+<!-- Partner Section -->
+<div id="partnerSection" style="display:none;margin:16px 0;padding:12px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);"></div>
+
+  <!-- Mobile action buttons – each opens a bottom sheet -->
+  <div class="mobile-actions" id="mobileActionsPanel">
+    <button type="button" class="btn mobile-action-btn" id="mobileMissionsBtn">
+      <span><i class="fas fa-clipboard-list"></i> Tasks Reflection</span>
+      <span class="action-badge" id="mobilePendingSigmaBadge">0</span>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileCompletedTasksBtn">
+      <span><i class="fas fa-check-circle"></i> Completed Tasks</span>
+      <span class="action-badge" id="mobileCompletedBadge">0</span>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileAchievementsBtn">
+      <span><i class="fas fa-award"></i> Achievements</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileAddSigmaBtn">
+      <span><i class="fas fa-chart-line"></i> Add Sigma Log</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <button type="button" class="btn mobile-action-btn" id="mobileThemeSelectorBtn" style="display:none;">
+      <span><i class="fas fa-palette"></i> Choose Focus Themes</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <a href="board.html" class="btn mobile-action-btn mobile-link-btn">
+      <span><i class="fas fa-comments"></i> Meadow Buzz</span>
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    <a href="testjar.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
+      <span><i class="fas fa-paint-brush"></i> Decorate Jar</span>
+      <i class="fas fa-chevron-right"></i>
+    </a>
+    <button type="button" class="btn mobile-action-btn mobile-accent" id="mobileUpgradeBtn">
+      <span><i class="fas fa-crown"></i> Upgrade Tier</span>
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Desktop Layout Grid (tasks, filters, sidebars – identical to before) -->
+  <div class="profile-layout-grid desktop-only-grid">
+    <aside class="left-column">
+      <div class="card">
+        <nav class="sub-nav">
+          <a href="#" class="sub-link active" id="desktopMissionsBtn"><i class="fas fa-rocket"></i> Go to Missions</a>
+          <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Meadow Buzz</a>
+          <a href="#" id="desktopAchievementsBtn" class="sub-link">
+            <i class="fas fa-award"></i> Achievements
+            <span class="achievements-badge" style="margin-left: auto; background: var(--honey-gradient); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; display: none;"></span>
+          </a>
+          <a href="testjar.html" class="sub-link" style="margin-top: 12px; background: var(--honey-gradient); color: white;"><i class="fas fa-paint-brush"></i> Decorate Jar</a>
+          <div class="card" style="margin-top: 16px; padding: 16px; background: var(--secondary);">
+            <button id="addSigmaBtnDesktop" class="btn tiny" style="width: 100%;"><i class="fas fa-chart-line"></i> Add Sigma Log</button>
+          </div>
+          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="pendingSigmaSection">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-clipboard-list" style="color: var(--success);"></i> Tasks Reflection</span>
+              <span class="pending-sigma-badge" id="pendingSigmaCountBadge" style="background: var(--honey-gradient); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;">0</span>
+            </div>
+          </div>
+          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="completedTasksSection">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i> Completed Tasks</span>
+              <span class="completed-badge" id="completedCountBadge" style="background: var(--honey-gradient); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;">0</span>
+            </div>
+          </div>
+          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="themeSelectorDesktopBtn">
+            <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-palette"></i> Choose Focus Themes</div>
+          </div>
+          <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
+          <a href="#" id="upgradeTierBtn" class="sub-link" style="color: var(--success);"><i class="fas fa-rocket"></i> Upgrade Tier</a>
+        </nav>
+      </div>
+    </aside>
+
+    <section class="middle-column">
+      <div class="card">
+        <h3 style="margin-bottom: 24px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-list-check" style="color: var(--primary);"></i> Daily Tasks</h3>
+        <div class="filter-row">
+          <div class="dropdown-container" id="coreFilterDropdown">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.5px;">Core Theme:</span>
+            <div class="dropdown-header"><span id="coreFilterSummary">Themes</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="coreFilterList"></div>
+          </div>
+          <div class="dropdown-container" id="stageFilterDropdown">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.5px;">Stage:</span>
+            <div class="dropdown-header"><span id="stageFilterSummary">Stages</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="stageFilterList"></div>
+          </div>
+          <div class="dropdown-container" id="tagFilterDropdown">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.5px;">Subcategory:</span>
+            <div class="dropdown-header"><span id="tagFilterSummary">Tags</span> <i class="fas fa-chevron-down"></i></div>
+            <div class="dropdown-list" id="tagFilterList"></div>
+          </div>
+        </div>
+        <div class="progressWrap" style="margin: 24px 0;">
+          <progress id="progressBar" value="0" max="100" style="width: 100%; height: 14px;"></progress>
+          <div style="text-align: right; margin-top: 8px;"><span id="progressPct" class="tiny bold">0%</span></div>
+        </div>
+        <div id="tasks" class="tasks">
+          <p class="tiny muted" style="padding: 24px; text-align: center;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Fetching missions...</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a></div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-  <script src="app.js"></script>
+<script type="module" src="js/app.js"></script>
+
+<!-- ========== ALL MODALS (must be before script that references them) ========== -->
+<div id="achieveModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="max-width: 440px; padding: 32px;">
+    <button onclick="closeAchieve()" class="close-modal-btn" style="position: absolute; top: 16px; right: 16px; background: var(--secondary); width: 44px; height: 44px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; color: var(--fg); z-index: 2001; display: flex; align-items: center; justify-content: center;">&times;</button>
+    <div style="perspective: 1000px; padding: 16px 0;">
+      <div style="width: 100%; transform-style: preserve-3d; animation: modalRotate 8s linear infinite; display: flex; justify-content: center; align-items: center;">
+        <img id="modalImg" src="" style="width: 100%; height: auto; max-height: 60vh; object-fit: contain; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));">
+      </div>
+    </div>
+    <button class="btn" onclick="shareTrophy()" style="width: 100%; margin-top: 16px;">Share Trophy</button>
+  </div>
+</div>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
+</div>
+<!-- Custom Confirmation Modal -->
+<div id="confirmationModal" class="modal-overlay" style="display: none; z-index: 10001;">
+  <div class="modal-content" style="max-width: 400px; text-align: center;">
+    <h3 style="margin-bottom: 16px;">Cancel Subscription</h3>
+    <p id="confirmationMessage">Are you sure you want to cancel your subscription?</p>
+    <div style="display: flex; gap: 12px; margin-top: 24px;">
+      <button id="confirmYesBtn" class="btn btn-danger" style="flex: 1;">Yes, Cancel</button>
+      <button id="confirmNoBtn" class="btn btn-secondary" style="flex: 1;">No, Keep It</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Bottom Sheet -->
+<div id="editProfileSheet" class="bottom-sheet-overlay" data-static="true" style="visibility: hidden; opacity: 0;">
+  <div class="bottom-sheet">
+    <div class="bottom-sheet-header"><h3>Edit Profile</h3><button class="bottom-sheet-close" onclick="closeEditProfileSheet()">&times;</button></div>
+    <div class="bottom-sheet-content">
+      <form id="editProfileForm">
+        <div class="form-field">
+          <label>Profile Picture</label>
+          <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+            <img id="avatarPreview" src="" alt="Avatar preview" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: var(--secondary);">
+            <label class="btn tiny" style="cursor: pointer; background: var(--secondary); color: var(--fg); margin: 0;"><i class="fas fa-upload"></i> Upload Image<input type="file" id="avatarUpload" accept="image/*" style="display: none;"></label>
+          </div>
+          <input type="text" id="editAvatarUrl" placeholder="Or paste image URL" style="margin-top: 8px;">
+        </div>
+        <div class="form-field"><label>Phone Number</label><input type="tel" id="editPhone" placeholder="+1234567890"></div>
+        <div class="form-field"><label>Address</label><textarea id="editAddress" rows="2" placeholder="Your address"></textarea></div>
+        <button type="submit" class="btn" style="width: 100%;">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade Tier Bottom Sheet -->
+<div id="upgradeTierSheet" class="bottom-sheet-overlay" data-static="true" style="visibility: hidden; opacity: 0;">
+  <div class="bottom-sheet">
+    <div class="bottom-sheet-header"><h3>Upgrade Your Tier</h3><button class="bottom-sheet-close" onclick="closeUpgradeTierSheet()">&times;</button></div>
+    <!-- Active Subscription Info -->
+<div id="subscriptionInfo" style="margin-bottom: 20px; display: none;">
+  <hr>
+  <div style="background: var(--secondary); padding: 16px; border-radius: var(--radius-md); margin: 16px 0;">
+    <h4 style="margin: 0 0 8px;"><i class="fas fa-credit-card"></i> Current Subscription</h4>
+    <p id="subscriptionPlan" style="margin: 4px 0;"><strong>Plan:</strong> <span id="subTier"></span></p>
+    <p id="subscriptionRenewal" style="margin: 4px 0;"><strong>Renews on:</strong> <span id="subRenewalDate"></span></p>
+    <p id="subscriptionCancelMsg" style="margin: 8px 0; color: var(--error); display: none;"></p>
+    <button id="cancelSubscriptionBtn" class="btn btn-danger tiny" style="margin-top: 8px;">Cancel Subscription</button>
+  </div>
+</div>
+    <div class="bottom-sheet-content">
+      
+      <div class="tier-option" data-tier="plus"><h4>🌱 Meadow+</h4><p>Unlock Sprout tasks, choose focus themes, and accelerate your impact.</p><button class="btn tiny select-tier">Select</button></div>
+      <hr>
+      <div class="tier-option" data-tier="steward"><h4>🌸 Steward Meadow</h4><p>Full access to all tasks (Bloom stage), priority support, and community leadership.</p><button class="btn tiny select-tier">Select</button></div>
+      <hr>
+      <div class="tier-option" data-tier="collective"><h4>🌾 Collective Meadow</h4><p>Everything in Steward + influence multiplier, early feature access, and collective decision‑making.</p><button class="btn tiny select-tier">Select</button></div>
+      <p class="tiny muted" style="margin-top: 20px; text-align: center;">Upgrade is free during early access. Stripe integration coming soon.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    // Check for successful checkout redirect
+  if (window.location.search.includes('checkout=success')) {
+    alert('Payment successful! Your tier will be upgraded shortly.');
+    // Remove the query param to avoid repeated alerts on refresh
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  // ========== GLOBAL FUNCTIONS (required) ==========
+  function openAchieve(src) { document.getElementById('modalImg').src = src; document.getElementById('achieveModal').style.display = 'flex'; }
+  function closeAchieve() { document.getElementById('achieveModal').style.display = 'none'; }
+  async function shareTrophy() {}
+  function closeMobileStatsModal() { document.getElementById('mobileStatsModal').style.display = 'none'; }
+
+  document.getElementById('viewProfileStatusBtn')?.addEventListener('click', () => {
+    if (window.updateMobileStatsModal) window.updateMobileStatsModal();
+    document.getElementById('mobileStatsModal').style.display = 'flex';
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('meadow-theme') || localStorage.getItem('hive-theme') || 'classic';
+    document.body.setAttribute('data-theme', savedTheme);
+  });
+
+  // ========== AVATAR DROPDOWN ==========
+  const avatarDropdown = document.getElementById('profileAvatarDropdown');
+  const dropdownMenu = document.getElementById('avatarDropdownMenu');
+  if (avatarDropdown && dropdownMenu) {
+    avatarDropdown.addEventListener('click', (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdownMenu.classList.remove('show'));
+  }
+
+  // ========== LOGOUT FROM HEADER ==========
+  document.getElementById('logoutBtnHeader')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const { supabase } = await import('./js/supabase-config.js');
+    await supabase.auth.signOut();
+    window.location.replace('index.html');
+  });
+
+  // ========== EDIT PROFILE ==========
+  let supabaseClient = null;
+  async function getSupabase() {
+    if (!supabaseClient) {
+      const module = await import('./js/supabase-config.js');
+      supabaseClient = module.supabase;
+    }
+    return supabaseClient;
+  }
+
+  // ========== STRIPE CHECKOUT ==========
+async function startCheckout(tier) {
+  const supabase = await getSupabase();
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError || !session) {
+    alert('Please log in first');
+    return;
+  }
+
+  // Your Edge Function URL (replace with your actual one)
+  const functionUrl = 'https://gxboojbfmpejbjolfmjq.supabase.co/functions/v1/stripe-checkout';
+
+  try {
+    const response = await fetch(functionUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tier }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      alert('Checkout error: ' + (errorData.error || 'Unknown error'));
+      return;
+    }
+
+    const { url } = await response.json();
+    window.location.href = url; // redirect to Stripe Checkout
+  } catch (err) {
+    console.error('Checkout failed:', err);
+    alert('Could not start checkout. Please try again.');
+  }
+}
+
+
+  async function uploadAvatar(file) {
+    const supabase = await getSupabase();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) { console.error('Auth error:', userError); return null; }
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    console.log('Uploading to path:', fileName);
+    const { error } = await supabase.storage.from('avatars').upload(fileName, file, { upsert: true });
+    if (error) { console.error('Upload error:', error); alert('Failed to upload image: ' + error.message); return null; }
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
+    console.log('Upload success, public URL:', publicUrl);
+    return publicUrl;
+  }
+
+  async function loadEditProfileData() {
+    const supabase = await getSupabase();
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) { console.error('Auth error loading profile:', userError); return; }
+    console.log('Loading profile for user:', user.id);
+    const { data: profile, error } = await supabase.from('profiles').select('avatar_url, phone_number, address').eq('id', user.id).single();
+    if (error) { console.error('Error loading profile data:', error); return; }
+    console.log('Loaded profile data:', profile);
+    const phoneInput = document.getElementById('editPhone');
+    const addressInput = document.getElementById('editAddress');
+    const avatarUrlInput = document.getElementById('editAvatarUrl');
+    const preview = document.getElementById('avatarPreview');
+    if (phoneInput) phoneInput.value = profile.phone_number || '';
+    if (addressInput) addressInput.value = profile.address || '';
+    if (avatarUrlInput) avatarUrlInput.value = profile.avatar_url || '';
+    if (preview) preview.src = profile.avatar_url || 'https://api.dicebear.com/9.x/fun-emoji/svg?seed=default';
+  }
+
+ window.openEditProfileSheet = async () => {
+    console.log('Opening edit profile sheet');
+    await loadEditProfileData();
+    const sheet = document.getElementById('editProfileSheet');
+    console.log('Sheet element found?', sheet);
+    if (sheet) {
+        // Force the sheet to become visible using inline styles (highest specificity)
+        sheet.style.display = 'flex';
+        sheet.style.visibility = 'visible';
+        sheet.style.opacity = '1';
+        sheet.classList.add('active');
+        // Force a reflow
+        sheet.offsetHeight;
+        console.log('Sheet should now be visible');
+    } else {
+        console.error('Edit profile sheet element not found!');
+    }
+};
+
+window.closeEditProfileSheet = () => {
+    console.log('Closing edit profile sheet');
+    const sheet = document.getElementById('editProfileSheet');
+    if (sheet) {
+        sheet.style.display = 'none';
+        sheet.style.visibility = 'hidden';
+        sheet.style.opacity = '0';
+        sheet.classList.remove('active');
+    }
+};
+  document.getElementById('editProfileBtn')?.addEventListener('click', (e) => { e.preventDefault(); openEditProfileSheet(); });
+
+  const avatarUploadInput = document.getElementById('avatarUpload');
+  if (avatarUploadInput) {
+    avatarUploadInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      console.log('Avatar file selected:', file.name);
+      const url = await uploadAvatar(file);
+      if (url) {
+        document.getElementById('editAvatarUrl').value = url;
+        document.getElementById('avatarPreview').src = url;
+        alert('Image uploaded!');
+      }
+      e.target.value = '';
+    });
+  }
+
+  const editProfileForm = document.getElementById('editProfileForm');
+  if (editProfileForm) {
+    console.log('Edit profile form found, attaching submit listener');
+    editProfileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log('Edit profile form SUBMITTED!');
+      const supabase = await getSupabase();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) { console.error('Auth error on submit:', userError); alert('You must be logged in'); return; }
+      const phone = document.getElementById('editPhone').value;
+      const address = document.getElementById('editAddress').value;
+      const avatarUrl = document.getElementById('editAvatarUrl').value;
+      console.log('Saving – phone:', phone, 'address:', address, 'avatarUrl:', avatarUrl);
+      const updateData = { phone_number: phone || null, address: address || null, avatar_url: avatarUrl || null, updated_at: new Date().toISOString() };
+      const { error } = await supabase.from('profiles').update(updateData).eq('id', user.id);
+      if (error) {
+        console.error('Database update error:', error);
+        alert('Failed to update profile: ' + error.message);
+      } else {
+        console.log('Profile updated successfully!');
+        alert('Profile updated successfully!');
+        closeEditProfileSheet();
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+  } else {
+    console.error('Edit profile form NOT found!');
+  }
+
+  // ========== UPGRADE TIER ==========
+  window.openUpgradeTierSheet = () => {
+    // Close any open bottom sheets first (theme selector, missions, etc.)
+    document.querySelectorAll('.bottom-sheet-overlay').forEach(el => {
+      el.classList.remove('active');
+      el.style.visibility = 'hidden';
+      el.style.opacity = '0';
+    });
+    const loader = document.getElementById('global-loader');
+    if (loader) loader.style.display = 'none';
+    const sheet = document.getElementById('upgradeTierSheet');
+    if (sheet) { sheet.style.visibility = 'visible'; sheet.style.opacity = '1'; sheet.classList.add('active'); }
+    else { console.error('upgradeTierSheet not found'); }
+  };
+  window.closeUpgradeTierSheet = () => {
+    const sheet = document.getElementById('upgradeTierSheet');
+    if (sheet) { sheet.classList.remove('active'); sheet.style.visibility = 'hidden'; sheet.style.opacity = '0'; }
+  };
+
+  const upgradeBtn = document.getElementById('upgradeTierBtn');
+  if (upgradeBtn) {
+    console.log('Upgrade button found, attaching click listener');
+    upgradeBtn.addEventListener('click', (e) => { e.preventDefault(); openUpgradeTierSheet(); });
+  } else {
+    console.error('Upgrade button NOT found!');
+  }
+  document.getElementById('mobileUpgradeBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openUpgradeTierSheet();
+  });
+  // ========== STRIPE CHECKOUT FOR TIER SELECTION ==========
+  const tierSelectBtns = document.querySelectorAll('.tier-option .select-tier');
+  if (tierSelectBtns.length) {
+    console.log(`Found ${tierSelectBtns.length} tier selection buttons, attaching Stripe checkout`);
+    tierSelectBtns.forEach(btn => {
+      // Remove any existing listeners (to avoid double calls)
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const tierOption = newBtn.closest('.tier-option');
+        const tier = tierOption.dataset.tier;
+        console.log('Starting Stripe checkout for tier:', tier);
+        await startCheckout(tier);
+      });
+    });
+  } else {
+    console.error('No tier selection buttons found!');
+  }
+</script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+
+<!-- Decorator Jar Bottom Sheet -->
+<div id="decoratorSheet" class="bottom-sheet-overlay jar-deco-sheet" style="display: none; visibility: hidden; opacity: 0;">
+  <div class="bottom-sheet">
+    <div class="bottom-sheet-header">
+      <h3><i class="fas fa-paint-brush"></i> Decorate Your Jar</h3>
+      <button class="bottom-sheet-close" onclick="closeDecoratorSheet()">&times;</button>
+    </div>
+    <div class="bottom-sheet-content">
+      <div class="jar-deco-body">
+        <div id="jarContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initDecorator } from './js/decorator.js';
+import { initCollab, checkInviteOnLoad } from './js/collaboration.js';
+import './js/share-card.js';
+
+// Expose functions globally
+window.initDecorator = initDecorator;
+window.invitePartner = invitePartner;
+
+// Init collaboration on load
+initCollab();
+checkInviteOnLoad();
+
+// Re-use the existing supabase client from profile.js context
+// The decorator will be initialized when first opened
+</script>
 </body>
 </html>

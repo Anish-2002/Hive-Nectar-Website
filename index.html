@@ -1,106 +1,198 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hive Nectar | Home</title>
+  <title>The Meadow | Belonging</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body>
+<body class="page-index" data-theme="classic">
 
- <header class="header">
-  <div class="logo-area">
-    <div class="brandmark"><img src="logo.svg" alt="" style="width:20px;"></div>
-    <span class="brand-title">HIVE NECTAR</span>
-  </div>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+<header class="header" data-testid="main-header">
+  <a href="index.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
     <i class="fas fa-bars"></i>
   </button>
-  <nav class="nav-links" id="navLinks">
-    <a href="index.html">Home</a>
+  <nav class="nav-links" id="navLinks" data-testid="nav-links">
+    <a href="index.html" class="active">Home</a>
     <a href="pollenpop.html">PollenPop</a>
-    <a href="join.html">Join the Hive</a>
-    <a href="about.html">About</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
   </nav>
 </header>
 
-  <main class="wrap">
-    <section class="hero-card">
-      <h1>The Hive Ecosystem</h1>
-      <p style="opacity: 0.9; max-width: 600px; margin: 0 auto;">[Hero Subheading Placeholder: Connecting people through meaningful growth and collective action.]</p>
-    </section>
+<main class="wrap">
+  <!-- Hero – Position Statement -->
+  <section class="hero-card" data-testid="hero-section">
+    <h1>The Meadow</h1>
+    <p>Work, family, kids, chores, deadlines, responsibilities. These endless loops exhaust us, making it hard to keep up, stay calm, and recognise ourselves.</p>
+    <br>
+    <p>The stress and fatigue pull us away from what feels normal. From our rhythm, our goals, our dreams. From the bonds that make us who we are.</p>
+    <br>
+    <p>The Meadow is a living system. I built it first for myself and my family, during a time when I had lost all of those things, too.</p>
+    <a href="join.html" class="btn" style="margin-top: 24px;" data-testid="hero-cta">
+      <i class="fas fa-seedling"></i> Join The Meadow
+    </a>
+  </section>
 
-    <div class="grid-main">
-      <div class="main-column">
-        
-        <section class="card">
-          <h2 class="section-title">Intro: The Hive + Hive Nectar</h2>
-          <div class="placeholder-box">
-            [Placeholder: High-level overview explaining the relationship between The Hive ecosystem and the Hive Nectar brand mission.]
+  <div class="grid-main">
+    <div class="main-column">
+      <!-- Introduction – design philosophy -->
+      <section class="card lift" data-testid="intro-section">
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 12px;">
+          <span style="background: var(--honey-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🌿</span>
+          The Meadow
+        </h2>
+        <p style="margin-top: 16px; line-height: 1.8;">It is designed around small, low‑effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>
+        <p style="margin-top: 16px; line-height: 1.8;">We are part of nature. And like nature, we are resilient. We can heal and regenerate when there is space.</p>
+        <p style="margin-top: 16px; line-height: 1.8;">The Meadow creates that space. Tasks fit quietly into your day. There is no commitment required, no reminders sent. But there is real, visible evidence that you showed up, participated, and earned something; a small, honest nudge that you are still here.</p>
+        <p style="margin-top: 16px; line-height: 1.8;">We hope that nudge helps you feel like yourself again.</p>
+        <div style="display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 140px; text-align: center; padding: 20px; background: var(--secondary); border-radius: var(--radius-lg);">
+            <div id="statMembers" style="font-size: 2rem; font-weight: 700; color: var(--primary-dark);">+</div>
+            <div class="tiny muted">Active Members</div>
           </div>
-        </section>
-
-        <section class="card">
-          <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">How it Works</h2>
-          <div class="step-grid">
-            <div class="step-item">
-              <div class="step-num">1</div>
-              <h4>Do Small Actions</h4>
-              <p class="tiny">[Placeholder: Explain the daily micro-habits or tasks users perform.]</p>
-            </div>
-            <div class="step-item">
-              <div class="step-num">2</div>
-              <h4>Earn Nectar</h4>
-              <p class="tiny">[Placeholder: Explain the reward system and value of Nectar within the hive.]</p>
-            </div>
-            <div class="step-item">
-              <div class="step-num">3</div>
-              <h4>Grow Collective Impact</h4>
-              <p class="tiny">[Placeholder: Explain how individual actions scale to benefit the whole community.]</p>
-            </div>
+          <div style="flex: 1; min-width: 140px; text-align: center; padding: 20px; background: var(--secondary); border-radius: var(--radius-lg);">
+            <div id="statTasks" style="font-size: 2rem; font-weight: 700; color: var(--primary-dark);">+</div>
+            <div class="tiny muted">Tasks Completed</div>
           </div>
-        </section>
-
-        <section class="card highlight-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-            <div>
-              <h2 class="section-title" style="margin: 0;">PollenPop</h2>
-              <p class="placeholder-text" style="margin-top: 5px;">[PollenPop product teaser placeholder: Introducing our first physical product.]</p>
-            </div>
-            <a href="pollenpop.html" class="btn" style="width: auto; padding: 10px 20px; text-decoration: none;">Learn more →</a>
+          <div style="flex: 1; min-width: 140px; text-align: center; padding: 20px; background: var(--secondary); border-radius: var(--radius-lg);">
+            <div id="statPossibilities" style="font-size: 2rem; font-weight: 700; color: var(--primary-dark);">∞</div>
+            <div class="tiny muted">Possibilities</div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <aside class="side-column">
-        <section class="card" style="border-left: 4px solid var(--cta);">
-          <h3 class="section-title">Founder Note</h3>
-          <div class="placeholder-box" style="background: none; border: none; padding: 0; text-align: left;">
-            <p style="font-style: italic; color: var(--fg);">"[Founder note placeholder: This section will contain the vision and personal message from the founder regarding Phase 1 and beyond.]"</p>
+      <!-- What Exists Here – 4 step cards (matching bullet points) -->
+      <section class="card lift" data-testid="how-it-works-section">
+        <h2 class="section-title" style="text-align: center; margin-bottom: 2rem;">What Exists Here</h2>
+        <div class="how-it-works-grid">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h4>PollenPop</h4>
+            <p class="tiny muted" style="margin-top: 8px;">Small, tangible tasks that seed new behaviours and anchor them into your daily routine as habits.</p>
           </div>
-        </section>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h4>Nectar</h4>
+            <p class="tiny muted" style="margin-top: 8px;">The energy unit inside The Meadow. It records your presence and marks your contribution.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h4>Honey Unit</h4>
+            <p class="tiny muted" style="margin-top: 8px;">Effort‑earned wealth built from accumulated Nectar. It is yours alone, unexchangeable, and a living record of your impact.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <h4>Themes & Growth Stages</h4>
+            <p class="tiny muted" style="margin-top: 8px;">Four core themes to choose from based on your interest and curiosity. Each theme has growth stages, and there are no instructions for how to move through them. Over time, repetition happens naturally; without force, without conscious decision. You are both witness and participant.</p>
+          </div>
+        </div>
+        <p style="margin-top: 24px; text-align: center; font-style: italic;">Everything here is optional and adjustable. The system does not tell you who to be. It shows you what you are capable of doing, repeatedly.</p>
+      </section>
 
-        <section class="card" style="background: var(--bg); border: 1px dashed var(--border); text-align: center;">
-          <h4 style="margin-bottom: 10px;">Ready to Join?</h4>
-          <p class="tiny" style="margin-bottom: 15px;">Be part of the early-access hive members.</p>
-          <a href="join.html" class="text-link" style="font-weight: 700;">Sign up today →</a>
-        </section>
-      </aside>
+      <!-- Credibility Signals -->
+      <section class="card lift" data-testid="credibility-section">
+        <h2 class="section-title" style="display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-shield-alt" style="color: var(--primary);"></i> Credibility Signals
+        </h2>
+        <p style="margin-top: 16px; line-height: 1.7;">The Meadow was designed with the weight of human burden in mind: daily pressure, mental load, the quiet imbalance that builds over time.</p>
+        <p style="margin-top: 16px; line-height: 1.7;">When that pressure accumulates, we stop recognising ourselves. We don't know who the person shouting at their kids is. We don't know how we got here.</p>
+        <p style="margin-top: 16px; line-height: 1.7;">This experience led to understanding the mechanism behind <strong>‘Norm Shift’</strong>, the way behaviour quietly resets without us noticing. Raising your voice once becomes a pattern. Forgetting an anniversary once becomes annual. Norm Shift can move in either direction, depending on how it shapes your habits and character over time.</p>
+        <p style="margin-top: 16px; line-height: 1.7; font-weight: 500;">The Meadow exists to help you notice the shift, and, if you choose, find your way back.</p>
+      </section>
+
+      <!-- PollenPop Highlight (kept as before) -->
+      <section class="card highlight-card lift" style="position: relative;" data-testid="pollenpop-section">
+        <span class="badge-float"><i class="fas fa-star"></i> FIRST PRODUCT</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+          <div style="flex: 1; min-width: 200px;">
+            <h2 class="section-title" style="margin: 0; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-flask" style="color: var(--primary);"></i> PollenPop
+            </h2>
+            <p style="margin-top: 12px; line-height: 1.7;">PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>
+          </div>
+          <a href="pollenpop.html" class="btn" style="flex-shrink: 0;" data-testid="pollenpop-cta">
+            Learn more <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </section>
     </div>
-  </main>
 
- <footer class="footer">
-  <div class="footer-links">
-    <a href="profile.html">My Profile</a>
-    <span>|</span>
-    <a href="board.html">Communication Board</a>
+    <aside class="side-column">
+      <!-- Founder Snapshot (you may keep or remove – the document didn't ask for it) -->
+      <section class="card lift" data-testid="founder-section">
+        <h3 class="section-title" style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+          <i class="fas fa-user-check" style="color: var(--primary);"></i> Founder Snapshot
+        </h3>
+        <div class="founder-quote">
+          <p style="font-style: italic; color: var(--fg); line-height: 1.8;">"Before The Meadow existed, the founder experienced career stagnation after parental leave due to a newborn, a young child, and self‑esteem that had quietly eroded. The work happened in the margins – training courses squeezed into lunch breaks, dinner planned on the same kitchen bench as everything else. Patterns emerged between lab work and school pick‑ups, between spreadsheets and garden beds. The system was first tested in her own daily loops, then refined into themes, stages, gates, and units."</p>
+          <p style="margin-top: 16px; font-weight: 600; color: var(--primary-dark);">— The Meadow Team</p>
+        </div>
+      </section>
+
+      <section class="cta-section" data-testid="join-cta-section-2">
+        <h4>Already a member?</h4>
+        <a href="login.html" class="btn" data-testid="login-link"><i class="fas fa-sign-in-alt"></i> Login here</a>
+      </section>
+
+      <section class="cta-section" data-testid="join-cta-section-3">
+        <h4>Join The Meadow</h4>
+        <p class="tiny" style="color: rgba(255,255,255,0.9);">Be part of the early‑access community and start earning Nectar today.</p>
+        <a href="join.html" class="btn" data-testid="join-cta-btn">Sign up today <i class="fas fa-chevron-right"></i></a>
+      </section>
+
+      <!-- Quick Links -->
+      <section class="card lift">
+        <h4 style="margin-bottom: 16px;">Quick Links</h4>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <a href="profile.html" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--secondary); border-radius: var(--radius-md); font-weight: 600; transition: var(--transition-smooth);">
+            <i class="fas fa-user-circle" style="color: var(--primary);"></i> My Profile
+          </a>
+          <a href="board.html" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--secondary); border-radius: var(--radius-md); font-weight: 600; transition: var(--transition-smooth);">
+            <i class="fas fa-comments" style="color: var(--primary);"></i> Communication Board
+          </a>
+          <a href="faq.html" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--secondary); border-radius: var(--radius-md); font-weight: 600; transition: var(--transition-smooth);">
+            <i class="fas fa-question-circle" style="color: var(--primary);"></i> FAQ
+          </a>
+        </div>
+      </section>
+    </aside>
   </div>
-  <p>&copy; 2025 Hive Nectar. All rights reserved.</p>
+</main>
+
+<footer class="footer" data-testid="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span>
+    <a href="founders.html">Founders</a>
+  </div>
+  <div class="social-footer" style="margin-top: 16px; display: flex; justify-content: center; gap: 20px;">
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-x-twitter"></i></a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-  <script src="app.js"></script>
+<script>
+  function toggleBuzzPreview() {
+    const el = document.getElementById('buzzPreview');
+    if (el) el.classList.toggle('show');
+  }
+</script>
+
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+<script type="module" src="js/notification.js"></script>
 </body>
 </html>

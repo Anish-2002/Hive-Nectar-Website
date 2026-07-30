@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin CRM | The Meadow</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    .crm-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 120px); max-width: 1400px; margin: 0 auto; padding: 20px; gap: 20px; }
+    .crm-sidebar { background: var(--card-bg); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border); height: fit-content; position: sticky; top: 100px; }
+    .crm-sidebar .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; color: var(--fg); transition: 0.2s; margin-bottom: 4px; font-size: 0.85rem; }
+    .crm-sidebar .nav-item:hover { background: rgba(200,169,110,0.1); }
+    .crm-sidebar .nav-item.active { background: var(--primary); color: #fff; font-weight: 600; }
+    .crm-content { min-height: 500px; }
+    .crm-layer { display: none; }
+    .crm-layer.active { display: block; }
+
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .admin-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .admin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .admin-table tr:hover td { background: rgba(200,169,110,0.04); }
+    .admin-table .clickable { cursor: pointer; }
+    .admin-table .clickable:hover { color: var(--primary); }
+    .admin-form { display: grid; gap: 12px; max-width: 500px; }
+    .admin-form label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); }
+    .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); color: var(--fg); font-size: 0.9rem; }
+    .admin-form textarea { min-height: 80px; resize: vertical; }
+    .admin-form .btn { width: fit-content; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; text-align: center; }
+    .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .stat-card .label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); margin-top: 4px; }
+
+    .pill { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+    .pill.active { background: #d4edda; color: #155724; }
+    .pill.canceled { background: #f8d7da; color: #721c24; }
+    .pill.free { background: #e2e3e5; color: #383d41; }
+    .pill.past-due { background: #fff3cd; color: #856404; }
+    .pill.unread { background: #cce5ff; color: #004085; }
+    .pill.resolved { background: #d4edda; color: #155724; }
+
+    .inquiry-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
+    .inquiry-card.unread { border-left: 3px solid var(--primary); }
+    .inquiry-card .meta { display: flex; gap: 16px; font-size: 0.75rem; color: var(--fg-muted); margin-bottom: 8px; }
+    .inquiry-card .msg { font-size: 0.9rem; margin-bottom: 8px; }
+
+    .user-detail-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; margin-top: 16px; display: none; }
+    .user-detail-panel.open { display: block; }
+    .user-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .user-detail-grid .field { font-size: 0.85rem; }
+    .user-detail-grid .field .val { font-weight: 600; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--card-bg); border-radius: var(--radius-md); padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+
+    @media (max-width: 768px) {
+      .crm-wrap { grid-template-columns: 1fr; }
+      .crm-sidebar { position: static; display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; }
+      .crm-sidebar .nav-item { font-size: 0.75rem; padding: 6px 10px; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .user-detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="page-admin" data-theme="classic">
+
+<header class="header">
+  <a href="index.html" class="logo-area" style="text-decoration:none;color:inherit;">
+    <div class="brandmark"><img src="newlogo.webp" alt="Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="board.html">Board</a>
+    <a href="faq.html">FAQ</a>
+    <a href="login.html">Login</a>
+  </nav>
+</header>
+
+<div class="crm-wrap">
+
+  <!-- Sidebar -->
+  <aside class="crm-sidebar">
+    <p class="tiny" style="font-weight:700;margin-bottom:12px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:0.05em;">CRM</p>
+    <div class="nav-item active" data-layer="dashboard"><i class="fas fa-th-large"></i> Dashboard</div>
+    <div class="nav-item" data-layer="users"><i class="fas fa-users"></i> Users</div>
+    <div class="nav-item" data-layer="tasks"><i class="fas fa-tasks"></i> Tasks</div>
+    <div class="nav-item" data-layer="achievements"><i class="fas fa-trophy"></i> Achievements</div>
+    <div class="nav-item" data-layer="comms"><i class="fas fa-bullhorn"></i> Comms</div>
+    <div class="nav-item" data-layer="inquiries"><i class="fas fa-inbox"></i> Inquiries</div>
+    <div class="nav-item" data-layer="system"><i class="fas fa-cog"></i> System</div>
+    <hr style="border-color:var(--border);margin:12px 0;">
+    <div class="nav-item" data-layer="admins"><i class="fas fa-shield-alt"></i> Admins</div>
+  </aside>
+
+  <!-- Content -->
+  <div class="crm-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="layer-dashboard" class="crm-layer active">
+      <h2 style="margin-bottom:20px;">Dashboard</h2>
+      <div id="statsGrid" class="stat-grid"></div>
+    </section>
+
+    <!-- ===== USERS ===== -->
+    <section id="layer-users" class="crm-layer">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">Users</h2>
+        <input id="userSearch" type="text" placeholder="Search by name or email..." style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;width:280px;font-size:0.85rem;">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr>
+            <th>Name</th><th>Email</th><th>Joined</th><th>Tier</th><th>Points</th><th>Tasks</th><th>Status</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table>
+      </div>
+      <div id="userDetail" class="user-detail-panel"></div>
+    </section>
+
+    <!-- ===== TASKS ===== -->
+    <section id="layer-tasks" class="crm-layer">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="margin:0;">Tasks</h2>
+        <button class="btn" onclick="openTaskModal()"><i class="fas fa-plus"></i> New Task</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr>
+            <th>#</th><th>Title</th><th>Theme</th><th>Stage</th><th>Points</th><th>Order</th><th style="width:80px;text-align:center;">Active</th><th style="width:80px;"></th>
+          </tr></thead>
+          <tbody id="tasksBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== ACHIEVEMENTS ===== -->
+    <section id="layer-achievements" class="crm-layer">
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button class="btn btn-secondary" id="achievementTabMilestones" onclick="switchAchTab('milestones')" style="flex:1;">🏆 Milestones</button>
+        <button class="btn btn-secondary" id="achievementTabTokens" onclick="switchAchTab('tokens')" style="flex:1;">🎨 Theme Tokens</button>
+      </div>
+
+      <!-- Milestones Panel -->
+      <div id="achMilestonesPanel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span id="milestoneCount" class="tiny muted"></span>
+          <button class="btn" onclick="openMilestoneModal()"><i class="fas fa-plus"></i> New Milestone</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr>
+              <th style="width:40px;">#</th><th>Name</th><th>Category</th><th>Requirement</th><th>Reward</th><th style="width:80px;text-align:center;">Active</th><th style="width:80px;"></th>
+            </tr></thead>
+            <tbody id="milestonesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tokens Panel -->
+      <div id="achTokensPanel" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span id="tokenCount" class="tiny muted"></span>
+          <button class="btn" onclick="openTokenModal()"><i class="fas fa-plus"></i> New Token</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr>
+              <th>Name</th><th>Theme</th><th>Stage</th><th>Tasks Required</th><th style="width:80px;text-align:center;">Active</th><th style="width:80px;"></th>
+            </tr></thead>
+            <tbody id="tokensBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMMS ===== -->
+    <section id="layer-comms" class="crm-layer">
+      <h2 style="margin-bottom:16px;">Communications</h2>
+      <div class="card" style="padding:20px;margin-bottom:20px;">
+        <h3 style="font-size:1rem;margin-bottom:12px;">Send Broadcast</h3>
+        <div class="admin-form">
+          <label>Title</label>
+          <input id="commTitle" placeholder="Broadcast title">
+          <label>Message</label>
+          <textarea id="commContent" placeholder="Write your message..."></textarea>
+          <button class="btn" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+      </div>
+      <div id="commHistory"></div>
+    </section>
+
+    <!-- ===== INQUIRIES ===== -->
+    <section id="layer-inquiries" class="crm-layer">
+      <h2 style="margin-bottom:16px;">Contact Inquiries</h2>
+      <div id="inquiryFilters" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"></div>
+      <div id="inquiryList"></div>
+    </section>
+
+    <!-- ===== SYSTEM ===== -->
+    <section id="layer-system" class="crm-layer">
+      <h2 style="margin-bottom:16px;">System</h2>
+      <div class="admin-form" style="max-width:400px;">
+        <button class="btn" onclick="runDowngrade()"><i class="fas fa-sync"></i> Run Expired Subscriptions Check</button>
+        <div id="sysResult" style="margin-top:12px;font-size:0.85rem;"></div>
+
+        <hr style="border-color:var(--border);margin:20px 0;">
+
+        <button class="btn" onclick="sendRenewalReminders()"><i class="fas fa-bell"></i> Check Upcoming Renewals (7 days)</button>
+        <div id="reminderResult" style="margin-top:12px;font-size:0.85rem;"></div>
+        <div id="reminderPreview" style="font-size:0.85rem;"></div>
+      </div>
+      <div style="margin-top:24px;">
+        <h3 style="font-size:1rem;margin-bottom:8px;">Active Subscribers</h3>
+        <div id="activeSubsList"></div>
+      </div>
+    </section>
+
+    <!-- ===== ADMINS ===== -->
+    <section id="layer-admins" class="crm-layer">
+      <h2 style="margin-bottom:16px;">Admin Management</h2>
+      <div class="admin-form" style="max-width:400px;margin-bottom:20px;">
+        <label>Add admin by email</label>
+        <div style="display:flex;gap:8px;">
+          <input id="newAdminEmail" type="email" placeholder="user@example.com" style="flex:1;">
+          <button class="btn" onclick="addAdmin()"><i class="fas fa-plus"></i> Add</button>
+        </div>
+      </div>
+      <table class="admin-table" style="max-width:400px;">
+        <thead><tr><th>Email</th><th>Added</th><th style="width:60px;"></th></tr></thead>
+        <tbody id="adminsBody"></tbody>
+      </table>
+    </section>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+<div id="toast-container"></div>
+
+<!-- Task Edit Modal -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal-box">
+    <h3 id="taskModalTitle" style="margin-bottom:16px;">New Task</h3>
+    <div class="admin-form">
+      <label>Task Title</label>
+      <input id="taskTitle">
+      <label>Description</label>
+      <textarea id="taskDesc"></textarea>
+      <label>Theme</label>
+      <select id="taskTheme">
+        <option value="T01">🌱 Connecting / Belonging</option>
+        <option value="T02">✨ Creating / Circularity</option>
+        <option value="T03">💡 Innovation / Shift</option>
+        <option value="T04">⚡ Acting / Motivating</option>
+        <option value="T05">🌙 Reflecting / Learning</option>
+      </select>
+      <label>Stage</label>
+      <select id="taskStage">
+        <option value="🌰 Seeds">🌰 Seeds</option>
+        <option value="🌱 Sprout">🌱 Sprout</option>
+        <option value="🌸 Bloom">🌸 Bloom</option>
+        <option value="🌾 Harvest">🌾 Harvest</option>
+      </select>
+      <label>Nectar Reward</label>
+      <input id="taskPoints" type="number" value="10">
+      <label>Task Order</label>
+      <input id="taskOrder" type="number" value="1">
+      <label>Core Theme Name (for grouping)</label>
+      <input id="taskCoreTheme" placeholder="e.g. Connecting / Belonging">
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn" onclick="saveTask()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-secondary" onclick="closeTaskModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/admin-crm.js"></script>
+</body>
+</html>
