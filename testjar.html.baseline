@@ -96,25 +96,6 @@
             0% { width: 0; height: 0; opacity: 1; }
             100% { width: 120px; height: 120px; opacity: 0; transform: translate(-60px, -60px); }
         }
-
-        /* Glowing bees */
-        .bee-orbit { position:absolute; z-index:30; pointer-events:none; }
-        .bee { position:absolute; width:34px; height:22px; transform:translate(-50%,-50%); animation:beeGlow 1.8s ease-in-out infinite; }
-        @keyframes beeGlow {
-          0%   { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
-          50%  { filter:drop-shadow(0 0 10px rgba(255,240,100,1)) drop-shadow(0 0 24px rgba(255,190,0,.75)) drop-shadow(0 0 44px rgba(255,130,0,.38)); }
-          100% { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
-        }
-        @keyframes wingFlap { from{opacity:.55;transform:scaleY(1);} to{opacity:.85;transform:scaleY(.6);} }
-        .bee .wing { animation:wingFlap .22s ease-in-out infinite alternate; }
-        @keyframes bee1 { 0%{transform:translate(0,0);}20%{transform:translate(52px,-16px);}45%{transform:translate(76px,12px);}65%{transform:translate(36px,26px);}80%{transform:translate(-10px,14px);}100%{transform:translate(0,0);} }
-        @keyframes bee2 { 0%{transform:translate(40px,4px);}30%{transform:translate(78px,-18px);}55%{transform:translate(60px,22px);}75%{transform:translate(14px,30px);}100%{transform:translate(40px,4px);} }
-        @keyframes bee3 { 0%{transform:translate(20px,-10px);}18%{transform:translate(70px,-24px);}40%{transform:translate(90px,6px);}60%{transform:translate(55px,24px);}80%{transform:translate(10px,10px);}100%{transform:translate(20px,-10px);} }
-        #bee1-orbit { animation:bee1 6.2s linear infinite; }
-        #bee2-orbit { animation:bee2 4.5s ease-in-out infinite; }
-        #bee3-orbit { animation:bee3 7.3s linear infinite; }
-        #bee2-orbit .bee { animation-delay:-0.6s; }
-        #bee3-orbit .bee { animation-delay:-1.2s; }
     </style>
 </head>
 <body class="page-jar" data-theme="classic">
@@ -152,21 +133,9 @@
 
     <!-- Right: jar -->
     <div style="display:flex;flex-direction:column;align-items:center;justify-self:center;width:100%;">
-      <div class="jar-wrap-bees" style="position:relative;display:inline-block;">
-        <div id="jar-container">
-          <div class="glass-reflection"></div>
-          <div class="honey-layer">
-            <div class="honey-shimmer"></div>
-            <div class="honey-bubble" style="left:20%;bottom:30%;width:12px;height:12px;animation-delay:0s;"></div>
-            <div class="honey-bubble" style="left:55%;bottom:50%;width:8px;height:8px;animation-delay:1.2s;"></div>
-            <div class="honey-bubble" style="left:75%;bottom:25%;width:10px;height:10px;animation-delay:2.5s;"></div>
-            <div class="honey-bubble" style="left:35%;bottom:65%;width:6px;height:6px;animation-delay:0.8s;"></div>
-          </div>
-        </div>
-        <div class="bee-orbit" id="bee1-orbit" style="top:-30px;left:180px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
-        <div class="bee-orbit" id="bee2-orbit" style="top:-40px;left:80px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
-        <div class="bee-orbit" id="bee3-orbit" style="top:-50px;left:140px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
-      </div>
+      <div class="firefly" style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;box-shadow:0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);animation:drift 4s infinite ease-in-out;pointer-events:none;z-index:30;top:8%;left:-18%;animation-delay:0s;"></div>
+      <div class="firefly" style="position:absolute;width:4px;height:4px;background:#ffd700;border-radius:50%;box-shadow:0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);animation:drift 4s infinite ease-in-out;pointer-events:none;z-index:30;top:45%;right:-12%;animation-delay:1.5s;"></div>
+      <div id="jar-container"><div class="glass-reflection"></div></div>
       <div style="margin-top:1.25rem;width:16rem;height:0.75rem;background:rgba(212,175,55,0.12);border-radius:100%;filter:blur(12px);"></div>
       <div class="jar-actions">
         <button class="btn" onclick="window.location.href='profile.html'"><i class="fas fa-arrow-left"></i> Back</button>
@@ -236,6 +205,11 @@ if (savedData && savedData.length) {
         if (d.milestone_id) savedPositions.set(`milestone:${d.milestone_id}`, { x: d.x_pos, y: d.y_pos });
         if (d.token_id) savedPositions.set(`token:${d.token_id}`, { x: d.x_pos, y: d.y_pos });
     });
+} else {
+    try {
+        const local = JSON.parse(localStorage.getItem(`jar_deco_${USER_ID}_v2`) || '[]');
+        local.forEach(s => savedPositions.set(`${s.source}:${s.id}`, { x: s.x, y: s.y }));
+    } catch {}
 }
 
 // ======================== PHYSICS ========================
@@ -263,78 +237,15 @@ const render = Render.create({
 let walls = [];
 const buildWalls = () => {
     walls.forEach(w => Composite.remove(engine.world, w));
-    const W = { isStatic: true, render: { visible: false }, friction: 0.6 };
-    const W2 = { isStatic: true, render: { visible: false }, friction: 0.6, chamfer: 2 };
-    const R = 100; // border-radius of bottom corners
-    const w = dims.W, h = dims.H;
-
+    const W = { isStatic: true, render: { visible: false }, chamfer: 2 };
     walls = [
-        // Straight walls — full body section (overlap taper below)
-        Bodies.rectangle(w/2, h-3, w-2*R-20, 10, W2),              // flat bottom center
-        Bodies.rectangle(4, h*0.4, 10, h*0.9, W2),                  // left wall (full height, overlaps taper)
-        Bodies.rectangle(w-4, h*0.4, 10, h*0.9, W2),               // right wall
+        Bodies.rectangle(dims.W/2, dims.H-5, dims.W-20, WALL_THICKNESS, W),
+        Bodies.rectangle(5, dims.H/2, WALL_THICKNESS, dims.H, W),
+        Bodies.rectangle(dims.W-5, dims.H/2, WALL_THICKNESS, dims.H, W),
     ];
-
-    // Neck-to-body transition walls (jar tapers from narrow neck to wider body)
-    const neckW = w * 0.42;
-    const neckXe = (w - neckW) / 2; // neck left edge
-    const taperLen = h * 0.2;
-    const taperDx = w * 0.16;
-    const taperAngle = Math.atan2(taperLen, taperDx);
-    // Left taper — overlaps with straight wall below
-    walls.push(Bodies.rectangle(neckXe / 2 + 2, h * 0.16,
-        Math.hypot(taperLen, taperDx) + 8, 10, { ...W, angle: -taperAngle }));
-    // Right taper
-    walls.push(Bodies.rectangle(w - neckXe / 2 - 2, h * 0.16,
-        Math.hypot(taperLen, taperDx) + 8, 10, { ...W, angle: taperAngle + 0.01 }));
-
-    // Bottom-left curve — 7 segments along the 100px radius arc
-    const steps = 7;
-    const cx = R, cy = h - R; // center of arc
-    for (let i = 0; i < steps; i++) {
-        const a0 = (i / steps) * Math.PI / 2;      // start angle
-        const a1 = ((i+1) / steps) * Math.PI / 2;  // end angle
-        const am = (a0 + a1) / 2;                  // mid angle
-        const len = R * (Math.PI / 2) / steps;     // segment length along arc
-        const mx = cx - R * Math.cos(am) - 4;      // x offset inward
-        const my = cy + R * Math.sin(am);           // y offset inward
-        // Place a small wall tangent to the curve at the midpoint
-        walls.push(Bodies.rectangle(mx, my, len + 6, 10, { ...W, angle: am }));
-    }
-
-    // Bottom-right curve — mirror of left
-    for (let i = 0; i < steps; i++) {
-        const a0 = (i / steps) * Math.PI / 2;
-        const a1 = ((i+1) / steps) * Math.PI / 2;
-        const am = (a0 + a1) / 2;
-        const len = R * (Math.PI / 2) / steps;
-        const mx = w - R + R * Math.cos(am) + 4;
-        const my = cy + R * Math.sin(am);
-        walls.push(Bodies.rectangle(mx, my, len + 6, 10, { ...W, angle: Math.PI - am }));
-    }
-
     Composite.add(engine.world, walls);
 };
 buildWalls();
-
-// Safety net — teleport any escaped coin back inside the jar
-const { Events } = Matter;
-Events.on(engine, 'afterUpdate', () => {
-  const margin = 8;
-  engine.world.bodies.forEach(b => {
-    if (b.isStatic || !b.achievementKey) return;
-    let clamped = false;
-    let nx = b.position.x, ny = b.position.y;
-    if (nx < margin) { nx = margin; clamped = true; }
-    if (nx > dims.W - margin) { nx = dims.W - margin; clamped = true; }
-    if (ny < margin + 40) { ny = margin + 40; clamped = true; }
-    if (ny > dims.H - margin) { ny = dims.H - margin; clamped = true; }
-    if (clamped) {
-      Body.setPosition(b, { x: nx, y: ny });
-      Body.setVelocity(b, { x: 0, y: 0 });
-    }
-  });
-});
 
 const doRipple = (x, y) => {
     const el = document.createElement('div');
@@ -377,21 +288,20 @@ const dropAchievement = (url, key) => {
     updateBadges();
 
     const r = RADIUS() * (0.85 + Math.random() * 0.3);
-    // Drop from center of jar opening — no wide spread
-    const dropX = dims.W / 2 + (Math.random() - 0.5) * 20;
-    const dropY = 30 + Math.random() * 30; // drop from just below the lid
+    const dropX = 40 + Math.random() * (dims.W - 80);
+    const dropY = -40 - Math.random() * 30;
 
     const token = Bodies.circle(dropX, dropY, r, {
-        restitution: 0.5 + Math.random() * 0.15,
-        friction: 0.3 + Math.random() * 0.1,
-        frictionAir: 0.015 + Math.random() * 0.008,
-        density: 0.002 + Math.random() * 0.001,
+        restitution: 0.25 + Math.random() * 0.2,
+        friction: 0.4 + Math.random() * 0.3,
+        frictionAir: 0.015 + Math.random() * 0.02,
+        density: 0.002 + Math.random() * 0.003,
         inertia: Infinity,
         render: { sprite: { texture: url, xScale: TOKEN_SCALE(), yScale: TOKEN_SCALE() } }
     });
 
     Body.setAngularVelocity(token, 0);
-    Body.setVelocity(token, { x: (Math.random() - 0.5) * 1, y: 0.5 + Math.random() * 0.5 });
+    Body.setVelocity(token, { x: (Math.random() - 0.5) * 2, y: 0 });
     token.achievementKey = key;
     Composite.add(engine.world, token);
 
@@ -500,6 +410,7 @@ window.addEventListener('resize', () => {
 // ======================== SAVE ========================
 document.getElementById('saveBtn').addEventListener('click', async () => {
     const decorations = [];
+    const toLocalStorage = [];
 
     engine.world.bodies.forEach(b => {
         if (!b.achievementKey) return;
@@ -521,6 +432,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         }
 
         decorations.push(dec);
+        toLocalStorage.push({ source, id, x: dec.x_pos, y: dec.y_pos });
     });
 
     if (!decorations.length) { showToast('Nothing to save', 'info'); return; }
@@ -529,9 +441,11 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
         p_user_id: USER_ID, p_decorations: decorations
     });
     if (error) {
-        showToast('⚠️ Save failed: ' + (error.message || error), 'error');
+        // Fallback to localStorage
+        localStorage.setItem(`jar_deco_${USER_ID}_v2`, JSON.stringify(toLocalStorage));
+        showToast('Jar saved! (local)', 'success');
     } else {
-        showToast('Jar saved to cloud! 🏺', 'success');
+        showToast('Jar saved! 🏺', 'success');
     }
 });
 

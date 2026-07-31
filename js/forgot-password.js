@@ -15,7 +15,10 @@ if (!form || !btn || !emailInput) {
         btn.innerText = "Processing...";
         btn.disabled = true;
 
-        const redirectUrl = `${window.location.origin}/reset-password.html`;
+        // Dynamic redirect URL — works on localhost AND GitHub Pages
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+        const redirectUrl = `${window.location.origin}${basePath}reset-password.html`;
 
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: redirectUrl,

@@ -1,6 +1,7 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
 import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
+import { isPartnerDone, partnerInfo, partnerCompletedTasks, hasCollabAccess } from './collaboration.js';
 
 // ======================== HELPER FUNCTIONS ========================
 function hexToRgba(hex, alpha) {
@@ -737,6 +738,28 @@ function createTaskCard(task) {
 
     const description = showingExperienced ? (task.experienced_description || task.task_description) : (task.novice_description || task.task_description);
 
+    // Partner progress badge — only for collective tier+
+    const partnerName = hasCollabAccess && partnerInfo.length > 0 ? partnerInfo[0].username : 'Partner';
+    const partnerHasAnyCompleted = hasCollabAccess && partnerCompletedTasks.size > 0;
+    const partnerDoneThis = hasCollabAccess && typeof isPartnerDone === 'function' && isPartnerDone(task.id);
+    const partnerBadge = partnerDoneThis && isCompleted
+      ? `<div style="margin-top:4px;font-size:.7rem;color:#16a34a;display:flex;align-items:center;gap:4px;">
+           <span>✅</span><span>You & ${partnerName} both completed</span>
+         </div>`
+      : partnerDoneThis && isLocked
+        ? `<div style="margin-top:4px;font-size:.7rem;color:#b8860b;display:flex;align-items:center;gap:4px;">
+             <span>🔒</span><span>${partnerName} completed — you haven't reached this yet</span>
+           </div>`
+        : partnerDoneThis
+          ? `<div style="margin-top:4px;font-size:.7rem;color:#b8860b;display:flex;align-items:center;gap:4px;">
+               <span>🐝</span><span>${partnerName} completed</span>
+             </div>`
+          : partnerHasAnyCompleted && !isCompleted && !isLocked
+            ? `<div style="margin-top:4px;font-size:.7rem;color:#888;display:flex;align-items:center;gap:4px;">
+                 <span>⏳</span><span>Due for you — ${partnerName} completed other tasks</span>
+               </div>`
+            : '';
+
     const likeBtnColor = (currentReaction === 'like') ? '#22c55e' : (isLocked ? '#ccc' : '#ffcc00');
     const dislikeBtnColor = (currentReaction === 'dislike') ? '#ef4444' : (isLocked ? '#ccc' : '#ffcc00');
     const likeTextColor = (currentReaction === 'like') ? 'white' : (isLocked ? '#666' : '#1e293b');
@@ -769,6 +792,7 @@ function createTaskCard(task) {
                     <div style="font-size: 0.9rem; margin: 6px 0; color: var(--fg-muted);">
                         ${description}
                     </div>
+                    ${partnerBadge}
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
                         ${corePill}
                         ${stagePill}

@@ -431,6 +431,14 @@ progress::-moz-progress-bar { background:var(--honey-gradient); border-radius:va
 .physics-jar::before { content:''; position:absolute; top:-15px; left:50%; transform:translateX(-50%); width:220px; height:30px; background:rgba(212,175,55,0.04); border:2px solid rgba(212,175,55,0.3); border-radius:50%; box-shadow:inset 0 0 15px rgba(212,175,55,0.2); z-index:5; }
 /* Glass reflection */
 .glass-reflection { position:absolute; left:12%; top:10%; width:10px; height:65%; background:linear-gradient(to bottom,rgba(255,255,255,0.2),transparent); border-radius:20px; pointer-events:none; z-index:25; }
+
+/* Honey layer — warm amber fill inside jar */
+.honey-layer { position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:inherit; overflow:hidden; background:radial-gradient(ellipse at 50% 100%, rgba(255,180,30,0.35) 0%, rgba(200,140,20,0.15) 50%, transparent 80%); }
+.honey-shimmer { position:absolute; inset:0; background:linear-gradient(135deg, transparent 30%, rgba(255,220,100,0.08) 50%, transparent 70%); animation:honeyFlow 4s ease-in-out infinite; }
+@keyframes honeyFlow { 0%,100%{transform:translateX(-10%) scaleX(1);} 50%{transform:translateX(10%) scaleX(1.1);} }
+.honey-bubble { position:absolute; border-radius:50%; background:radial-gradient(circle at 35% 35%, rgba(255,220,100,0.5), rgba(200,140,20,0.2)); animation:bubbleRise 5s ease-in-out infinite; }
+@keyframes bubbleRise { 0%,100%{transform:translateY(0) scale(1);opacity:0.6;} 50%{transform:translateY(-40px) scale(1.2);opacity:0.9;} }
+
 /* Jar glow under */
 .jar-glow { width:260px; height:20px; margin-top:-16px; background:rgba(212,175,55,0.15); border-radius:100%; filter:blur(16px); pointer-events:none; }
 /* Fireflies */
@@ -439,9 +447,40 @@ progress::-moz-progress-bar { background:var(--honey-gradient); border-radius:va
 /* Canvas inside jar */
 .physics-jar canvas { position:absolute; top:0; left:0; z-index:10; border-radius:inherit; }
 
-/* Coin pile — foreground coins overlapping bottom-left of jar */
-.coin-pile { position:absolute; bottom:0; left:0; z-index:20; pointer-events:none; width:60px; height:60px; overflow:visible; }
-.pile-coin { border-radius:50%; background:radial-gradient(circle at 35% 35%, #ffd700, #b8860b); border:2px solid #daa520; box-shadow:0 2px 6px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4); overflow:visible; display:flex; align-items:center; justify-content:center; }
+/* Glowing bees */
+.bee-orbit { position:absolute; z-index:30; pointer-events:none; }
+.bee { position:absolute; width:34px; height:22px; transform:translate(-50%,-50%); animation:beeGlow 1.8s ease-in-out infinite; }
+#bee1-orbit { top:-30px; left:180px; animation:bee1 6.2s linear infinite; }
+#bee2-orbit { top:-40px; left:80px; animation:bee2 4.5s ease-in-out infinite; }
+#bee3-orbit { top:-50px; left:140px; animation:bee3 7.3s linear infinite; }
+@keyframes beeGlow {
+  0%   { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
+  50%  { filter:drop-shadow(0 0 10px rgba(255,240,100,1)) drop-shadow(0 0 24px rgba(255,190,0,.75)) drop-shadow(0 0 44px rgba(255,130,0,.38)); }
+  100% { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
+}
+@keyframes wingFlap { from{opacity:.55;transform:scaleY(1);} to{opacity:.85;transform:scaleY(.6);} }
+.bee .wing { animation:wingFlap .22s ease-in-out infinite alternate; }
+@keyframes bee1 { 0%{transform:translate(0,0);} 20%{transform:translate(52px,-16px);} 45%{transform:translate(76px,12px);} 65%{transform:translate(36px,26px);} 80%{transform:translate(-10px,14px);} 100%{transform:translate(0,0);} }
+@keyframes bee2 { 0%{transform:translate(40px,4px);} 30%{transform:translate(78px,-18px);} 55%{transform:translate(60px,22px);} 75%{transform:translate(14px,30px);} 100%{transform:translate(40px,4px);} }
+@keyframes bee3 { 0%{transform:translate(20px,-10px);} 18%{transform:translate(70px,-24px);} 40%{transform:translate(90px,6px);} 60%{transform:translate(55px,24px);} 80%{transform:translate(10px,10px);} 100%{transform:translate(20px,-10px);} }
+#bee1-orbit { animation:bee1 6.2s linear infinite; }
+#bee2-orbit { animation:bee2 4.5s ease-in-out infinite; }
+#bee3-orbit { animation:bee3 7.3s linear infinite; }
+#bee2-orbit .bee { animation-delay:-0.6s; }
+#bee3-orbit .bee { animation-delay:-1.2s; }
+
+/* Sparkles */
+#sparkle-layer { position:fixed; inset:0; pointer-events:none; z-index:110; }
+.sparkle { position:absolute; color:#f9d66b; font-size:13px; line-height:1; animation:sparkleFly .65s ease-out forwards; }
+@keyframes sparkleFly { 0%{opacity:1;transform:translate(0,0) scale(1.3);} 100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.3);} }
+
+/* Drop ripple */
+.ripple { position:absolute; border-radius:50%; pointer-events:none; z-index:25; background:radial-gradient(circle, rgba(212,175,55,.28), transparent 70%); animation:rippleOut .6s ease-out forwards; }
+@keyframes rippleOut { 0%{width:0;height:0;opacity:1;} 100%{width:100px;height:100px;opacity:0;transform:translate(-50px,-50px);} }
+
+/* Token pop-in on drop */
+@keyframes tokenPop { 0%{transform:scale(0.5);opacity:0.3;} 60%{transform:scale(1.2);} 80%{transform:scale(0.9);} 100%{transform:scale(1);opacity:1;} }
+.pop-in { animation:tokenPop 0.4s cubic-bezier(.22,.68,0,1.2) forwards; }
 
 /* Actions */
 .jar-actions { display:flex; gap:12px; width:100%; max-width:400px; }

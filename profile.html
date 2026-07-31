@@ -35,6 +35,7 @@
   <!-- Compact Profile Header (no card background) -->
   <div class="profile-header-row">
     <button class="btn tiny" onclick="shareStats()"><i class="fas fa-share-nodes"></i> Share</button>
+    <button class="btn tiny" onclick="invitePartner()" style="background:var(--honey-gradient);color:#fff;"><i class="fas fa-user-plus"></i> Invite</button>
     <div class="user-info-row">
       <div class="avatar-dropdown" id="profileAvatarDropdown">
         <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="User" class="avatar-large" id="profileAvatar">
@@ -73,13 +74,12 @@
   </div>
 </div>
 
+<!-- Partner Section -->
+<div id="partnerSection" style="display:none;margin:16px 0;padding:12px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);"></div>
+
   <!-- Mobile action buttons – each opens a bottom sheet -->
   <div class="mobile-actions" id="mobileActionsPanel">
     <button type="button" class="btn mobile-action-btn" id="mobileMissionsBtn">
-      <span><i class="fas fa-rocket"></i> Daily Tasks</span>
-      <i class="fas fa-chevron-right"></i>
-    </button>
-    <button type="button" class="btn mobile-action-btn" id="mobilePendingSigmaBtn">
       <span><i class="fas fa-clipboard-list"></i> Tasks Reflection</span>
       <span class="action-badge" id="mobilePendingSigmaBadge">0</span>
     </button>
@@ -278,7 +278,6 @@
   function openAchieve(src) { document.getElementById('modalImg').src = src; document.getElementById('achieveModal').style.display = 'flex'; }
   function closeAchieve() { document.getElementById('achieveModal').style.display = 'none'; }
   async function shareTrophy() {}
-  async function shareStats() {}
   function closeMobileStatsModal() { document.getElementById('mobileStatsModal').style.display = 'none'; }
 
   document.getElementById('viewProfileStatusBtn')?.addEventListener('click', () => {
@@ -531,9 +530,16 @@ window.closeEditProfileSheet = () => {
 
 <script type="module">
 import { initDecorator } from './js/decorator.js';
+import { initCollab, checkInviteOnLoad } from './js/collaboration.js';
+import './js/share-card.js';
 
-// Expose decorator functions globally
+// Expose functions globally
 window.initDecorator = initDecorator;
+window.invitePartner = invitePartner;
+
+// Init collaboration on load
+initCollab();
+checkInviteOnLoad();
 
 // Re-use the existing supabase client from profile.js context
 // The decorator will be initialized when first opened
