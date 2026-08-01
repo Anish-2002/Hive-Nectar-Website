@@ -1,113 +1,190 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trophy Studio | The Meadow</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-    
-    <style>
-        body[data-theme="classic"] { --bg: #fdfdfb; --card: #ffffff; --fg: #1e293b; --border: #e2e8f0; --primary: #facc15; }
-        body[data-theme="gold"] { --bg: #fefce8; --card: #fef9c3; --fg: #713f12; --border: #fde047; --primary: #eab308; }
-        body[data-theme="dark"] { --bg: #0f172a; --card: #1e293b; --fg: #29ca72; --border: #334155; --primary: #facc15; }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <title>Honey Jar - Lid Decorator | The Meadow</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍯</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body { 
-            margin: 0; background: var(--bg); color: var(--fg); 
-            font-family: 'Segoe UI', sans-serif; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; 
-        }
-        
-        header { 
-            background: #1e293b; color: white; padding: 10px 20px; 
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
-            flex-shrink: 0;
-        }
-        .brand { font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; font-size: 1rem; }
-        .back-btn { color: white; text-decoration: none; font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: var(--bg);
+      background-image: radial-gradient(circle at 20% 80%, rgba(200,169,110,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(200,169,110,0.08) 0%, transparent 50%);
+      overflow-y: auto;
+      touch-action: none;
+      user-select: none;
+      position: relative;
+    }
 
-        .studio-container { 
-            display: flex; 
-            flex: 1; 
-            flex-direction: row;
-            overflow: hidden; 
-        }
+    /* Site header/footer span full width inside centered flex body */
+    .header, .footer { width: 100%; flex-shrink: 0; }
 
-        #workspace { 
-            flex-grow: 1; 
-            position: relative; 
-            background: radial-gradient(circle, var(--card) 0%, var(--bg) 100%); 
-            touch-action: none;
-        }
+    /* Scene wrapper */
+    #jar-scene {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 0 6px;
+      overflow: visible;
+    }
 
-        #inventory { 
-            width: 320px; 
-            background: var(--card); 
-            border-left: 1px solid var(--border); 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            overflow-y: auto;
-            z-index: 10;
-        }
+    #canvas {
+      width: min(94vw, 900px);
+      max-width: 900px;
+      aspect-ratio: 900 / 650;
+      background: radial-gradient(ellipse 80% 90% at 50% 42%, #3d2212 0%, #1e1007 55%, #0c0704 100%);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35), 0 0 30px rgba(212,160,23,0.12);
+      cursor: pointer;
+      touch-action: none;
+      display: block;
+    }
 
-        @media (max-width: 900px) {
-            .studio-container { 
-                flex-direction: column;
-            }
-            #inventory { 
-                width: 100%; 
-                height: 45%;
-                border-left: none; 
-                border-top: 1px solid var(--border);
-                padding: 15px;
-                box-sizing: border-box;
-            }
-            #workspace {
-                height: 55%;
-            }
-            .decoration-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
-            }
-        }
+    /* ─── Token Tray (below nav bar, static) ─── */
+    #tray {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      width: 100%;
+      padding: 10px 16px 12px;
+      background: rgba(255,252,244,0.85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,169,110,0.35);
+      z-index: 40;
+      flex-shrink: 0;
+    }
 
-        .section-title { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 10px; display: block; }
-        
-        .decoration-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .deco-item {
-            background: var(--bg); border: 2px solid var(--border); border-radius: 12px;
-            padding: 15px; text-align: center; cursor: pointer; transition: 0.2s;
-        }
-        .deco-item.active { border-color: var(--primary); background: rgba(250, 204, 21, 0.1); }
-        .deco-item i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+    #token-count-bar {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 8px;
+    }
+    #token-count { font-size: 13px; font-weight: 800; color: var(--primary-dark); letter-spacing: .03em; }
+    #token-count span { color: var(--fg); font-size: 14px; }
 
-        .control-group { background: var(--bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-        input[type="range"] { width: 100%; accent-color: var(--primary); margin: 10px 0; }
-        input[type="color"] { width: 100%; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: none; }
+    #clear-btn {
+      background: rgba(200, 120, 30, 0.12);
+      border: 1px solid rgba(180, 120, 40, 0.4);
+      color: var(--primary-dark);
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    #clear-btn:hover { background: rgba(200, 120, 30, 0.25); }
 
-        .save-btn { 
-            margin-top: auto; padding: 15px; background: var(--primary); color: #000; 
-            border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem;
-            flex-shrink: 0;
-        }
-    </style>
+    #tray-tokens { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; max-width: 95vw; }
+
+    .tray-token {
+      width: 56px; height: 56px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: transparent;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+      border: none;
+      cursor: pointer; touch-action: none;
+      transition: transform .14s, box-shadow .14s, filter .14s;
+    }
+    .tray-token:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(0,0,0,.30); filter: brightness(1.15); }
+    .tray-token:active { transform: scale(.92); }
+    .tray-token .t-img { width: 46px; height: 46px; object-fit: contain; pointer-events: none; }
+    .tray-token.used { opacity: .35; filter: grayscale(.7); pointer-events: none; }
+
+    #hint {
+      font-size: 12px;
+      color: var(--primary-dark);
+      opacity: .9;
+      margin-top: 7px;
+      font-weight: 700;
+      min-height: 17px;
+      text-align: center;
+      transition: color 0.2s, transform 0.2s;
+    }
+    #hint.alert { color: #e63946; transform: scale(1.04); }
+
+    /* Action buttons below jar */
+    #jar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 14px 0 14px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+    #jar-actions .save-btn {
+      background: var(--honey-gradient);
+      border: none;
+      color: #fff;
+      padding: 10px 26px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--honey-glow);
+      transition: transform .15s;
+      letter-spacing: .04em;
+    }
+    #jar-actions .save-btn:hover { transform: scale(1.05); }
+    #jar-actions .save-btn:disabled { opacity: .5; cursor: default; transform: none; }
+    #jar-actions #clear-btn2 {
+      background: rgba(200, 120, 30, 0.12);
+      border: 1px solid rgba(180, 120, 40, 0.4);
+      color: var(--primary-dark);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    #jar-actions #clear-btn2:hover { background: rgba(200, 120, 30, 0.25); }
+
+    /* Loading gate */
+    #load-gate {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--bg);
+      gap: 16px;
+    }
+    #load-gate .spin {
+      width: 46px; height: 46px;
+      border: 4px solid rgba(200,169,110,0.25);
+      border-top: 4px solid #b8860b;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #load-gate p { color: var(--primary-dark); font-weight: 800; font-size: 14px; letter-spacing: .05em; }
+  </style>
 </head>
-<body data-theme="classic">
+<body>
 
 <header class="header">
-  <a href="index.html" class="logo-area" style="text-decoration: none; color: inherit;">
-    <div class="brandmark">
-      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
-    </div>
+  <a href="the-meadow.html" class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
     <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
     <a href="the-meadow.html">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
     <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
@@ -115,145 +192,1079 @@
   </nav>
 </header>
 
-<div class="studio-container">
-    <main id="workspace"></main>
+<div id="load-gate">
+  <div class="spin"></div>
+  <p>GATHERING YOUR TOKENS…</p>
+</div>
 
-    <aside id="inventory">
-        <div>
-            <span class="section-title">Select Item</span>
-            <div class="decoration-grid">
-                <div class="deco-item active" onclick="selectDeco('tie.glb')">
-                    <i class="fas fa-ribbon"></i>
-                    <span style="font-size: 11px;">Standard Tie</span>
-                </div>
-                <div class="deco-item" style="opacity: 0.5; cursor: not-allowed;">
-                    <i class="fas fa-star"></i>
-                    <span style="font-size: 11px;">Locked</span>
-                </div>
-            </div>
-        </div>
+<!-- Token tray: just below the navigation bar -->
+<div id="tray">
+  <div id="token-count-bar">
+    <div id="token-count">LID STICKERS: <span id="sticker-num">0</span> / 3</div>
+    <button id="clear-btn">Clear Lid</button>
+  </div>
+  <div id="tray-tokens"></div>
+  <div id="hint">Tap a token below — watch the lid unscrew and fit it on!</div>
+</div>
 
-        <div class="control-group">
-            <span class="section-title">Adjustments</span>
-            <label style="font-size: 11px;">Scale</label>
-            <input type="range" id="tieScale" min="0.5" max="5" value="1" step="0.1">
-            
-            <label style="font-size: 11px;">Item Color</label>
-            <input type="color" id="tieColor" value="#ff0000">
-        </div>
+<div id="jar-scene">
+  <canvas id="canvas" width="900" height="650"></canvas>
+</div>
 
-        <div class="control-group">
-            <span class="section-title">Jar Base</span>
-            <input type="color" id="jarColor" value="#ffffff">
-        </div>
-
-        <button class="save-btn" id="exportBtn"><i class="fas fa-check-circle"></i> Save to Profile</button>
-    </aside>
+<!-- Action buttons: just below the jar -->
+<div id="jar-actions">
+  <button class="save-btn" id="saveBtn">SAVE LID</button>
+  <button id="clear-btn2">Clear Lid</button>
 </div>
 
 <footer class="footer">
-  <div class="footer-links">
-    <a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a>
-  </div>
+  <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a></div>
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
-<script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-    }
-</script>
-
 <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { DragControls } from 'three/addons/controls/DragControls.js';
+  import { supabase } from './js/supabase-config.js';
+  import './js/app.js';
 
-    document.body.setAttribute('data-theme', localStorage.getItem('meadow-theme') || localStorage.getItem('hive-theme') || 'classic');
+  const MAX_STICKERS = 3;
+  let currentUser = null;
+  let tokens = [];            // { id, name, icon, img }
+  let placed = [];            // placed token objects (max 3)
+  let isDirty = false;
 
-    const scene = new THREE.Scene();
-    const workspace = document.getElementById('workspace');
-    
-    const camera = new THREE.PerspectiveCamera(45, workspace.offsetWidth / workspace.offsetHeight, 0.1, 1000);
-    camera.position.set(0, 0.5, 4);
+  // ─── Canvas state (port of reference: custom-fitted screw lid) ───
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(workspace.offsetWidth, workspace.offsetHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    workspace.appendChild(renderer.domElement);
+  const jar = {
+    cx: 520, cy: 380,
+    bodyRadius: 122,
+    neckRadius: 100,
+    neckTopY: 235,
+    lidRestX: 520, lidRestY: 189, // tilted low edge (left, -14°) sits on jar NECK TOP line (217.6)
+    lidOpenX: 520, lidOpenY: 100,
+    lidRadius: 62,      // fits over new jar rim (rim radius ≈ 55)
+    lidThickness: 20    // proportional skirt height
+  };
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1.5));
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(2, 2, 5);
-    scene.add(light);
+  const lidState = {
+    currentX: jar.lidRestX, currentY: jar.lidRestY,
+    viewMix: 0, angle: 0, // 0 = perspective view, 1 = top view
+    status: 'CLOSED', progress: 0, holdTimer: 0
+  };
 
-    const orbit = new OrbitControls(camera, renderer.domElement);
-    orbit.enableDamping = true;
+  let sealEffect = { active: false, radius: 108, alpha: 0 };
+  let flyingToken = null;
+  let honeyLevel = 0; // 0..1 from nectar earned / total
+  let honeyDisplay = 0;   // animated fill value (rises from bottom on load)
+  let honeyWavePhase = 0; // wave animation phase
+  let honeySplash = 0;    // splash intensity while filling settles
 
-    let jar, currentDeco;
-    const loader = new GLTFLoader();
+  const dustParticles = Array.from({ length: 45 }, () => ({
+    x: Math.random() * 900, y: Math.random() * 650,
+    radius: Math.random() * 2 + 0.8, alpha: Math.random(),
+    speedY: -0.2 - Math.random() * 0.3,
+    pulseSpeed: 0.01 + Math.random() * 0.02
+  }));
 
-    loader.load('honey_jar.glb', (gltf) => {
-        jar = gltf.scene;
-        jar.position.y = -0.5;
-        scene.add(jar);
-    });
+  let honeyBubbles = [];
 
-    window.selectDeco = function(file) {
-        if (currentDeco) scene.remove(currentDeco);
-        loader.load(file, (gltf) => {
-            currentDeco = gltf.scene;
-            currentDeco.position.set(0, 0, 0.8);
-            scene.add(currentDeco);
-            
-            const drag = new DragControls([currentDeco], camera, renderer.domElement);
-            drag.addEventListener('dragstart', () => orbit.enabled = false);
-            drag.addEventListener('dragend', () => orbit.enabled = true);
-        });
+  const bees = [
+    { x: 260, y: 150, scale: 0.85, angle: -0.2, orbitRadius: 20, speed: 1.2 },
+    { x: 380, y: 220, scale: 0.75, angle: 0.3, orbitRadius: 15, speed: 1.5 },
+    { x: 740, y: 240, scale: 0.9, angle: -0.4, orbitRadius: 25, speed: 0.9 },
+    { x: 250, y: 380, scale: 0.8, angle: 0.1, orbitRadius: 18, speed: 1.1 },
+    { x: 770, y: 460, scale: 0.85, angle: -0.3, orbitRadius: 22, speed: 1.3 },
+    { x: 310, y: 580, scale: 0.95, angle: -0.1, orbitRadius: 12, speed: 1.0 }
+  ];
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function easeOutQuad(t) { return t * (2 - t); }
+
+  // Polyfill: CanvasRenderingContext2D.roundRect (Chrome 99+, Safari 16+)
+  if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+      if (typeof radii === 'number') radii = [radii];
+      if (!Array.isArray(radii)) radii = [0];
+      const r = radii[0] || 0;
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
     };
-    selectDeco('tie.glb');
+  }
 
-    document.getElementById('tieColor').addEventListener('input', (e) => {
-        if(currentDeco) currentDeco.traverse(c => { if(c.isMesh) c.material.color.set(e.target.value); });
-    });
-
-    document.getElementById('jarColor').addEventListener('input', (e) => {
-        if(jar) jar.traverse(c => { if(c.isMesh) c.material.color.set(e.target.value); });
-    });
-
-    document.getElementById('tieScale').addEventListener('input', (e) => {
-        if(currentDeco) {
-            const s = parseFloat(e.target.value);
-            currentDeco.scale.set(s, s, s);
-        }
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', () => {
-        renderer.render(scene, camera);
-        const imgData = renderer.domElement.toDataURL("image/png");
-        localStorage.setItem('achievementEmoji', imgData);
-        alert("Success! Your trophy is saved.");
-        window.location.href = 'profile.html';
-    });
-
-    function animate() {
-        requestAnimationFrame(animate);
-        orbit.update();
-        renderer.render(scene, camera);
+  // ─── Token icon drawing (SVG image clipped to circle) ───
+  function drawTokenImage(img, x, y, radius) {
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+      ctx.restore();
+    } else {
+      // Fallback: honey dot
+      ctx.fillStyle = '#b8860b';
+      ctx.beginPath();
+      ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
+      ctx.fill();
     }
-    animate();
+  }
 
-    window.addEventListener('resize', () => {
-        const w = workspace.offsetWidth;
-        const h = workspace.offsetHeight;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
+  // ─── Honey fill: earned / total (0..1), animated height ───
+  // Reference jar silhouette (280x430 viewBox) mapped to canvas coords
+  const JAR_S = 0.837; // scale factor
+  const jx = (rx) => jar.cx + (rx - 140) * JAR_S;
+  const jy = (ry) => jar.cy + (ry - 232) * JAR_S;
+
+  function jarPath() {
+    ctx.beginPath();
+    ctx.moveTo(jx(74), jy(56));
+    ctx.bezierCurveTo(jx(74), jy(82), jx(24), jy(112), jx(24), jy(164));
+    ctx.lineTo(jx(24), jy(368));
+    ctx.bezierCurveTo(jx(24), jy(408), jx(256), jy(408), jx(256), jy(368));
+    ctx.lineTo(jx(256), jy(164));
+    ctx.bezierCurveTo(jx(256), jy(112), jx(206), jy(82), jx(206), jy(56));
+    ctx.closePath();
+  }
+
+  // Honeycomb lattice rows (reference polygon grid, scaled)
+  const HONEYCOMB_ROWS = [
+    [85,380,100,370,115,380,115,396,100,406,85,396],[115,380,130,370,145,380,145,396,130,406,115,396],
+    [145,380,160,370,175,380,175,396,160,406,145,396],[175,380,190,370,205,380,205,396,190,406,175,396],
+    [70,358,85,348,100,358,100,374,85,384,70,374],[100,358,115,348,130,358,130,374,115,384,100,374],
+    [130,358,145,348,160,358,160,374,145,384,130,358],[160,358,175,348,190,358,190,374,175,384,160,374],
+    [190,358,205,348,220,358,220,374,205,384,190,374],[85,336,100,326,115,336,115,352,100,362,85,352],
+    [115,336,130,326,145,336,145,352,130,362,115,352],[145,336,160,326,175,336,175,352,160,362,145,352],
+    [175,336,190,326,205,336,205,352,190,362,175,352],[70,314,85,304,100,314,100,330,85,340,70,330],
+    [100,314,115,304,130,314,130,330,115,340,100,330],[130,314,145,304,160,314,160,330,145,340,130,330],
+    [160,314,175,304,190,314,190,330,175,340,160,330],[190,314,205,304,220,314,220,330,205,340,190,330],
+    [85,292,100,282,115,292,115,308,100,318,85,308],[115,292,130,282,145,292,145,308,130,318,115,308],
+    [145,292,160,282,175,292,175,308,160,318,145,308],[175,292,190,282,205,292,205,308,190,318,175,308]
+  ];
+
+  function drawHoneycomb() {
+    ctx.save();
+    ctx.globalAlpha = 0.14;
+    ctx.strokeStyle = 'rgba(140,60,0,0.9)';
+    ctx.lineWidth = 0.8;
+    HONEYCOMB_ROWS.forEach((p) => {
+      ctx.beginPath();
+      ctx.moveTo(jx(p[0]), jy(p[1]));
+      for (let i = 2; i < p.length; i += 2) ctx.lineTo(jx(p[i]), jy(p[i + 1]));
+      ctx.closePath();
+      ctx.stroke();
     });
+    ctx.restore();
+  }
+
+  function drawMasonJar() {
+    const x = jar.cx, y = jar.cy;
+    const jarBottom = jy(408);
+    const jarTop = jy(164);
+
+    // Drop shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 175, 140, 28, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Honey fill — level = honeyDisplay (animated, rises from bottom on load)
+    const fillTop = lerp(jarBottom, jarTop, honeyDisplay);
+    ctx.save();
+    jarPath();
+    ctx.clip();
+
+    // Honey-core radial gradient (reference honeyCore)
+    const core = ctx.createRadialGradient(x, jy(280), 10, x, jy(300), 150);
+    core.addColorStop(0, '#fffef0');
+    core.addColorStop(0.06, '#fff5a0');
+    core.addColorStop(0.18, '#ffe040');
+    core.addColorStop(0.36, '#ffa800');
+    core.addColorStop(0.58, '#e06800');
+    core.addColorStop(0.78, '#b84200');
+    core.addColorStop(1, '#6a2200');
+    ctx.fillStyle = core;
+    ctx.fillRect(jx(20), fillTop, jx(260) - jx(20), jarBottom - fillTop);
+
+    // Wavy honey surface: rolling sea-like waves at the fill level
+    // Two sine components for organic motion; always animated once filled
+    const amp = 7 + honeySplash * 6;
+    const waveAmp = Math.max(3, amp * (0.55 + 0.45 * honeyDisplay));
+    const leftX = jx(30), rightX = jx(250);
+    const topBand = fillTop - waveAmp * 2 - 10;
+    // Darken the band above the wave so the wave reads as a surface edge
+    ctx.fillStyle = 'rgba(120,40,0,0.35)';
+    ctx.fillRect(leftX, topBand, rightX - leftX, waveAmp * 3 + 16);
+
+    // Build the wave surface path (two summed sines = rolling sea)
+    const surfPts = [];
+    for (let px = leftX; px <= rightX; px += 3) {
+      const wy = fillTop
+        + Math.sin(px * 0.035 + honeyWavePhase) * waveAmp
+        + Math.sin(px * 0.09 + honeyWavePhase * 1.7) * waveAmp * 0.45;
+      surfPts.push([px, wy]);
+    }
+    // Honey below the wave
+    ctx.fillStyle = 'rgba(255,230,120,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(leftX, fillTop);
+    surfPts.forEach(([px, wy]) => ctx.lineTo(px, wy));
+    ctx.lineTo(rightX, jarBottom);
+    ctx.lineTo(leftX, jarBottom);
+    ctx.closePath();
+    ctx.fill();
+    // Wave crest foam line following the surface
+    ctx.strokeStyle = 'rgba(255,250,190,0.85)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy) : ctx.lineTo(px, wy)));
+    ctx.stroke();
+    // Soft second foam edge just below the crest
+    ctx.strokeStyle = 'rgba(255,235,140,0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy + 3) : ctx.lineTo(px, wy + 3)));
+    ctx.stroke();
+
+    // Surface shimmer line at honey level
+    const shimmer = ctx.createLinearGradient(0, fillTop - 6, 0, fillTop + 6);
+    shimmer.addColorStop(0, 'rgba(255,250,180,0)');
+    shimmer.addColorStop(0.5, 'rgba(255,255,200,0.9)');
+    shimmer.addColorStop(1, 'rgba(255,230,100,0)');
+    ctx.fillStyle = shimmer;
+    ctx.beginPath();
+    ctx.ellipse(x, fillTop, jx(250) - x, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Honeycomb matrix behind honey
+    drawHoneycomb();
+
+    // Bubbles only in filled region
+    honeyBubbles.forEach((b) => {
+      if (b.y < fillTop) return;
+      ctx.strokeStyle = `rgba(255,235,170,${b.alpha})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(255,255,255,${b.alpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // Glass tint + edge stroke
+    const edge = ctx.createLinearGradient(jx(24), 0, jx(256), 0);
+    edge.addColorStop(0, 'rgba(255,218,80,0.95)');
+    edge.addColorStop(0.42, 'rgba(255,248,180,0.72)');
+    edge.addColorStop(0.78, 'rgba(210,140,20,0.62)');
+    edge.addColorStop(1, 'rgba(140,70,5,0.90)');
+    jarPath();
+    ctx.fillStyle = 'rgba(255,190,60,0.08)';
+    ctx.fill();
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+
+    // Left edge highlight
+    ctx.save();
+    jarPath();
+    ctx.clip();
+    const lEdge = ctx.createLinearGradient(jx(20), 0, jx(120), 0);
+    lEdge.addColorStop(0, 'rgba(255,252,210,0.62)');
+    lEdge.addColorStop(1, 'rgba(255,240,150,0)');
+    ctx.strokeStyle = lEdge;
+    ctx.lineWidth = 16;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(jx(74), jy(58));
+    ctx.bezierCurveTo(jx(70), jy(84), jx(28), jy(116), jx(26), jy(166));
+    ctx.lineTo(jx(26), jy(368));
+    ctx.stroke();
+    ctx.restore();
+
+    // Right edge shadow
+    ctx.save();
+    jarPath();
+    ctx.clip();
+    const rEdge = ctx.createLinearGradient(jx(160), 0, jx(256), 0);
+    rEdge.addColorStop(0, 'rgba(120,50,0,0)');
+    rEdge.addColorStop(1, 'rgba(90,38,0,0.55)');
+    ctx.strokeStyle = rEdge;
+    ctx.lineWidth = 14;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(jx(206), jy(58));
+    ctx.bezierCurveTo(jx(210), jy(84), jx(252), jy(116), jx(254), jy(166));
+    ctx.lineTo(jx(254), jy(368));
+    ctx.stroke();
+    ctx.restore();
+
+    // Bottom glow
+    const botGlow = ctx.createRadialGradient(x, jarBottom, 10, x, jarBottom, 80);
+    botGlow.addColorStop(0, 'rgba(255,170,30,0.5)');
+    botGlow.addColorStop(1, 'rgba(255,100,0,0)');
+    ctx.fillStyle = botGlow;
+    ctx.beginPath();
+    ctx.ellipse(x, jarBottom - 10, 100, 26, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Neck collar (brass, reference neckGrad)
+    const neckY = jy(60);
+    ctx.fillStyle = 'rgba(180,108,18,0.42)';
+    ctx.strokeStyle = 'rgba(200,138,20,0.58)';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.roundRect(jx(62), jy(38), jx(218) - jx(62), jy(60) - jy(38), 4);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(200,148,38,0.38)';
+    ctx.strokeStyle = 'rgba(255,228,120,0.52)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(x, jy(38), jx(218) - x, Math.abs(jy(38) - jy(48)) * 0.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,210,80,0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.ellipse(x, neckY, jx(218) - x, Math.abs(neckY - jy(52)) * 0.9, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Rim highlight
+    ctx.fillStyle = 'rgba(255,250,190,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(x, jy(37), 30, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Specular highlights
+    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+    ctx.beginPath();
+    ctx.roundRect(jx(74) - 8, jy(120), 16, 200, 8);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.beginPath();
+    ctx.roundRect(jx(206) + 2, jy(140), 9, 180, 4.5);
+    ctx.fill();
+  }
+
+  // ─── Wooden screw lid — two views ───
+  // Perspective: reference design (viewBox 200x80 port) at rest.
+  // Top view: blueprint exact circles. Dispatcher cross-fades via viewMix.
+  function drawStickerSlices(rx, ry, cy, angle) {
+    ctx.save();
+    ctx.translate(0, cy);
+    ctx.rotate(angle);
+    const count = placed.length;
+    if (count > 0) {
+      const slice = (Math.PI * 2) / count;
+      placed.forEach((sticker, i) => {
+        const startA = i * slice - Math.PI / 2;
+        const endA = startA + slice;
+        const midA = startA + slice / 2;
+
+        ctx.save();
+        ctx.fillStyle = '#fcefd2';
+        ctx.strokeStyle = '#cda26f';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        if (ry === rx) ctx.arc(0, 0, rx, startA, endA);
+        else ctx.ellipse(0, 0, rx, ry, 0, startA, endA);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        let dist = 0, sc = 1.15;
+        if (count === 2) { dist = rx * 0.45; sc = 0.78; }
+        else if (count === 3) { dist = rx * 0.52; sc = 0.62; }
+        if (count === 1) { dist = 0; sc = 1.0; }
+
+        const ratio = (ry === rx) ? 1 : ry / rx;
+        const lx = Math.cos(midA) * dist;
+        const ly = Math.sin(midA) * dist * ratio;
+        ctx.translate(lx, ly);
+        drawTokenImage(sticker.img, 0, 0, rx * 0.42 * (sc * 1.1));
+        ctx.restore();
+      });
+    }
+    ctx.restore();
+  }
+
+  function drawLidPerspective(angle) {
+    // Exact reference design (viewBox 200x80): static baked perspective
+    const lr = jar.lidRadius;
+    const u = lr / 96;
+    const brassRx = 96 * u;
+    const woodRx = 82 * u;
+    const woodRy = 16 * u;
+    const woodCy = -18 * u;
+    const brassBotY = 22 * u;
+    const shadowY = 34 * u;
+
+    // Drop shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.beginPath();
+    ctx.ellipse(0, shadowY, 94 * u, 7 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Brass ring side
+    const brassSide = ctx.createLinearGradient(0, 0, 0, brassBotY);
+    brassSide.addColorStop(0, '#9a6210');
+    brassSide.addColorStop(1, '#3e2202');
+    ctx.fillStyle = brassSide;
+    ctx.globalAlpha = 0.90;
+    ctx.fillRect(-brassRx, 0, brassRx * 2, brassBotY);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#3e2202';
+    ctx.beginPath();
+    ctx.ellipse(0, brassBotY, brassRx, 13 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Brass ring top face
+    const brassTop = ctx.createLinearGradient(0, -brassRx, 0, brassRx);
+    brassTop.addColorStop(0, '#d8aa3c');
+    brassTop.addColorStop(0.28, '#f5ce5e');
+    brassTop.addColorStop(0.62, '#a07218');
+    brassTop.addColorStop(1, '#664a08');
+    ctx.fillStyle = brassTop;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, brassRx, 14 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Inner shadow on brass
+    ctx.fillStyle = 'rgba(0,0,0,0.20)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, woodRx, 10 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wood side depth strip
+    const woodSide = ctx.createLinearGradient(0, woodCy, 0, woodCy + 20 * u);
+    woodSide.addColorStop(0, '#7e4814');
+    woodSide.addColorStop(1, '#3a1c04');
+    ctx.fillStyle = woodSide;
+    ctx.globalAlpha = 0.84;
+    ctx.fillRect(-woodRx, woodCy, woodRx * 2, 20 * u);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#5c3008';
+    ctx.beginPath();
+    ctx.ellipse(0, woodCy + 20 * u, woodRx, 9.5 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wood top face
+    const woodFace = ctx.createRadialGradient(-woodRx * 0.36, woodCy - woodRx * 0.36, 8, 0, woodCy, woodRx);
+    woodFace.addColorStop(0, '#d08848');
+    woodFace.addColorStop(0.32, '#ae6220');
+    woodFace.addColorStop(0.68, '#8c4c10');
+    woodFace.addColorStop(1, '#6a3408');
+    ctx.fillStyle = woodFace;
+    ctx.beginPath();
+    ctx.ellipse(0, woodCy, woodRx, woodRy, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Concentric grain rings
+    const rings = [[68, 12], [54, 9.5], [40, 7], [27, 4.6], [15, 2.5], [6, 1]];
+    ctx.strokeStyle = 'rgba(65,25,3,0.20)';
+    ctx.lineWidth = 1.2;
+    rings.forEach(([rx, ry], i) => {
+      ctx.globalAlpha = 1 - i * 0.02;
+      ctx.beginPath();
+      ctx.ellipse(0, woodCy, rx * u, ry * u, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // Radial grain lines
+    ctx.strokeStyle = 'rgba(65,25,3,0.10)';
+    ctx.lineWidth = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(0, woodCy - 15 * u); ctx.lineTo(0, woodCy + 15 * u);
+    ctx.moveTo(-48 * u, woodCy - 13 * u); ctx.lineTo(-22 * u, woodCy - 6 * u);
+    ctx.moveTo(48 * u, woodCy - 13 * u); ctx.lineTo(22 * u, woodCy - 6 * u);
+    ctx.moveTo(-66 * u, woodCy - 3 * u); ctx.lineTo(-38 * u, woodCy + 2 * u);
+    ctx.moveTo(66 * u, woodCy - 3 * u); ctx.lineTo(38 * u, woodCy + 2 * u);
+    ctx.moveTo(-68 * u, woodCy + 6 * u); ctx.lineTo(-40 * u, woodCy - 2 * u);
+    ctx.moveTo(68 * u, woodCy + 6 * u); ctx.lineTo(40 * u, woodCy - 2 * u);
+    ctx.stroke();
+
+    // Highlights
+    ctx.fillStyle = 'rgba(255,205,130,0.24)';
+    ctx.beginPath();
+    ctx.ellipse(-32 * u, woodCy - 5 * u, 26 * u, 9 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,245,168,0.30)';
+    ctx.beginPath();
+    ctx.ellipse(-38 * u, -4 * u, 34 * u, 4.5 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.20)';
+    ctx.beginPath();
+    ctx.ellipse(38 * u, 5 * u, 22 * u, 3.5 * u, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Screw-hole dots
+    ctx.fillStyle = 'rgba(50,18,2,0.55)';
+    ctx.beginPath();
+    ctx.arc(0, woodCy, 2.8 * u, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(80,32,6,0.40)';
+    ctx.beginPath();
+    ctx.arc(0, woodCy, 1.4 * u, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sticker slices (elliptical, on perspective face)
+    drawStickerSlices(woodRx, woodRy, woodCy, angle);
+  }
+
+  function drawLidTopView(angle) {
+    // Blueprint exact top view (viewBox 200x200): concentric circles
+    const lr = jar.lidRadius;
+    const u = lr / 96;
+    const brassRx = 96 * u;
+    const s = brassRx / 92; // blueprint brass r=92 → our brassRx
+    const darkR = 80 * s;
+    const woodR = 78 * s;
+
+    // Outer brass ring (topBrassGrad diagonal)
+    const topBrass = ctx.createLinearGradient(-brassRx, -brassRx, brassRx, brassRx);
+    topBrass.addColorStop(0, '#f5ce5e');
+    topBrass.addColorStop(0.5, '#d8aa3c');
+    topBrass.addColorStop(1, '#664a08');
+    ctx.fillStyle = topBrass;
+    ctx.beginPath();
+    ctx.arc(0, 0, brassRx, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dark ring (blueprint #3e2202 r=80)
+    ctx.fillStyle = '#3e2202';
+    ctx.beginPath();
+    ctx.arc(0, 0, darkR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Wood insert (topWoodGrad r=78)
+    const topWood = ctx.createRadialGradient(-woodR * 0.4, -woodR * 0.4, 8, 0, 0, woodR);
+    topWood.addColorStop(0, '#d08848');
+    topWood.addColorStop(0.5, '#ae6220');
+    topWood.addColorStop(1, '#6a3408');
+    ctx.fillStyle = topWood;
+    ctx.beginPath();
+    ctx.arc(0, 0, woodR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Concentric grain rings (blueprint 65,50,35,20 of 78)
+    const ringRatios = [65 / 78, 50 / 78, 35 / 78, 20 / 78];
+    ctx.strokeStyle = 'rgba(65,25,3,0.22)';
+    ctx.lineWidth = 1.4;
+    ringRatios.forEach((rr, i) => {
+      ctx.globalAlpha = 1 - i * 0.03;
+      ctx.beginPath();
+      ctx.arc(0, 0, woodR * rr, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    // Center screw dot (blueprint r=4)
+    ctx.fillStyle = 'rgba(50,18,2,0.6)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 4 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sheen highlight (blueprint: ellipse 70,70 rx35 ry20 rot -30 → offset (-30,-30))
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.save();
+    ctx.translate(-30 * s, -30 * s);
+    ctx.rotate(-0.52);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 35 * s, 20 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Sticker slices (circular, on top-view wood)
+    drawStickerSlices(woodR, woodR, 0, angle);
+  }
+
+  function draw3DWoodenScrewLid() {
+    ctx.save();
+    ctx.translate(lidState.currentX, lidState.currentY);
+    ctx.rotate(-0.24); // reference tilt (-14deg)
+    const angle = lidState.angle;
+    const vm = lidState.viewMix; // 0 = perspective, 1 = top view
+
+    // True 3D flip: perspective squashes to edge-on line (vm 0→0.5),
+    // then top view expands from that line to full circle (vm 0.5→1).
+    // Only ONE view is ever visible — no cross-fade ghosting.
+    if (vm < 0.5) {
+      const sy = 1 - vm * 2; // 1 → 0 (perspective collapses)
+      ctx.save();
+      ctx.scale(1, Math.max(0.02, sy));
+      drawLidPerspective(angle);
+      ctx.restore();
+    } else {
+      const sy = (vm - 0.5) * 2; // 0 → 1 (top view expands)
+      ctx.save();
+      ctx.scale(1, Math.max(0.02, sy));
+      drawLidTopView(angle);
+      ctx.restore();
+    }
+
+    // Grip ridges on brass side (visible only in perspective half)
+    if (vm < 0.5) {
+      const lr = jar.lidRadius;
+      const u = lr / 96;
+      const brassRx = 96 * u;
+      const numRidges = 22;
+      ctx.strokeStyle = 'rgba(30,14,4,0.55)';
+      ctx.lineWidth = 2.5;
+      ctx.save();
+      ctx.globalAlpha = 1 - vm * 2;
+      ctx.translate(0, 7 * u);
+      ctx.rotate(angle * 0.5);
+      for (let i = 0; i < numRidges; i++) {
+        const ra = (i / numRidges) * Math.PI * 2;
+        const rx = Math.cos(ra) * brassRx;
+        if (Math.sin(ra) > -0.2) {
+          ctx.beginPath();
+          ctx.moveTo(rx, -6 * u);
+          ctx.lineTo(rx, 9 * u);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.restore(); // pop tilt
+  }
+
+  function drawSealEffect() {
+    if (!sealEffect.active) return;
+    ctx.save();
+    ctx.translate(jar.lidRestX, jar.lidRestY + 12);
+    ctx.scale(1.0, 0.35);
+    ctx.strokeStyle = `rgba(255,200,80,${sealEffect.alpha})`;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(0, 0, sealEffect.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawFlyingToken() {
+    if (!flyingToken) return;
+    const t = easeOutQuad(flyingToken.progress);
+    let curX, curY;
+    if (flyingToken.isPlacing) {
+      curX = lerp(flyingToken.startX, jar.lidOpenX, t);
+      curY = lerp(flyingToken.startY, jar.lidOpenY, t) - Math.sin(t * Math.PI) * 60;
+    } else {
+      // Removal: fly from open lid position to the lid rest spot
+      curX = lerp(jar.lidOpenX, jar.lidRestX, t);
+      curY = lerp(jar.lidOpenY, jar.lidRestY, t) - Math.sin(t * Math.PI) * 60;
+    }
+    ctx.save();
+    ctx.translate(curX, curY);
+    ctx.fillStyle = 'rgba(255,215,0,0.4)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 48, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#D1D1D1';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, 42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    drawTokenImage(flyingToken.img, 0, 0, 26);
+    ctx.restore();
+  }
+
+  function drawGlowingBees(timeSec) {
+    bees.forEach((b, idx) => {
+      const hx = b.x + Math.cos(timeSec * b.speed + idx) * b.orbitRadius;
+      const hy = b.y + Math.sin(timeSec * b.speed * 1.3 + idx) * (b.orbitRadius * 0.6);
+      ctx.save();
+      ctx.translate(hx, hy);
+      ctx.rotate(b.angle + Math.sin(timeSec * 2 + idx) * 0.08);
+
+      const glow = ctx.createRadialGradient(0, 0, 2, 0, 0, 30 * b.scale);
+      glow.addColorStop(0, 'rgba(255,235,100,0.95)');
+      glow.addColorStop(0.4, 'rgba(255,160,20,0.5)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, 0, 30 * b.scale, 0, Math.PI * 2);
+      ctx.fill();
+
+      const s = b.scale;
+      const flap = Math.sin(timeSec * 40 + idx) * 0.2;
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.beginPath();
+      ctx.ellipse(-4 * s, -12 * s, (6 + flap) * s, 14 * s, -Math.PI / 4, 0, Math.PI * 2);
+      ctx.ellipse(4 * s, -12 * s, (6 - flap) * s, 14 * s, Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffc400';
+      ctx.beginPath();
+      ctx.ellipse(0, 2 * s, 10 * s, 14 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#1c1208';
+      [-4, 1, 6].forEach((oy) => {
+        ctx.beginPath();
+        ctx.rect(-9 * s, oy * s, 18 * s, 3 * s);
+        ctx.fill();
+      });
+      ctx.beginPath();
+      ctx.arc(0, -12 * s, 6 * s, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
+  }
+
+  function drawDust() {
+    dustParticles.forEach((p) => {
+      p.y += p.speedY;
+      p.alpha += Math.sin(p.y * 0.05) * p.pulseSpeed;
+      if (p.y < 0) p.y = 650;
+      ctx.fillStyle = `rgba(255,220,130,${Math.max(0.1, Math.min(0.85, p.alpha))})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // ─── Animation state machine (reference port + top-view flip) ───
+  function updateAnimations() {
+    const speed = 0.026;
+
+    // Honey: animate fill from bottom toward the earned level; wave on surface
+    if (honeyDisplay < honeyLevel) {
+      honeyDisplay = Math.min(honeyLevel, honeyDisplay + 0.006);
+      honeySplash = 1; // keep splash while filling
+    } else {
+      honeySplash = Math.max(0, honeySplash - 0.03); // settle
+    }
+    honeyWavePhase += 0.06;
+
+    if (lidState.status === 'OPENING') {
+      lidState.progress += speed;
+      if (lidState.progress >= 1) {
+        lidState.progress = 1;
+        if (flyingToken) {
+          lidState.status = 'FLYING_TOKEN';
+          flyingToken.progress = 0;
+        } else {
+          lidState.status = 'HOLDING';
+          lidState.holdTimer = Date.now();
+        }
+      }
+    } else if (lidState.status === 'FLYING_TOKEN') {
+      if (flyingToken) {
+        flyingToken.progress += 0.04;
+        if (flyingToken.progress >= 1) {
+          const tk = flyingToken.targetSticker;
+          if (flyingToken.isPlacing) {
+            if (placed.length < MAX_STICKERS) {
+              placed.push(tk);
+              isDirty = true;
+              updateTrayUI();
+            }
+          } else {
+            placed = placed.filter(p => p !== tk);
+            isDirty = true;
+            updateTrayUI();
+          }
+          flyingToken = null;
+          lidState.status = 'HOLDING';
+          lidState.holdTimer = Date.now();
+        }
+      }
+    } else if (lidState.status === 'HOLDING') {
+      if (Date.now() - lidState.holdTimer >= 2200) {
+        lidState.status = 'CLOSING';
+        lidState.progress = 1;
+      }
+    } else if (lidState.status === 'CLOSING') {
+      lidState.progress -= speed;
+      if (lidState.progress <= 0) {
+        lidState.progress = 0;
+        lidState.status = 'CLOSED';
+        sealEffect = { active: true, radius: jar.lidRadius, alpha: 1.0 };
+      }
+    }
+
+    const eased = easeOutQuad(lidState.progress);
+    lidState.currentX = lerp(jar.lidRestX, jar.lidOpenX, eased);
+    lidState.currentY = lerp(jar.lidRestY, jar.lidOpenY, eased);
+    // View switch: perspective (0) at rest → top view (1) when open → back
+    lidState.viewMix = eased;
+    lidState.angle = (1 - eased) * Math.PI * 4;
+
+    if (sealEffect.active) {
+      sealEffect.radius += 1.6;
+      sealEffect.alpha -= 0.04;
+      if (sealEffect.alpha <= 0) sealEffect.active = false;
+    }
+  }
+
+  function render(time) {
+    updateAnimations();
+    ctx.clearRect(0, 0, 900, 650);
+
+    // Version stamp — tells us which build the browser is actually running
+    ctx.fillStyle = 'rgba(255,220,130,0.35)';
+    ctx.font = '10px Nunito, sans-serif';
+    ctx.fillText('v3-canvas', 860, 640);
+
+    // Background
+    const bgGrad = ctx.createRadialGradient(jar.cx, jar.cy - 50, 50, jar.cx, jar.cy, 600);
+    bgGrad.addColorStop(0, '#3d2212');
+    bgGrad.addColorStop(0.5, '#1e1007');
+    bgGrad.addColorStop(1, '#090402');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 900, 650);
+
+    drawDust();
+    drawMasonJar();
+    draw3DWoodenScrewLid();
+    drawSealEffect();
+    drawFlyingToken();
+    drawGlowingBees(time * 0.002);
+    requestAnimationFrame(render);
+  }
+
+  // ─── Click handling ───
+  function canvasCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (900 / rect.width),
+      y: (e.clientY - rect.top) * (650 / rect.height)
+    };
+  }
+
+  canvas.addEventListener('click', (e) => {
+    if (lidState.status !== 'CLOSED') return;
+    const { x, y } = canvasCoords(e);
+
+    // Click closed lid -> remove last sticker
+    if (Math.hypot(x - jar.lidRestX, y - jar.lidRestY) <= jar.lidRadius * 1.1) {
+      if (placed.length > 0) {
+        const lastPlaced = placed[placed.length - 1];
+        placed = placed.filter(p => p !== lastPlaced);
+        isDirty = true;
+        updateTrayUI();
+        flyingToken = {
+          targetSticker: { ...lastPlaced },
+          startX: jar.lidOpenX, startY: jar.lidOpenY,
+          name: lastPlaced.name, img: lastPlaced.img,
+          progress: 0, isPlacing: false
+        };
+        lidState.status = 'OPENING';
+        lidState.progress = 0;
+      }
+      return;
+    }
+  });
+
+  // ─── Tray UI ───
+  const trayTokensEl = document.getElementById('tray-tokens');
+  const stickerNumEl = document.getElementById('sticker-num');
+  const hintEl = document.getElementById('hint');
+
+  function updateTrayUI() {
+    stickerNumEl.textContent = placed.length;
+    document.querySelectorAll('.tray-token').forEach((btn) => {
+      const id = btn.dataset.tokenId;
+      btn.classList.toggle('used', placed.some(p => p.id === id));
+    });
+    if (placed.length === MAX_STICKERS) {
+      hintEl.textContent = 'Lid is full! Click the lid to peel off a sticker.';
+      hintEl.classList.remove('alert');
+    } else if (placed.length === 0) {
+      hintEl.textContent = 'Tap a token below — watch the lid unscrew and fit it on!';
+      hintEl.classList.remove('alert');
+    } else {
+      hintEl.textContent = `${placed.length}/${MAX_STICKERS} on the lid. Click the lid to remove one.`;
+      hintEl.classList.remove('alert');
+    }
+  }
+
+  function spawnTray() {
+    trayTokensEl.innerHTML = '';
+    tokens.forEach((tk) => {
+      const btn = document.createElement('button');
+      btn.className = 'tray-token';
+      btn.dataset.tokenId = tk.id;
+      btn.innerHTML = `<img class="t-img" src="${tk.icon}" alt="${tk.name}" title="${tk.name}" onerror="this.style.display='none'">`;
+      btn.addEventListener('click', (e) => {
+        console.log('[decorator] tray click:', tk.name, '| status:', lidState.status);
+        if (lidState.status !== 'CLOSED' || placed.length >= MAX_STICKERS || placed.some(p => p.id === tk.id)) {
+          if (placed.length >= MAX_STICKERS) {
+            hintEl.textContent = 'The lid is full! Click the lid to peel off a sticker first.';
+            hintEl.classList.add('alert');
+          }
+          return;
+        }
+        // Map tray button position to canvas coords for flight start
+        const rect = canvas.getBoundingClientRect();
+        const bRect = btn.getBoundingClientRect();
+        const sx = (bRect.left + bRect.width / 2 - rect.left) * (900 / rect.width);
+        const sy = (bRect.top + bRect.height / 2 - rect.top) * (650 / rect.height);
+        flyingToken = {
+          targetSticker: tk,
+          startX: sx, startY: sy,
+          name: tk.name, img: tk.img,
+          progress: 0, isPlacing: true
+        };
+        lidState.status = 'OPENING';
+        lidState.progress = 0;
+      });
+      trayTokensEl.appendChild(btn);
+    });
+    if (tokens.length === 0) {
+      trayTokensEl.innerHTML = '<div style="color:var(--primary-dark);font-size:12px;font-weight:700;padding:8px;">No tokens yet — reveal tokens in Achievements first! 🎖️</div>';
+    }
+    updateTrayUI();
+  }
+
+  // ─── Save / Load ───
+  const saveBtn = document.getElementById('saveBtn');
+  const clearBtn = document.getElementById('clear-btn');
+  const clearBtn2 = document.getElementById('clear-btn2');
+
+  async function saveLid() {
+    if (!currentUser) return;
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'SAVING…';
+    try {
+      const decorations = placed.map((p, i) => ({
+        token_id: p.id,
+        x_pos: i * 20 + 10,
+        y_pos: 20,
+        scale: 1
+      }));
+      const { error } = await supabase.rpc('save_jar_decorations', {
+        p_user_id: currentUser.id,
+        p_decorations: decorations
+      });
+      if (error) throw error;
+      isDirty = false;
+      hintEl.textContent = 'Lid saved to cloud! 🏺';
+      hintEl.classList.remove('alert');
+    } catch (err) {
+      console.error('Save error:', err);
+      hintEl.textContent = 'Save failed — please try again.';
+      hintEl.classList.add('alert');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'SAVE LID';
+    }
+  }
+
+  async function loadSavedLid() {
+    if (!currentUser) return;
+    const { data: saved, error } = await supabase
+      .from('user_jar_decorations')
+      .select('token_id')
+      .eq('user_id', currentUser.id);
+    if (error || !saved) return;
+    const tokenMap = new Map(tokens.map(t => [t.id, t]));
+    saved.forEach((d) => {
+      const tk = tokenMap.get(d.token_id);
+      if (tk && placed.length < MAX_STICKERS && !placed.some(p => p.id === tk.id)) placed.push(tk);
+    });
+    updateTrayUI();
+  }
+
+  // ─── Honey level: earned nectar / total nectar (all tasks) ───
+  async function loadHoneyLevel() {
+    try {
+      const [{ data: tasks }, { data: profile }] = await Promise.all([
+        supabase.from('tasks').select('nectar_reward'),
+        supabase.from('profiles').select('nectar_points').eq('id', currentUser.id).maybeSingle()
+      ]);
+      const total = (tasks || []).reduce((s, t) => s + (Number(t.nectar_reward) || 0), 0);
+      const earned = profile ? Number(profile.nectar_points) || 0 : 0;
+      honeyLevel = total > 0 ? Math.min(1, Math.max(0, earned / total)) : 0;
+      honeyDisplay = 0;   // start empty; animates up to honeyLevel in updateAnimations
+      honeySplash = 1;    // wave splash while filling
+      // Honey bubbles span the fillable region (reference jar silhouette)
+      honeyBubbles = Array.from({ length: 55 }, () => ({
+        x: jx(24) + (jx(256) - jx(24)) * Math.random(),
+        y: jy(120) + (jy(408) - jy(120)) * Math.random(),
+        r: Math.random() * 6 + 2,
+        alpha: 0.3 + Math.random() * 0.5
+      }));
+    } catch (err) {
+      console.error('Honey level error:', err);
+    }
+  }
+
+  function clearAllStickers() {
+    if (placed.length === 0 || lidState.status !== 'CLOSED') return;
+    placed = [];
+    isDirty = true;
+    updateTrayUI();
+  }
+
+  clearBtn.addEventListener('click', clearAllStickers);
+  if (clearBtn2) clearBtn2.addEventListener('click', clearAllStickers);
+  saveBtn.addEventListener('click', saveLid);
+
+  // ─── Init ───
+  async function init() {
+    try {
+      const { data: { user }, error: authErr } = await supabase.auth.getUser();
+      if (authErr || !user) {
+        window.location.replace('login.html');
+        return;
+      }
+      currentUser = user;
+
+      // ALL owned tokens (revealed + previously earned)
+      const { data: userTokens } = await supabase
+        .from('user_tokens')
+        .select('token_id')
+        .eq('user_id', user.id);
+
+      const tokenIds = (userTokens || []).map(ut => ut.token_id);
+      if (tokenIds.length > 0) {
+        const { data: tokenDefs } = await supabase
+          .from('tokens')
+          .select('id, name, icon_url')
+          .in('id', tokenIds);
+        tokens = (tokenDefs || []).map(t => {
+          const img = new Image();
+          if (t.icon_url) img.src = t.icon_url;
+          return { id: t.id, name: t.name, icon: t.icon_url || '', img };
+        });
+      }
+
+      spawnTray();
+      await loadSavedLid();
+      await loadHoneyLevel();
+      document.getElementById('load-gate').style.display = 'none';
+      // Fail-loud: if render throws, surface it — never leave a silent static jar
+      try {
+        requestAnimationFrame(render);
+      } catch (err) {
+        console.error('Render start error:', err);
+        hintEl.textContent = 'Canvas error — see console.';
+        hintEl.classList.add('alert');
+      }
+    } catch (err) {
+      console.error('Init error:', err);
+      document.getElementById('load-gate').style.display = 'none';
+      hintEl.textContent = 'Failed to load tokens.';
+      hintEl.classList.add('alert');
+    }
+  }
+
+  init();
 </script>
 </body>
 </html>

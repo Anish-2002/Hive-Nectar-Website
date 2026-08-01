@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Nectar | The Golden Milestone Jar</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        :root { --jar-glass: rgba(212,175,55,0.04); --gold-edge: rgba(212,175,55,0.35); --glow-color: #ffd700; }
+        #jar-container {
+            position: relative; width: min(320px, 85vw); height: min(450px, 120vw); margin: 0 auto;
+            background: var(--jar-glass); border-radius: 40px 40px 100px 100px;
+            border: 1px solid rgba(212,175,55,0.2);
+            box-shadow: inset 0 0 60px rgba(212,175,55,0.06), 0 20px 40px rgba(0,0,0,0.06);
+            backdrop-filter: blur(2px);
+            aspect-ratio: 320 / 450;
+        }
+        #jar-container::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: min(220px, 60vw); height: 30px; background: rgba(212,175,55,0.04);
+            border: 2px solid var(--gold-edge); border-radius: 50%;
+            box-shadow: inset 0 0 15px rgba(212,175,55,0.15); z-index: 5;
+        }
+        .glass-reflection {
+            position: absolute; left: 15%; top: 15%; width: 12px; height: 60%;
+            background: linear-gradient(to bottom,rgba(255,255,255,0.25),transparent);
+            border-radius: 20px; pointer-events: none; z-index: 25;
+        }
+        .firefly {
+            position: absolute; width: 4px; height: 4px; background: #ffd700; border-radius: 50%;
+            box-shadow: 0 0 10px 4px rgba(255,215,0,0.4),0 0 20px 8px rgba(255,174,0,0.2);
+            animation: drift 4s infinite ease-in-out; pointer-events: none; z-index: 30;
+        }
+        @keyframes drift { 0%,100%{opacity:0.3;transform:translateY(0)scale(1);} 50%{opacity:1;transform:translateY(-25px)scale(1.3);} }
+        canvas { position: absolute; top: 0; left: 0; z-index: 10; border-radius: inherit; width: 100% !important; height: 100% !important; }
+        .badge-grid::-webkit-scrollbar { width: 4px; }
+        .badge-grid::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+        .jar-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 84px; height: 84px; cursor: pointer; transition: all 0.25s ease;
+            position: relative;
+        }
+        .jar-badge img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 2px 6px rgba(212,175,55,0.25)); }
+        .jar-badge:hover { transform: scale(1.1); }
+        .jar-badge:hover img { filter: drop-shadow(0 4px 12px rgba(212,175,55,0.45)); }
+        .jar-badge.dropped { opacity: 0.25; cursor: not-allowed; transform: none !important; pointer-events: none; }
+        .jar-badge.dropped img { filter: grayscale(1); }
+        .jar-badge .badge-label {
+            position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
+            font-size: 0.55rem; white-space: nowrap; color: var(--fg-muted);
+            background: rgba(255,255,255,0.8); padding: 1px 6px; border-radius: 6px;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .jar-badge:hover .badge-label { opacity: 1; }
+        .jar-badge.dropped .badge-label { opacity: 0; }
+        .badge-section-title {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--fg-muted); grid-column: 1 / -1; margin: 12px 0 4px; padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+        .jar-badge.token-badge { border-radius: 50%; }
+        .jar-badge.token-badge img { border-radius: 50%; }
+        .jar-actions { display: flex; gap: 16px; justify-content: center; margin-top: 28px; flex-wrap: wrap; }
+        .jar-loading { color: var(--fg-muted); font-size: 0.85rem; padding: 20px; text-align: center; }
+
+        .jar-layout {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;
+            width: 60%; margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .jar-layout { width: 90%; gap: 2rem; }
+        }
+        @media (max-width: 640px) {
+            .jar-layout { grid-template-columns: 1fr; gap: 2rem; width: 95%; }
+            .jar-badge { width: 68px; height: 68px; }
+            #jar-container { width: min(260px, 80vw); height: min(380px, 110vw); }
+            #jar-container::before { width: min(180px, 55vw); }
+            .jar-layout h1 { font-size: 1.8rem !important; }
+            .badge-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        @media (max-width: 400px) {
+            .badge-grid { grid-template-columns: repeat(3, 1fr) !important; }
+            .jar-badge { width: 56px; height: 56px; }
+        }
+
+        /* Drop ripple effect */
+        .ripple {
+            position: absolute; border-radius: 50%; pointer-events: none; z-index: 15;
+            background: radial-gradient(circle, rgba(212,175,55,0.3), transparent 70%);
+            animation: rippleOut 0.6s ease-out forwards;
+        }
+        @keyframes rippleOut {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 120px; height: 120px; opacity: 0; transform: translate(-60px, -60px); }
+        }
+
+        /* Glowing bees */
+        .bee-orbit { position:absolute; z-index:30; pointer-events:none; }
+        .bee { position:absolute; width:34px; height:22px; transform:translate(-50%,-50%); animation:beeGlow 1.8s ease-in-out infinite; }
+        @keyframes beeGlow {
+          0%   { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
+          50%  { filter:drop-shadow(0 0 10px rgba(255,240,100,1)) drop-shadow(0 0 24px rgba(255,190,0,.75)) drop-shadow(0 0 44px rgba(255,130,0,.38)); }
+          100% { filter:drop-shadow(0 0 5px rgba(255,220,60,.9)) drop-shadow(0 0 14px rgba(255,160,0,.55)) drop-shadow(0 0 28px rgba(255,100,0,.25)); }
+        }
+        @keyframes wingFlap { from{opacity:.55;transform:scaleY(1);} to{opacity:.85;transform:scaleY(.6);} }
+        .bee .wing { animation:wingFlap .22s ease-in-out infinite alternate; }
+        @keyframes bee1 { 0%{transform:translate(0,0);}20%{transform:translate(52px,-16px);}45%{transform:translate(76px,12px);}65%{transform:translate(36px,26px);}80%{transform:translate(-10px,14px);}100%{transform:translate(0,0);} }
+        @keyframes bee2 { 0%{transform:translate(40px,4px);}30%{transform:translate(78px,-18px);}55%{transform:translate(60px,22px);}75%{transform:translate(14px,30px);}100%{transform:translate(40px,4px);} }
+        @keyframes bee3 { 0%{transform:translate(20px,-10px);}18%{transform:translate(70px,-24px);}40%{transform:translate(90px,6px);}60%{transform:translate(55px,24px);}80%{transform:translate(10px,10px);}100%{transform:translate(20px,-10px);} }
+        #bee1-orbit { animation:bee1 6.2s linear infinite; }
+        #bee2-orbit { animation:bee2 4.5s ease-in-out infinite; }
+        #bee3-orbit { animation:bee3 7.3s linear infinite; }
+        #bee2-orbit .bee { animation-delay:-0.6s; }
+        #bee3-orbit .bee { animation-delay:-1.2s; }
+    </style>
+</head>
+<body class="page-jar" data-theme="classic">
+
+<header class="header">
+  <a href="the-meadow.html" class="logo-area">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
+    <span class="brand-title">THE MEADOW</span>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
+  <nav class="nav-links" id="navLinks">
+    <a href="the-meadow.html">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
+    <a href="board.html">Communication Board</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html">Login to Pollen Pop</a>
+  </nav>
+</header>
+
+<div style="min-height:100vh;padding-top:6rem;">
+  <div class="jar-layout">
+
+    <!-- Left: achievements grid -->
+    <div style="max-width:480px;">
+      <div style="border-left:4px solid #f59e0b;padding-left:16px;margin-bottom:24px;">
+        <h1 style="font-size:2.8rem;font-weight:900;text-transform:uppercase;font-style:italic;letter-spacing:-0.05em;color:var(--primary-dark);margin:0;">Hive Achievements</h1>
+        <p style="font-size:0.875rem;margin:8px 0 0;color:var(--fg-muted);">Click a badge to drop it into the Golden Jar.</p>
+      </div>
+      <div id="controls" class="badge-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-height:480px;overflow-y:auto;padding:8px;">
+        <div class="jar-loading">Loading your achievements...</div>
+      </div>
+    </div>
+
+    <!-- Right: jar -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-self:center;width:100%;">
+      <div class="jar-wrap-bees" style="position:relative;display:inline-block;">
+        <div id="jar-container">
+          <div class="glass-reflection"></div>
+          <div class="honey-layer">
+            <div class="honey-shimmer"></div>
+            <div class="honey-bubble" style="left:20%;bottom:30%;width:12px;height:12px;animation-delay:0s;"></div>
+            <div class="honey-bubble" style="left:55%;bottom:50%;width:8px;height:8px;animation-delay:1.2s;"></div>
+            <div class="honey-bubble" style="left:75%;bottom:25%;width:10px;height:10px;animation-delay:2.5s;"></div>
+            <div class="honey-bubble" style="left:35%;bottom:65%;width:6px;height:6px;animation-delay:0.8s;"></div>
+          </div>
+        </div>
+        <div class="bee-orbit" id="bee1-orbit" style="top:-30px;left:180px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
+        <div class="bee-orbit" id="bee2-orbit" style="top:-40px;left:80px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
+        <div class="bee-orbit" id="bee3-orbit" style="top:-50px;left:140px;"><div class="bee"><img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzQgMjIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGVsbGlwc2UgY3g9IjE3IiBjeT0iMTQiIHJ4PSIxNyIgcnk9IjExIiBmaWxsPSJyZ2JhKDI1NSwyMjAsNjAsMC4yNSkiLz4KICA8ZWxsaXBzZSBjeD0iMTIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMjIiIGN5PSI3IiByeD0iOSIgcnk9IjUuNSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwuNzIpIiBzdHJva2U9InJnYmEoMjU1LDIyMCw4MCwuNCkiIHN0cm9rZS13aWR0aD0iLjYiLz4KICA8ZWxsaXBzZSBjeD0iMTciIGN5PSIxNCIgcng9IjExIiByeT0iNyIgZmlsbD0icmdiYSgyNTUsMjA0LDAsLjkpIi8+CiAgPGxpbmUgeDE9IjExIiB5MT0iMTQiIHgyPSIyMyIgeTI9IjE0IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMzgpIiBzdHJva2Utd2lkdGg9IjEuNCIvPgogIDxsaW5lIHgxPSIxMyIgeTE9IjkiIHgyPSIxMyIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIxNyIgeTE9IjgiIHgyPSIxNyIgeTI9IjIwIiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxsaW5lIHgxPSIyMSIgeTE9IjkiIHgyPSIyMSIgeTI9IjE5IiBzdHJva2U9InJnYmEoOTAsNTAsMCwuMjgpIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogIDxjaXJjbGUgY3g9IjI2IiBjeT0iMTEiIHI9IjMuNSIgZmlsbD0icmdiYSgyNTUsMjQwLDEyMCwuNzUpIi8+Cjwvc3ZnPg==" alt="bee" style="width:100%;height:100%;"></div></div>
+      </div>
+      <div style="margin-top:1.25rem;width:16rem;height:0.75rem;background:rgba(212,175,55,0.12);border-radius:100%;filter:blur(12px);"></div>
+      <div class="jar-actions">
+        <button class="btn" onclick="window.location.href='profile.html'"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-success" id="saveBtn"><i class="fas fa-save"></i> Save Jar</button>
+        <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-trash"></i> Reset</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="profile.html">My Profile</a> <span>|</span>
+    <a href="founders.html">Founders</a>
+  </div>
+  <p>&copy; 2025 The Meadow. All rights reserved.</p>
+</footer>
+
+<script type="module">
+import { supabase } from './js/supabase-config.js';
+import { showToast } from './js/app.js';
+
+const { data: { session } } = await supabase.auth.getSession();
+if (!session) {
+    document.getElementById('controls').innerHTML = '<p class="text-sm p-4" style="color:var(--fg-muted);">Please <a href="login.html" style="color:var(--primary);font-weight:700;">log in</a> to view your achievements.</p>';
+    throw new Error('Not authenticated');
+}
+const USER_ID = session.user.id;
+
+// ======================== FETCH ALL ACHIEVEMENTS ========================
+
+// 1. Fetch earned milestones
+const { data: userM } = await supabase
+    .from('user_milestones')
+    .select('milestone_id, milestones(id, name, icon_url, category, active)')
+    .eq('user_id', USER_ID);
+const earnedMilestones = (userM || [])
+    .map(um => um.milestones)
+    .filter(m => m && m.icon_url && m.active !== false);
+
+// 2. Fetch earned tokens
+const { data: userT } = await supabase
+    .from('user_tokens')
+    .select('token_id, tokens(id, name, icon_url, theme_id, stage, active)')
+    .eq('user_id', USER_ID);
+const earnedTokens = (userT || [])
+    .map(ut => ut.tokens)
+    .filter(t => t && t.icon_url && t.active !== false);
+
+// 3. Combine into a unified list with source tracking
+//    milestone_id is numeric, token_id is a UUID string
+const allAchievements = [
+    ...earnedMilestones.map(m => ({ ...m, _source: 'milestone', _id: m.id })),
+    ...earnedTokens.map(t => ({ ...t, _source: 'token', _id: t.id })),
+];
+
+// ======================== FETCH SAVED POSITIONS ========================
+// savedPositions keyed by "milestone:<id>" or "token:<id>"
+const savedPositions = new Map();
+const { data: savedData } = await supabase
+    .from('user_jar_decorations')
+    .select('*')
+    .eq('user_id', USER_ID);
+if (savedData && savedData.length) {
+    savedData.forEach(d => {
+        if (d.milestone_id) savedPositions.set(`milestone:${d.milestone_id}`, { x: d.x_pos, y: d.y_pos });
+        if (d.token_id) savedPositions.set(`token:${d.token_id}`, { x: d.x_pos, y: d.y_pos });
+    });
+}
+
+// ======================== PHYSICS ========================
+const { Engine, Render, Runner, Bodies, Composite, Body, Mouse, MouseConstraint } = Matter;
+
+const jarEl = document.getElementById('jar-container');
+const getDims = () => ({ W: jarEl.clientWidth, H: jarEl.clientHeight });
+let dims = getDims();
+const WALL_THICKNESS = 10;
+const RADIUS = () => Math.max(18, Math.min(30, dims.W * 0.09));
+const TOKEN_SCALE = () => Math.max(0.08, Math.min(0.14, dims.W / 2200));
+
+const engine = Engine.create({ gravity: { x: 0, y: 1.6 } });
+engine.world.bodies.forEach(b => Composite.remove(engine.world, b));
+
+const render = Render.create({
+    element: jarEl, engine,
+    options: {
+        width: dims.W, height: dims.H,
+        wireframes: false, background: 'transparent',
+        pixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    }
+});
+
+let walls = [];
+const buildWalls = () => {
+    walls.forEach(w => Composite.remove(engine.world, w));
+    const W = { isStatic: true, render: { visible: false }, friction: 0.6 };
+    const W2 = { isStatic: true, render: { visible: false }, friction: 0.6, chamfer: 2 };
+    const R = 100; // border-radius of bottom corners
+    const w = dims.W, h = dims.H;
+
+    walls = [
+        // Straight walls — full body section (overlap taper below)
+        Bodies.rectangle(w/2, h-3, w-2*R-20, 10, W2),              // flat bottom center
+        Bodies.rectangle(4, h*0.4, 10, h*0.9, W2),                  // left wall (full height, overlaps taper)
+        Bodies.rectangle(w-4, h*0.4, 10, h*0.9, W2),               // right wall
+    ];
+
+    // Neck-to-body transition walls (jar tapers from narrow neck to wider body)
+    const neckW = w * 0.42;
+    const neckXe = (w - neckW) / 2; // neck left edge
+    const taperLen = h * 0.2;
+    const taperDx = w * 0.16;
+    const taperAngle = Math.atan2(taperLen, taperDx);
+    // Left taper — overlaps with straight wall below
+    walls.push(Bodies.rectangle(neckXe / 2 + 2, h * 0.16,
+        Math.hypot(taperLen, taperDx) + 8, 10, { ...W, angle: -taperAngle }));
+    // Right taper
+    walls.push(Bodies.rectangle(w - neckXe / 2 - 2, h * 0.16,
+        Math.hypot(taperLen, taperDx) + 8, 10, { ...W, angle: taperAngle + 0.01 }));
+
+    // Bottom-left curve — 7 segments along the 100px radius arc
+    const steps = 7;
+    const cx = R, cy = h - R; // center of arc
+    for (let i = 0; i < steps; i++) {
+        const a0 = (i / steps) * Math.PI / 2;      // start angle
+        const a1 = ((i+1) / steps) * Math.PI / 2;  // end angle
+        const am = (a0 + a1) / 2;                  // mid angle
+        const len = R * (Math.PI / 2) / steps;     // segment length along arc
+        const mx = cx - R * Math.cos(am) - 4;      // x offset inward
+        const my = cy + R * Math.sin(am);           // y offset inward
+        // Place a small wall tangent to the curve at the midpoint
+        walls.push(Bodies.rectangle(mx, my, len + 6, 10, { ...W, angle: am }));
+    }
+
+    // Bottom-right curve — mirror of left
+    for (let i = 0; i < steps; i++) {
+        const a0 = (i / steps) * Math.PI / 2;
+        const a1 = ((i+1) / steps) * Math.PI / 2;
+        const am = (a0 + a1) / 2;
+        const len = R * (Math.PI / 2) / steps;
+        const mx = w - R + R * Math.cos(am) + 4;
+        const my = cy + R * Math.sin(am);
+        walls.push(Bodies.rectangle(mx, my, len + 6, 10, { ...W, angle: Math.PI - am }));
+    }
+
+    Composite.add(engine.world, walls);
+};
+buildWalls();
+
+// Safety net — teleport any escaped coin back inside the jar
+const { Events } = Matter;
+Events.on(engine, 'afterUpdate', () => {
+  const margin = 8;
+  engine.world.bodies.forEach(b => {
+    if (b.isStatic || !b.achievementKey) return;
+    let clamped = false;
+    let nx = b.position.x, ny = b.position.y;
+    if (nx < margin) { nx = margin; clamped = true; }
+    if (nx > dims.W - margin) { nx = dims.W - margin; clamped = true; }
+    if (ny < margin + 40) { ny = margin + 40; clamped = true; }
+    if (ny > dims.H - margin) { ny = dims.H - margin; clamped = true; }
+    if (clamped) {
+      Body.setPosition(b, { x: nx, y: ny });
+      Body.setVelocity(b, { x: 0, y: 0 });
+    }
+  });
+});
+
+const doRipple = (x, y) => {
+    const el = document.createElement('div');
+    el.className = 'ripple';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    jarEl.appendChild(el);
+    setTimeout(() => el.remove(), 700);
+};
+
+const mouse = Mouse.create(render.canvas);
+mouse.pixelRatio = render.options.pixelRatio;
+Composite.add(engine.world, MouseConstraint.create(engine, {
+    mouse, constraint: { stiffness: 0.15, render: { visible: false } }
+}));
+
+Render.run(render);
+Runner.run(Runner.create({ delta: 1000 / 60, timing: { timeScale: 1 } }), engine);
+
+// ======================== STATE ========================
+const droppedKeys = new Set(); // "milestone:12" or "token:<uuid>"
+
+// ======================== PLACE (static restore) ========================
+const placeStaticAchievement = (url, key, xPct, yPct) => {
+    droppedKeys.add(key);
+    const px = 15 + (xPct / 100) * (dims.W - 60);
+    const py = 15 + (yPct / 100) * (dims.H - 60);
+    const r = RADIUS() * (0.85 + Math.random() * 0.3);
+    const token = Bodies.circle(px, py, r, {
+        isStatic: true, restitution: 0.3, friction: 0.6, frictionAir: 0.02,
+        render: { sprite: { texture: url, xScale: TOKEN_SCALE(), yScale: TOKEN_SCALE() } }
+    });
+    token.achievementKey = key;
+    Composite.add(engine.world, token);
+};
+
+// ======================== DROP (dynamic falling) ========================
+const dropAchievement = (url, key) => {
+    droppedKeys.add(key);
+    updateBadges();
+
+    const r = RADIUS() * (0.85 + Math.random() * 0.3);
+    // Drop from center of jar opening — no wide spread
+    const dropX = dims.W / 2 + (Math.random() - 0.5) * 20;
+    const dropY = 30 + Math.random() * 30; // drop from just below the lid
+
+    const token = Bodies.circle(dropX, dropY, r, {
+        restitution: 0.5 + Math.random() * 0.15,
+        friction: 0.3 + Math.random() * 0.1,
+        frictionAir: 0.015 + Math.random() * 0.008,
+        density: 0.002 + Math.random() * 0.001,
+        inertia: Infinity,
+        render: { sprite: { texture: url, xScale: TOKEN_SCALE(), yScale: TOKEN_SCALE() } }
+    });
+
+    Body.setAngularVelocity(token, 0);
+    Body.setVelocity(token, { x: (Math.random() - 0.5) * 1, y: 0.5 + Math.random() * 0.5 });
+    token.achievementKey = key;
+    Composite.add(engine.world, token);
+
+    setTimeout(() => {
+        const bodies = engine.world.bodies;
+        if (bodies.find(b => b.achievementKey === key)) {
+            const b = bodies.find(b => b.achievementKey === key);
+            if (b) doRipple(b.position.x, b.position.y);
+        }
+    }, 300);
+};
+
+// ======================== RESTORE SAVED ========================
+savedPositions.forEach((pos, key) => {
+    const [source, id] = key.split(':');
+    const a = allAchievements.find(a => a._source === source && String(a._id) === id);
+    if (a) placeStaticAchievement(a.icon_url, key, pos.x, pos.y);
+});
+
+// ======================== UPDATE BADGES UI ========================
+const updateBadges = () => {
+    document.querySelectorAll('.jar-badge').forEach(el => {
+        const key = `${el.dataset.source}:${el.dataset.id}`;
+        el.classList.toggle('dropped', droppedKeys.has(key));
+    });
+};
+
+// ======================== INIT BADGES GRID ========================
+const init = () => {
+    const controls = document.getElementById('controls');
+    controls.innerHTML = '';
+
+    if (!allAchievements.length) {
+        controls.innerHTML = '<p style="color:var(--fg-muted);font-size:0.85rem;padding:20px;text-align:center;">No achievements earned yet. Complete tasks to unlock badges!</p>';
+        return;
+    }
+
+    // Separate into sections
+    const mil = allAchievements.filter(a => a._source === 'milestone');
+    const tok = allAchievements.filter(a => a._source === 'token');
+
+    let html = '';
+
+    // Milestones section
+    if (mil.length) {
+        html += '<div class="badge-section-title">🏆 Milestones</div>';
+        mil.forEach(a => {
+            const key = `milestone:${a._id}`;
+            const dropped = droppedKeys.has(key) ? 'dropped' : '';
+            html += `
+                <div class="jar-badge milestone-badge ${dropped}" data-source="milestone" data-id="${a._id}" data-url="${a.icon_url}"
+                     title="${a.name}">
+                    <img src="${a.icon_url}" alt="${a.name}" loading="lazy">
+                    <span class="badge-label">${a.name}</span>
+                </div>`;
+        });
+    }
+
+    // Tokens section
+    if (tok.length) {
+        html += '<div class="badge-section-title">🎨 Theme Tokens</div>';
+        tok.forEach(a => {
+            const key = `token:${a._id}`;
+            const dropped = droppedKeys.has(key) ? 'dropped' : '';
+            html += `
+                <div class="jar-badge token-badge ${dropped}" data-source="token" data-id="${a._id}" data-url="${a.icon_url}"
+                     title="${a.name}">
+                    <img src="${a.icon_url}" alt="${a.name}" loading="lazy">
+                    <span class="badge-label">${a.name}</span>
+                </div>`;
+        });
+    }
+
+    controls.innerHTML = html;
+
+    // Attach click handlers
+    controls.querySelectorAll('.jar-badge').forEach(el => {
+        const key = `${el.dataset.source}:${el.dataset.id}`;
+        if (droppedKeys.has(key)) el.classList.add('dropped');
+        el.onclick = () => {
+            if (!droppedKeys.has(key)) {
+                dropAchievement(el.dataset.url, key);
+            }
+        };
+    });
+};
+init();
+
+// ======================== RESIZE HANDLER ========================
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        dims = getDims();
+        render.options.width = dims.W;
+        render.options.height = dims.H;
+        render.canvas.width = dims.W * (render.options.pixelRatio || 1);
+        render.canvas.height = dims.H * (render.options.pixelRatio || 1);
+        render.canvas.style.width = dims.W + 'px';
+        render.canvas.style.height = dims.H + 'px';
+        buildWalls();
+        Render.setPixelRatio(render, render.options.pixelRatio || 1);
+    }, 200);
+});
+
+// ======================== SAVE ========================
+document.getElementById('saveBtn').addEventListener('click', async () => {
+    const decorations = [];
+
+    engine.world.bodies.forEach(b => {
+        if (!b.achievementKey) return;
+        const [source, ...idParts] = b.achievementKey.split(':');
+        const id = idParts.join(':');
+        const x = Math.round(((b.position.x - 15) / (dims.W - 60)) * 1000) / 10;
+        const y = Math.round(((b.position.y - 15) / (dims.H - 60)) * 1000) / 10;
+
+        const dec = {
+            x_pos: Math.max(0, Math.min(100, x)),
+            y_pos: Math.max(0, Math.min(100, y)),
+            scale: 1,
+        };
+
+        if (source === 'milestone') {
+            dec.milestone_id = parseInt(id);
+        } else if (source === 'token') {
+            dec.token_id = id;
+        }
+
+        decorations.push(dec);
+    });
+
+    if (!decorations.length) { showToast('Nothing to save', 'info'); return; }
+
+    const { error } = await supabase.rpc('save_jar_decorations', {
+        p_user_id: USER_ID, p_decorations: decorations
+    });
+    if (error) {
+        showToast('⚠️ Save failed: ' + (error.message || error), 'error');
+    } else {
+        showToast('Jar saved to cloud! 🏺', 'success');
+    }
+});
+
+// ======================== RESET ========================
+document.getElementById('resetBtn').addEventListener('click', () => {
+    if (droppedKeys.size === 0) return;
+    if (!confirm('Clear all tokens from the jar?')) return;
+    const toRemove = [];
+    engine.world.bodies.forEach(b => { if (b.achievementKey) toRemove.push(b); });
+    toRemove.forEach(b => Composite.remove(engine.world, b));
+    droppedKeys.clear();
+    updateBadges();
+    showToast('Jar cleared', 'info');
+});
+</script>
+
+</body>
+</html>

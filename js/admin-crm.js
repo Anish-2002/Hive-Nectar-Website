@@ -32,6 +32,8 @@ async function checkAuth() {
         <p class="tiny muted" style="margin:12px 0;">Your account (${user.email}) is not in the admin list.</p>
         <a href="profile.html" class="btn">Back to Profile</a>
       </div>`;
+    Loader.hide();
+    document.body.classList.remove('data-loading');
     return;
   }
   isAdminUser = true;
@@ -494,17 +496,23 @@ window.removeAdmin = async (email) => {
 // ======================== INIT ========================
 async function initCRM() {
   Loader.show('Loading dashboard...');
-  await Promise.all([
-    loadDashboard(),
-    loadUsers(),
-    loadTasks(),
-    loadAchievementsQuick(),
-    loadCommHistory(),
-    loadInquiries(),
-    loadActiveSubs(),
-    loadAdmins(),
-  ]);
-  Loader.hide();
+  try {
+    await Promise.all([
+      loadDashboard(),
+      loadUsers(),
+      loadTasks(),
+      loadAchievementsQuick(),
+      loadCommHistory(),
+      loadInquiries(),
+      loadActiveSubs(),
+      loadAdmins(),
+    ]);
+  } catch (e) {
+    console.error('initCRM error:', e);
+  } finally {
+    Loader.hide();
+    document.body.classList.remove('data-loading');
+  }
 }
 
 checkAuth();

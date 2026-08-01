@@ -9,7 +9,7 @@
 </head>
 <body class="page-generic">
   <header class="header">
-    <a href="index.html" class="logo-area">
+    <a href="the-meadow.html" class="logo-area">
       <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
       <span class="brand-title">THE MEADOW</span>
     </a>
@@ -41,7 +41,10 @@
       msg.textContent = 'No invite code found. The link may be invalid.';
       actions.style.display = 'none';
     } else {
+      const loader = document.getElementById('global-loader');
+      if (loader) loader.style.display = 'flex';
       const { data: { session } } = await supabase.auth.getSession();
+      if (loader) loader.style.display = 'none';
       if (!session) {
         msg.textContent = 'You need to log in first to accept this invite.';
         actions.innerHTML = '<a href="login.html?redirect=' + encodeURIComponent(window.location.href) + '" class="btn" style="display:block;text-align:center;margin-bottom:8px;">Log In</a><a href="signup.html" class="btn btn-secondary" style="display:block;text-align:center;">Sign Up</a>';
@@ -73,5 +76,8 @@
       }
     }
   </script>
+  <div id="global-loader" class="loader-overlay" style="display: none;">
+    <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
+  </div>
 </body>
 </html>

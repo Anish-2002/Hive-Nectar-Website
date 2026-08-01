@@ -12,6 +12,8 @@ function showToast(msg, type = 'info') {
 }
 
 async function init() {
+  const loader = document.getElementById('global-loader');
+  if (loader) loader.style.display = 'flex';
   // Auth check — only admin email can access
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -31,11 +33,20 @@ async function init() {
         <a href="profile.html" class="btn" style="margin-top: 20px;">Back to Profile</a>
       </div>
     `;
+    if (loader) loader.style.display = 'none';
+    document.body.classList.remove('data-loading');
     return;
   }
 
-  await loadMilestones();
-  await loadTokens();
+  try {
+    await loadMilestones();
+    await loadTokens();
+  } catch (e) {
+    console.error('init error:', e);
+  } finally {
+    if (loader) loader.style.display = 'none';
+    document.body.classList.remove('data-loading');
+  }
 }
 
 async function loadMilestones() {

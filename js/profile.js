@@ -1,6 +1,6 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
-import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
+import { getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
 import { isPartnerDone, partnerInfo, partnerCompletedTasks, hasCollabAccess } from './collaboration.js';
 
 // ======================== HELPER FUNCTIONS ========================
@@ -91,8 +91,6 @@ async function checkAndAwardMilestones() {
             });
             await updateAchievementsBadge();
         }
-
-        await checkAndAwardThemeTokens(userProfile.id, updateAchievementsBadge);
     } catch (err) {
         console.error('Failed to check milestones:', err);
     }
@@ -109,13 +107,37 @@ async function updateAchievementsBadge() {
         .eq('viewed', false);
     if (!mError) count += (mCount || 0);
 
-    const { count: tCount, error: tError } = await supabase
+    // Only count unviewed tokens that are VISIBLE for this user's tier
+    // (theme min_tier + stage allowed). Tokens outside tier access can't
+    // be revealed, so they must not keep the badge stuck.
+    const tierNum = tierToNumber[userProfile.tier] || 0;
+    const allowedStages = stagesForTier[tierNum] || [];
+    const { data: tierThemes } = await supabase
+        .from('themes')
+        .select('theme_id')
+        .lte('min_tier', tierNum);
+    const visibleThemeIds = new Set((tierThemes || []).map(t => t.theme_id));
+
+    const { data: unviewedTokens, error: tError } = await supabase
         .from('user_tokens')
-        .select('*', { count: 'exact', head: true })
+        .select('token_id')
         .eq('user_id', userProfile.id)
         .eq('viewed', false);
-    const revealedCount = revealedTokens.size;
-    if (!tError) count += Math.max(0, (tCount || 0) - revealedCount);
+    if (!tError) {
+        // token_id is the tokens table PK — need theme/stage; fetch token defs
+        const { data: tokenDefs } = await supabase
+            .from('tokens')
+            .select('id, theme_id, stage');
+        const defMap = new Map((tokenDefs || []).map(d => [d.id, d]));
+        const visibleUnviewed = (unviewedTokens || []).filter(ut => {
+            const def = defMap.get(ut.token_id);
+            if (!def) return false;
+            if (visibleThemeIds.size && !visibleThemeIds.has(def.theme_id)) return false;
+            if (allowedStages.length && !allowedStages.includes(def.stage)) return false;
+            return true;
+        });
+        count += visibleUnviewed.length;
+    }
 
     const badgeElements = document.querySelectorAll('.achievements-badge');
     badgeElements.forEach(el => {
@@ -183,7 +205,20 @@ async function generateAchievementsHtml() {
         earnedMap.set(um.milestone_id, { viewed: um.viewed });
     });
 
-    // 4. Fetch ALL token definitions (only active)
+    // 3b. Tier → theme + stage access: themes where min_tier <= user tier,
+    //     stages allowed per tier (stagesForTier)
+    const tierNum = tierToNumber[userProfile.tier] || 0;
+    const allowedStages = stagesForTier[tierNum] || [];
+    let accessibleThemeIds = null; // null = no filter (all themes)
+    const { data: tierThemes } = await supabase
+        .from('themes')
+        .select('theme_id')
+        .lte('min_tier', tierNum);
+    if (tierThemes && tierThemes.length) {
+        accessibleThemeIds = new Set(tierThemes.map(t => t.theme_id));
+    }
+
+    // 4. Fetch ALL active token definitions
     const { data: allTokens } = await supabase
         .from('tokens')
         .select('*')
@@ -191,25 +226,29 @@ async function generateAchievementsHtml() {
         .order('theme_id')
         .order('stage');
 
-    // 5. Fetch user's earned tokens
+    // 4b. Filter tokens by tier-accessible themes AND tier-accessible stages
+    const visibleTokens = (allTokens || []).filter(t =>
+        (!accessibleThemeIds || accessibleThemeIds.has(t.theme_id)) &&
+        allowedStages.includes(t.stage)
+    );
+
+    // 5. Fetch user's revealed tokens
     const { data: userTokens } = await supabase
         .from('user_tokens')
         .select('token_id, awarded_at, viewed')
         .eq('user_id', userProfile.id);
 
-    // 6. Build earned token map
-    const earnedTokenMap = new Map();
+    // 6. Build revealed token map
+    const revealedTokenMap = new Map();
     (userTokens || []).forEach(ut => {
-        earnedTokenMap.set(ut.token_id, { viewed: ut.viewed, awarded_at: ut.awarded_at });
+        revealedTokenMap.set(ut.token_id, { viewed: ut.viewed, awarded_at: ut.awarded_at });
     });
 
-    // 7. Build unified item list: milestones first, then tokens
-    const allItems = [];
-
+    // 7. Build milestone items (earn-to-unlock, unchanged)
+    const milestoneItems = [];
     allMilestones.forEach(m => {
         const earned = earnedMap.has(m.id);
-        allItems.push({
-            type: 'milestone',
+        milestoneItems.push({
             displayId: m.id,
             name: m.name,
             category: m.category,
@@ -221,11 +260,17 @@ async function generateAchievementsHtml() {
         });
     });
 
-    (allTokens || []).forEach(t => {
-        const earned = earnedTokenMap.has(t.id);
-        allItems.push({
-            type: 'token',
-            displayId: `token_${t.id}`,
+    // Sort: earned first, then by requirement_value ascending within each group
+    milestoneItems.sort((a, b) => {
+        if (a.earned !== b.earned) return a.earned ? -1 : 1;
+        return (a.requirement_value || 0) - (b.requirement_value || 0);
+    });
+
+    // 7b. Build token items (reveal-only, tier-filtered)
+    const tokenItems = (visibleTokens || []).map(t => {
+        const revealed = revealedTokenMap.has(t.id);
+        return {
+            displayId: t.id,
             name: t.name,
             category: 'theme_token',
             requirement_value: t.tasks_required,
@@ -233,50 +278,28 @@ async function generateAchievementsHtml() {
             description: t.description,
             stage: t.stage,
             theme_id: t.theme_id,
-            earned,
-            viewed: earned ? (earnedTokenMap.get(t.id)?.viewed ?? false) || revealedTokens.has(t.id) : false,
-        });
+            revealed,
+            viewed: revealed ? (revealedTokenMap.get(t.id)?.viewed ?? false) || revealedTokens.has(t.id) : false,
+        };
     });
 
-    // 8. Sort: earned first
-    allItems.sort((a, b) => {
-        if (a.earned !== b.earned) return a.earned ? -1 : 1;
-        return 0;
-    });
-
-    if (allItems.length === 0) {
-        return '<p class="tiny muted">No achievements available yet.</p>';
-    }
-
-    // 9. Build cards
-    let cardsHtml = '';
-    for (const item of allItems) {
+    // 8. Render milestone cards
+    let milestoneCards = '';
+    for (const item of milestoneItems) {
         const icon = item.icon_url || '';
         const safeIcon = icon.replace(/"/g, '%22');
         const safeName = item.name.replace(/"/g, '&quot;');
 
         if (item.earned) {
-            let description, subText;
-            if (item.type === 'token') {
-                let meta = {};
-                try { meta = JSON.parse(item.description); } catch {}
-                description = meta.copy || 'Great achievement!';
-                subText = `${item.stage} · ${TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token'}`;
-            } else {
-                description = getMilestoneDisplayDescription(item);
-                subText = getAchievementSubtext(item);
-            }
-            const safeDesc = description.replace(/"/g, '&quot;');
-            const safeSub = subText.replace(/"/g, '&quot;');
-
+            const safeDesc = getMilestoneDisplayDescription(item).replace(/"/g, '&quot;');
+            const safeSub = getAchievementSubtext(item).replace(/"/g, '&quot;');
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img" alt="${safeName}">`
                 : `<div class="no-icon-placeholder earned-placeholder">🏆</div>`;
-
-            cardsHtml += `
+            milestoneCards += `
                 <div class="achievement-container earned"
                      data-milestone-id="${item.displayId}"
-                     data-type="${item.type}"
+                     data-type="milestone"
                      data-icon="${safeIcon}"
                      data-name="${safeName}"
                      data-sub="${safeSub}"
@@ -298,20 +321,11 @@ async function generateAchievementsHtml() {
                     </div>
                 </div>`;
         } else {
-            let unlockText;
-            if (item.type === 'token') {
-                const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'this theme';
-                unlockText = `Complete ${item.requirement_value} tasks in ${themeName}`;
-            } else {
-                unlockText = getUnlockCondition(item);
-            }
-            const safeUnlock = unlockText.replace(/"/g, '&quot;');
-
+            const safeUnlock = getUnlockCondition(item).replace(/"/g, '&quot;');
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img locked-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img locked-img" alt="${safeName}">`
                 : `<div class="no-icon-placeholder locked-placeholder">🏆</div>`;
-
-            cardsHtml += `
+            milestoneCards += `
                 <div class="achievement-container locked">
                     <div class="achievement-card locked-card">
                         <div class="badge-icon-wrap">
@@ -327,6 +341,50 @@ async function generateAchievementsHtml() {
                     </div>
                 </div>`;
         }
+    }
+
+    // 8b. Render token cards (reveal-only, always visible if tier allows)
+    let tokenCards = '';
+    for (const item of tokenItems) {
+        const icon = item.icon_url || '';
+        const safeIcon = icon.replace(/"/g, '%22');
+        const safeName = item.name.replace(/"/g, '&quot;');
+        const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token';
+        const safeTheme = themeName.replace(/"/g, '&quot;');
+        let meta = {};
+        try { meta = JSON.parse(item.description); } catch {}
+        const safeDesc = (meta.copy || 'A free token from The Meadow.').replace(/"/g, '&quot;');
+
+        const imgTag = icon
+            ? `<img src="${icon}" class="achievement-badge-img token-badge-img" alt="${safeName}">`
+            : `<div class="no-icon-placeholder earned-placeholder">🎖️</div>`;
+
+        tokenCards += `
+            <div class="achievement-container ${item.revealed ? 'earned' : 'token-unrevealed'}"
+                 data-token-id="${item.displayId}"
+                 data-name="${safeName}"
+                 data-theme="${safeTheme}"
+                 data-desc="${safeDesc}"
+                 onclick="revealToken(this)">
+                <div class="achievement-card ${item.revealed ? '' : 'token-card'}">
+                    ${!item.revealed ? `
+                        <div class="mystery-overlay">
+                            <div class="reveal-msg">Click To Reveal</div>
+                        </div>
+                    ` : ''}
+                    <div class="badge-icon-wrap">
+                        ${imgTag}
+                    </div>
+                    <div class="achievement-card-text">
+                        <h3 class="font-bold text-gray-800 text-xl italic">${item.name}</h3>
+                        <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">${item.stage} · ${safeTheme}</p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    if (milestoneCards === '' && tokenCards === '') {
+        return '<p class="tiny muted">No achievements available yet.</p>';
     }
 
     return `
@@ -399,16 +457,99 @@ async function generateAchievementsHtml() {
             .achievement-name-locked { color: #a3a3a3 !important; font-size: 1.25rem; font-style: italic; }
             .no-icon-placeholder { width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: #fef3c7; border: 4px solid white; }
             .no-icon-placeholder.locked-placeholder { background: #e5e5e4; filter: grayscale(1); opacity: 0.5; }
+            .achievement-tabs { display: flex; justify-content: center; gap: 12px; margin: -20px 0 32px; flex-wrap: wrap; }
+            .achievement-tab {
+                background: white; border: 2px solid var(--honey-border); border-radius: 100px; padding: 10px 22px;
+                font-size: 0.85rem; font-weight: 800; color: #78716c; cursor: pointer; transition: all 0.3s;
+                display: inline-flex; align-items: center; gap: 8px;
+            }
+            .achievement-tab:hover { border-color: #f59e0b; color: var(--honey-amber); }
+            .achievement-tab.active { background: var(--honey-gradient); color: white; border-color: transparent; box-shadow: 0 6px 16px rgba(245,158,11,0.3); }
+            .tab-count { background: rgba(0,0,0,0.08); border-radius: 100px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
+            .achievement-tab.active .tab-count { background: rgba(255,255,255,0.25); }
+            .achievement-container.token-unrevealed { cursor: pointer; }
+            .achievement-container.token-unrevealed .achievement-card { background: linear-gradient(160deg, #fffdf6, #f8f0dd); border-style: dashed; }
         </style>
         <div class="profile-hero-mini">
             <h1 class="text-4xl font-black uppercase tracking-tighter italic">Nectar Artefacts</h1>
-            <p class="opacity-90 font-medium text-sm tracking-widest mt-2 uppercase">Unlock your garden milestones</p>
+            <p class="opacity-90 font-medium text-sm tracking-widest mt-2 uppercase">Earn milestones, reveal tokens</p>
         </div>
-        <div class="grid-achievements" id="achievementsGrid">
-            ${cardsHtml}
+        <div class="achievement-tabs">
+            <button class="achievement-tab active" id="tabMilestones" onclick="switchAchievementTab('milestones')">
+                🏆 Milestones ${milestoneItems.length ? `<span class="tab-count">${milestoneItems.filter(i => i.earned).length}/${milestoneItems.length}</span>` : ''}
+            </button>
+            <button class="achievement-tab" id="tabTokens" onclick="switchAchievementTab('tokens')">
+                🎖️ Tokens ${tokenItems.length ? `<span class="tab-count">${tokenItems.filter(i => i.revealed).length}/${tokenItems.length}</span>` : ''}
+            </button>
+        </div>
+        <div id="achievementsGrid">
+            <div id="milestoneSection">
+                ${milestoneCards ? `<div class="grid-achievements">${milestoneCards}</div>` : '<p class="tiny muted" style="text-align:center;padding:30px;">No milestones yet.</p>'}
+            </div>
+            <div id="tokenSection" style="display:none;">
+                ${tokenCards ? `<div class="grid-achievements">${tokenCards}</div>` : '<p class="tiny muted" style="text-align:center;padding:30px;">No tokens available for your tier yet.</p>'}
+            </div>
         </div>
     `;
 }
+
+window.switchAchievementTab = (tab) => {
+    const tabM = document.getElementById('tabMilestones');
+    const tabT = document.getElementById('tabTokens');
+    const secM = document.getElementById('milestoneSection');
+    const secT = document.getElementById('tokenSection');
+    if (!tabM || !tabT || !secM || !secT) return;
+    if (tab === 'tokens') {
+        tabT.classList.add('active');
+        tabM.classList.remove('active');
+        secT.style.display = 'block';
+        secM.style.display = 'none';
+    } else {
+        tabM.classList.add('active');
+        tabT.classList.remove('active');
+        secM.style.display = 'block';
+        secT.style.display = 'none';
+    }
+};
+
+window.revealToken = async (containerEl) => {
+    const tokenId = containerEl.dataset.tokenId;
+    const name = containerEl.dataset.name || '';
+    const theme = containerEl.dataset.theme || '';
+    const desc = containerEl.dataset.desc || '';
+
+    const overlay = containerEl.querySelector('.mystery-overlay');
+    if (overlay) overlay.remove();
+    containerEl.classList.remove('token-unrevealed');
+    containerEl.classList.add('earned');
+    const card = containerEl.querySelector('.achievement-card');
+    if (card) card.classList.remove('token-card');
+
+    try {
+        const { data, error } = await supabase.rpc('reveal_token', {
+            p_user_id: userProfile.id,
+            p_token_id: tokenId
+        });
+        if (error) throw error;
+        if (data && data.success === false) throw new Error(data.error || 'Reveal failed');
+        revealedTokens.add(tokenId);
+        showToast(`🎖️ ${name} revealed!`, 'success');
+        await updateAchievementsBadge();
+    } catch (err) {
+        console.error('Error revealing token:', err);
+        showToast('Failed to reveal token. Please try again.', 'error');
+        // Revert UI on failure
+        containerEl.classList.add('token-unrevealed');
+        containerEl.classList.remove('earned');
+        if (card) card.classList.add('token-card');
+        if (!containerEl.querySelector('.mystery-overlay')) {
+            const ov = document.createElement('div');
+            ov.className = 'mystery-overlay';
+            ov.innerHTML = '<div class="reveal-msg">Click To Reveal</div>';
+            containerEl.querySelector('.achievement-card').prepend(ov);
+        }
+    }
+};
 
 function attachAchievement3DEffects(container) {
     if (!container) return;
@@ -676,9 +817,10 @@ async function applyFiltersAndRender() {
     totalVisibleTasks = unlockedAll.length;
     completedVisibleTasks = unlockedAll.filter(t => completedSet.has(t.id)).length;
 
-    const tasksToShow = [...unlockedShown, ...lockedTasks];
-    // Sort each group by task_order ascending
-    tasksToShow.sort((a, b) => a.task_order - b.task_order);
+    const tasksToShow = [
+        ...unlockedShown.sort((a, b) => a.task_order - b.task_order),
+        ...lockedTasks.sort((a, b) => a.task_order - b.task_order)
+    ];
     renderTaskList(tasksToShow);
 
     const pct = totalVisibleTasks ? Math.min(Math.round((completedVisibleTasks / totalVisibleTasks) * 100), 100) : 0;
@@ -2770,13 +2912,12 @@ function setThemeFromTier() {
 
 // ======================== INIT ========================
 export async function initProfile() {
+    Loader.show("Gathering your nectar...");
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
         window.location.replace(getBaseURL() + 'login.html');
         return;
     }
-
-    Loader.show("Gathering your nectar...");
 
     try {
         const { data: profile, error: profileError } = await supabase
@@ -3001,6 +3142,7 @@ export async function initProfile() {
         showToast("Failed to load profile data.", "error");
     } finally {
         Loader.hide();
+        document.body.classList.remove('data-loading');
     }
 }
 

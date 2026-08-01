@@ -8,12 +8,12 @@
   <link rel="stylesheet" href="tester.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
-<body class="page-profile" data-theme="classic">
+<body class="page-profile" data-loading data-theme="classic">
 
 <canvas id="shareCanvas" width="600" height="400" style="display:none;"></canvas>
 
 <header class="header">
-  <a href="index.html" class="logo-area">
+  <a href="the-meadow.html" class="logo-area">
     <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
     <span class="brand-title">THE MEADOW</span>
   </a>
@@ -21,9 +21,8 @@
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
     <a href="the-meadow.html">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
     <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
@@ -103,7 +102,7 @@
       <span><i class="fas fa-comments"></i> Meadow Buzz</span>
       <i class="fas fa-chevron-right"></i>
     </a>
-    <a href="testjar.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
+    <a href="decorator.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
       <span><i class="fas fa-paint-brush"></i> Decorate Jar</span>
       <i class="fas fa-chevron-right"></i>
     </a>
@@ -124,7 +123,7 @@
             <i class="fas fa-award"></i> Achievements
             <span class="achievements-badge" style="margin-left: auto; background: var(--honey-gradient); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; display: none;"></span>
           </a>
-          <a href="testjar.html" class="sub-link" style="margin-top: 12px; background: var(--honey-gradient); color: white;"><i class="fas fa-paint-brush"></i> Decorate Jar</a>
+          <a href="decorator.html" class="sub-link" style="margin-top: 12px; background: var(--honey-gradient); color: white;"><i class="fas fa-paint-brush"></i> Decorate Jar</a>
           <div class="card" style="margin-top: 16px; padding: 16px; background: var(--secondary);">
             <button id="addSigmaBtnDesktop" class="btn tiny" style="width: 100%;"><i class="fas fa-chart-line"></i> Add Sigma Log</button>
           </div>
@@ -514,27 +513,13 @@ window.closeEditProfileSheet = () => {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 
 <!-- Decorator Jar Bottom Sheet -->
-<div id="decoratorSheet" class="bottom-sheet-overlay jar-deco-sheet" style="display: none; visibility: hidden; opacity: 0;">
-  <div class="bottom-sheet">
-    <div class="bottom-sheet-header">
-      <h3><i class="fas fa-paint-brush"></i> Decorate Your Jar</h3>
-      <button class="bottom-sheet-close" onclick="closeDecoratorSheet()">&times;</button>
-    </div>
-    <div class="bottom-sheet-content">
-      <div class="jar-deco-body">
-        <div id="jarContainer"></div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <script type="module">
-import { initDecorator } from './js/decorator.js';
 import { initCollab, checkInviteOnLoad } from './js/collaboration.js';
 import './js/share-card.js';
 
 // Expose functions globally
-window.initDecorator = initDecorator;
 window.invitePartner = invitePartner;
 
 // Init collaboration on load
@@ -542,7 +527,6 @@ initCollab();
 checkInviteOnLoad();
 
 // Re-use the existing supabase client from profile.js context
-// The decorator will be initialized when first opened
 </script>
 </body>
 </html>

@@ -3,26 +3,96 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The Meadow | The Meadow</title>
+  <title>The Meadow | Belonging</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* ── Hero — compact full-card content ── */
+    .page-the-meadow .hero-card { text-align: center; padding: 22px 28px; margin-bottom: 22px; }
+
+    /* ── Explore the Hive — square card grid ── */
+    .hive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 24px auto; max-width: 1140px; }
+    .hive-card {
+      aspect-ratio: 1; border-radius: 18px; cursor: pointer; position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(145deg, #fefcf5, #f5ead2); border: 2px solid rgba(212,175,55,0.25);
+      box-shadow: 0 4px 20px rgba(180,120,0,0.08); transition: transform .25s, box-shadow .25s, border-color .25s;
+      text-align: center; padding: 14px;
+    }
+    .hive-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 32px rgba(180,120,0,0.18); border-color: rgba(212,175,55,0.6); }
+    .hive-card:active { transform: scale(.97); }
+    .hive-card .hive-icon {
+      width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      background: var(--honey-gradient); color: #fff; font-size: 1.2rem; box-shadow: 0 6px 16px rgba(212,175,55,0.35);
+    }
+    .hive-card h4 { margin: 0; font-size: .95rem; color: var(--primary-dark); line-height: 1.3; }
+    .hive-card .hive-hint { font-size: .72rem; color: var(--fg-muted); line-height: 1.4; }
+    .hive-card .hive-open { position: absolute; top: 10px; right: 12px; font-size: .65rem; color: rgba(212,175,55,.7); transition: color .2s; }
+    .hive-card:hover .hive-open { color: #b8860b; }
+
+    /* ── Modal popup ── */
+    .hive-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(40,25,0,.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s; }
+    .hive-modal.open { opacity: 1; visibility: visible; }
+    .hive-modal-content {
+      background: linear-gradient(160deg, #fffdf6, #f8f0dd); border-radius: 24px; max-width: 560px; width: 100%;
+      max-height: 82vh; overflow-y: auto; padding: 32px; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,.35);
+      transform: translateY(20px) scale(.97); transition: transform .3s;
+    }
+    .hive-modal.open .hive-modal-content { transform: translateY(0) scale(1); }
+    .hive-modal-close {
+      position: sticky; top: 0; float: right; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--secondary); color: var(--fg); font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
+      transition: background .2s, transform .2s; z-index: 2; margin-left: 12px;
+    }
+    .hive-modal-close:hover { background: var(--primary); color: #fff; transform: rotate(90deg); }
+    .hive-modal-body h2 { display: flex; align-items: center; gap: 10px; color: var(--primary-dark); margin: 0 0 16px; font-size: 1.4rem; }
+    .hive-modal-body p, .hive-modal-body li { line-height: 1.8; color: var(--fg); font-size: 1rem; }
+    .hive-modal-body ul { padding-left: 20px; }
+
+    /* ── Accordion (FAQ style) ── */
+    .accordion { margin: 12px 0; border: 2px solid var(--border); border-radius: 16px; overflow: hidden; background: #fff; transition: border-color .2s; }
+    .accordion.open { border-color: rgba(212,175,55,0.5); }
+    .accordion-header {
+      width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; border: none;
+      background: transparent; font-size: 1.05rem; font-weight: 700; color: var(--primary-dark); text-align: left;
+    }
+    .accordion-header .acc-icon { width: 34px; height: 34px; border-radius: 10px; background: var(--honey-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .9rem; flex-shrink: 0; }
+    .accordion-header .acc-chevron { margin-left: auto; transition: transform .3s; color: var(--primary); }
+    .accordion.open .acc-chevron { transform: rotate(180deg); }
+    .accordion-body { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+    .accordion-body-inner { padding: 0 20px 20px 66px; line-height: 1.8; color: var(--fg); font-size: .98rem; }
+    .accordion-body-inner ul { padding-left: 20px; margin: 8px 0; }
+
+    /* ── Section headers ── */
+    .section-head { text-align: center; margin: 40px auto 8px; max-width: 1140px; }
+    .section-head h2 { margin: 0; color: var(--primary-dark); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.5rem; }
+    .section-head p { color: var(--fg-muted); margin-top: 6px; font-size: .95rem; }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,.4), transparent); margin: 32px auto; max-width: 1140px; }
+
+    /* ── Consistent section widths (matches existing 1140px) ── */
+    #hiveGrid, #accordionWrap, .page-the-meadow .resource-grid { max-width: 1140px; margin-left: auto; margin-right: auto; }
+
+    /* Stats strip (removed from page — CSS kept harmless) */
+
+    @media (max-width: 480px) {
+      .hive-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .hive-modal-content { padding: 24px 20px; }
+    }
+  </style>
 </head>
 <body class="page-the-meadow" data-theme="classic">
 
 <header class="header" data-testid="main-header">
-  <a href="index.html" class="logo-area" data-testid="logo-link">
-    <div class="brandmark">
-      <img src="newlogo.webp" alt="The Meadow Logo" class="logo-img">
-    </div>
+  <a href="the-meadow.html" class="logo-area" data-testid="logo-link">
+    <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
     <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu" data-testid="menu-toggle">
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks" data-testid="nav-links">
-    <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
     <a href="the-meadow.html" class="active">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
     <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
@@ -31,186 +101,65 @@
 </header>
 
 <main class="wrap">
-  <section class="hero-card" data-testid="meadow-hero">
+  <!-- Hero – Position Statement -->
+  <section class="hero-card" data-testid="hero-section">
     <h1>The Meadow</h1>
     <p>Built for the space between corporate sustainability and everyday behaviour.</p>
-  </section>
-
-  <!-- Create Your Account CTA -->
-  <section class="signup-cta">
-    <div class="signup-cta-card">
-      <div class="signup-cta-content">
-        <h2><i class="fas fa-user-plus"></i> Create Your Account</h2>
-        <p>Join the Meadow and start earning Nectar today. It's free.</p>
-      </div>
-      <button class="btn btn-success" onclick="openSignupSheet()" data-testid="signup-cta-btn">
-        <i class="fas fa-rocket"></i> Sign Up Here
-      </button>
-    </div>
-  </section>
-
-  <!-- Benefits + Login row -->
-  <section class="about-section">
-    <div class="sidebar-row">
-      <div class="benefits-card">
-        <h4 style="margin: 0 0 16px; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-gift" style="color: var(--primary);"></i> PollenPop Member Benefits
-        </h4>
-        <ul class="benefits-list">
-          <li><i class="fas fa-check-circle"></i><span>Access to daily sustainability tasks</span></li>
-          <li><i class="fas fa-check-circle"></i><span>Earn Nectar points for real rewards</span></li>
-          <li><i class="fas fa-check-circle"></i><span>Track your growth & achievements</span></li>
-          <li><i class="fas fa-check-circle"></i><span>Join a community of changemakers</span></li>
-        </ul>
-      </div>
-      <div class="login-card" data-testid="login-card">
-        <h4>Already a member?</h4>
-        <p>Welcome back! Sign in to continue your journey.</p>
-        <a href="login.html" class="btn" data-testid="login-link">
-          <i class="fas fa-sign-in-alt"></i> Login to Pollen Pop
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why This Exists -->
-  <section class="about-section">
-    <div class="card lift" style="padding: 36px; border: 2px solid var(--border);">
-      <h2><i class="fas fa-question-circle" style="color: var(--primary);"></i> Why This Exists</h2>
-      <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: start;">
-        <div>
-          <p style="line-height: 1.8; margin-bottom: 20px;">
-            Most sustainability efforts operate at corporate or government scale and rely on information and innovation from the top down. Few address the architecture of everyday behaviour. The Meadow was built for that space.
-          </p>
-          <p style="line-height: 1.8; margin-bottom: 20px;">
-            It exists to prove that small, consistent actions can quietly rebuild lost habits and discipline into a stable, resilient lifestyle without moral pressure.
-          </p>
-          <p style="line-height: 1.8;">
-            To test that at scale, it was first embedded in the founder's own daily life. She is a scientist by training. A systems designer driven by both instinct and situation. A mother watching how habits and discipline shape the next generation, without anyone meaning for it to happen.
-          </p>
-        </div>
-        <div class="hex-container" style="flex-shrink: 0;">
-          <i class="fas fa-leaf"></i>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How This Is Different -->
-  <section class="about-section">
-    <div class="card lift" style="padding: 36px; border: 2px solid var(--border);">
-      <div style="text-align: center; margin-bottom: 32px;">
-        <h2 style="margin: 0;">How This Is Different</h2>
-        <p class="muted" style="margin-top: 8px;">The design rules are simple</p>
-      </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-        <div>
-          <h4 style="margin-bottom: 16px;"><i class="fas fa-ban" style="color: var(--primary);"></i> What we don't do</h4>
-          <ul style="list-style: none; padding-left: 0;">
-            <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No moral statements</li>
-            <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No competitive language</li>
-            <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No urgency framing</li>
-            <li><i class="fas fa-times-circle" style="color: var(--error); margin-right: 10px;"></i> No 'hero' narratives</li>
-          </ul>
-        </div>
-        <div>
-          <h4 style="margin-bottom: 16px;"><i class="fas fa-seedling" style="color: var(--primary);"></i> Built on three observations</h4>
-          <ul style="list-style: none; padding-left: 0;">
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Humans are part of nature</li>
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> When too much is extracted from a system's capacity to regenerate, fractures appear</li>
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Nature corrects imbalance over time, and so can we</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="card lift" style="margin-top: 24px; text-align: center; padding: 24px;">
-      <p style="font-size: 1.1rem; font-style: italic; margin: 0;">The Meadow is built as a micro‑regenerative loop: repair instead of replace, cook instead of order, talk before you shout.</p>
-    </div>
-  </section>
-
-  <!-- Founder Snapshot -->
-  <section class="about-section">
-    <div class="card lift" style="background: var(); border: 2px solid var(--border);">
-      <h2 style="display: flex; align-items: center; gap: 12px;"><i class="fas fa-user-check" style="color: var(--primary);"></i> Founder Snapshot</h2>
-      <p style="line-height: 1.8; margin-top: 16px;">Before The Meadow existed, the founder experienced career stagnation after parental leave due to a newborn, a young child, and self‑esteem that had quietly eroded. The fear of what came next was real, and what pulled her back was family.</p>
-      <p style="line-height: 1.8; margin-top: 16px;">The work happened in the margins – training courses squeezed into lunch breaks and late nights, dinner planned on the same kitchen bench as everything else. That is where The Meadow began.</p>
-      <p style="line-height: 1.8; margin-top: 16px;">Patterns emerged between lab work and school pick‑ups, between spreadsheets and garden beds, between noticing the slow drift of norms and trusting the resilience of structure.</p>
-      <p style="line-height: 1.8; margin-top: 16px;">Behaviour compounds over time, but so does neglect, and faster. The system was first tested in her own daily loops, then refined into themes, stages, gates, and units. It is still being refined now.</p>
-    </div>
-  </section>
-
-  <!-- Design Values -->
-  <section class="about-section">
-    <div class="card lift" style="padding: 36px; border: 2px solid var(--border);">
-      <div style="text-align: center; margin-bottom: 32px;">
-        <h2 style="margin: 0;">Design Values</h2>
-        <p class="muted" style="margin-top: 8px;">Coherence over performance, regeneration over intensity</p>
-      </div>
-      <div class="values-grid" data-testid="values-grid">
-        <div class="value-card"><div class="value-icon"><i class="fas fa-leaf"></i></div><h4>Humans are part of nature</h4><p>We are not separate from the natural world – our habits and rhythms echo its cycles.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-sync-alt"></i></div><h4>Regeneration over intensity</h4><p>Repair instead of replace, cook instead of order, talk before you shout.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-dice-d6"></i></div><h4>Structure over motivation</h4><p>Systems outlast willpower. We provide the architecture; you bring the presence.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-eye-slash"></i></div><h4>Optional visibility</h4><p>You choose how visible you want to be. Comparison and competition are optional.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-chart-line"></i></div><h4>Earned progression</h4><p>Progression comes from behaviour, not instruction. You earn what you repeat.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-hand-holding-heart"></i></div><h4>Physical evidence of impact</h4><p>The jar, tokens, and cue card exist for you to interpret and assign meaning.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-gate"></i></div><h4>Behavioural gates, not checkpoints</h4><p>No forced milestones – you move forward when your actions naturally unlock the next stage.</p></div>
-        <div class="value-card"><div class="value-icon"><i class="fas fa-brain"></i></div><h4>Coherence over performance</h4><p>The system works because it is internally consistent, not because it is optimised for metrics.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Explore The Meadow -->
-  <section class="about-section">
-    <div style="text-align: center; margin-bottom: 32px;">
-      <h2><i class="fas fa-map-signs"></i> Explore The Meadow</h2>
-      <p class="muted">Access all information, resources, and trial content</p>
-    </div>
-    <div class="resource-grid">
-      <a href="information-and-links.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-external-link-alt"></i></div>
-        <h4>Information and External Links</h4>
-        <p>Access reference materials, external resources, archive content, and explore the journey dashboard.</p>
-        <span class="resource-link">View Links <i class="fas fa-arrow-right"></i></span>
-      </a>
-      <a href="faq.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-question-circle"></i></div>
-        <h4>FAQ</h4>
-        <p>Find answers to common questions about The Meadow, Nectar, Bloom, and how it all works.</p>
-        <span class="resource-link">Browse FAQ <i class="fas fa-arrow-right"></i></span>
-      </a>
-      <a href="pollenpop.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-seedling"></i></div>
-        <h4>PollenPop</h4>
-        <p>Learn about the first product from The Meadow — how it works, what you receive, and how to begin.</p>
-        <span class="resource-link">Explore PollenPop <i class="fas fa-arrow-right"></i></span>
-      </a>
-      <a href="board.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-comments"></i></div>
-        <h4>Communication Board</h4>
-        <p>View updates, notices, community conversation, and real-time reference metrics.</p>
-        <span class="resource-link">Visit Board <i class="fas fa-arrow-right"></i></span>
-      </a>
-      <a href="contact.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-envelope"></i></div>
-        <h4>Contact</h4>
-        <p>Get in touch with The Meadow team for questions, partnerships, or support.</p>
-        <span class="resource-link">Contact Us <i class="fas fa-arrow-right"></i></span>
-      </a>
-      <a href="founders.html" class="resource-card">
-        <div class="resource-icon"><i class="fas fa-users"></i></div>
-        <h4>Founders</h4>
-        <p>Meet the people behind The Meadow and learn about the story that started it all.</p>
-        <span class="resource-link">Meet Founders <i class="fas fa-arrow-right"></i></span>
+    <br>
+    <p>Work, family, kids, chores, deadlines, responsibilities. These endless loops exhaust us, making it hard to keep up, stay calm, and recognise ourselves.</p>
+    <br>
+    <p>The Meadow is a living system, designed around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>
+    <a href="join.html" class="btn" style="margin-top: 24px;" data-testid="hero-cta">
+      <i class="fas fa-seedling"></i> Join The Meadow
+    </a>
+    <div style="margin-top: 12px;">
+      <a href="login.html" style="color: rgba(255,255,255,0.9); font-weight: 600; text-decoration: underline; font-size: .9rem;">
+        Already a member? Click to login
       </a>
     </div>
   </section>
 
+  <!-- Explore The Hive — square cards → modals -->
+  <div class="section-head">
+    <h2><i class="fas fa-map-signs"></i> Explore The Hive</h2>
+    <p>Tap a card to read more — every story, in full.</p>
+  </div>
+  <div class="hive-grid" id="hiveGrid"></div>
+
+  <div class="divider"></div>
+
+  <!-- FAQ-style accordions -->
+  <div class="section-head">
+    <h2><i class="fas fa-compass"></i> Quick Guide</h2>
+    <p>Expand each section for the full picture</p>
+  </div>
+  <div id="accordionWrap"></div>
+
+  <div class="divider"></div>
+
+  <!-- More To Explore -->
+  <div class="section-head">
+    <h2><i class="fas fa-th-large"></i> More To Explore</h2>
+  </div>
+  <div class="resource-grid">
+    <a href="information-and-links.html" class="resource-card">
+      <div class="resource-icon"><i class="fas fa-external-link-alt"></i></div>
+      <h4>Information and External Links</h4>
+      <p>Access reference materials, external resources, archive content, and explore the journey dashboard.</p>
+      <span class="resource-link">View Links <i class="fas fa-arrow-right"></i></span>
+    </a>
+  </div>
 </main>
 
 <footer class="footer" data-testid="footer">
   <div class="footer-links">
     <a href="profile.html">My Profile</a> <span>|</span>
     <a href="founders.html">Founders</a>
+  </div>
+  <div class="social-footer" style="margin-top: 16px; display: flex; justify-content: center; gap: 20px;">
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-instagram"></i></a>
+    <a href="#" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" style="color: var(--primary-dark); font-size: 1.2rem;"><i class="fab fa-x-twitter"></i></a>
   </div>
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
@@ -234,7 +183,6 @@
             <input type="text" id="signupLast" required placeholder="Doe" data-testid="signup-last">
           </div>
         </div>
-
         <div class="form-field">
           <label for="signupUsername">Username (choose a creative name)</label>
           <div class="input-wrapper">
@@ -242,7 +190,6 @@
             <input type="text" id="signupUsername" required placeholder="e.g., BusyBee" data-testid="signup-username">
           </div>
         </div>
-
         <div class="form-field">
           <label for="signupEmail">Email Address</label>
           <div class="input-wrapper">
@@ -250,7 +197,6 @@
             <input type="email" id="signupEmail" required placeholder="you@example.com" data-testid="signup-email">
           </div>
         </div>
-
         <div class="form-field">
           <label for="signupPass">Create Password</label>
           <div class="input-wrapper">
@@ -258,7 +204,6 @@
             <input type="password" id="signupPass" required minlength="6" placeholder="At least 6 characters" data-testid="signup-password">
           </div>
         </div>
-
         <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 12px;" data-testid="signup-submit">
           <i class="fas fa-rocket"></i> Sign Up
         </button>
@@ -268,37 +213,222 @@
   </div>
 </div>
 
-<script type="module" src="js/app.js"></script>
-<script>
-window.openSignupSheet = function() {
-  const sheet = document.getElementById('signupSheet');
-  if (!sheet) return;
-  sheet.style.display = 'flex';
-  sheet.style.visibility = 'visible';
-  sheet.style.opacity = '1';
-  sheet.classList.add('active');
-};
-window.closeSignupSheet = function() {
-  const sheet = document.getElementById('signupSheet');
-  if (!sheet) return;
-  sheet.classList.remove('active');
-  sheet.style.visibility = 'hidden';
-  sheet.style.opacity = '0';
-  setTimeout(() => { sheet.style.display = 'none'; }, 350);
-};
-// Close on overlay click
-document.addEventListener('click', function(e) {
-  const sheet = document.getElementById('signupSheet');
-  if (sheet && e.target === sheet) closeSignupSheet();
-});
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+
+  // ── Hive cards content (all content preserved, compact previews) ──
+  const hiveCards = [
+    {
+      icon: 'fa-seedling', title: 'What Exists Here', hint: 'PollenPop, Nectar, Honey, Themes',
+      html: `<h2><i class="fas fa-seedling"></i> What Exists Here</h2>
+        <p>The Meadow is designed around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>
+        <ul>
+          <li><strong>PollenPop</strong> — Small, tangible tasks that seed new behaviours and anchor them into your daily routine as habits.</li>
+          <li><strong>Nectar</strong> — The energy unit inside The Meadow. It records your presence and marks your contribution.</li>
+          <li><strong>Honey Unit</strong> — Effort-earned wealth built from accumulated Nectar. It is yours alone, unexchangeable, and a living record of your impact.</li>
+          <li><strong>Themes & Growth Stages</strong> — Four core themes to choose from based on your interest and curiosity. Each theme has growth stages, and there are no instructions for how to move through them. Over time, repetition happens naturally; without force, without conscious decision. You are both witness and participant.</li>
+        </ul>
+        <p><em>Everything here is optional and adjustable. The system does not tell you who to be. It shows you what you are capable of doing, repeatedly.</em></p>
+        <p>We are part of nature. And like nature, we are resilient. We can heal and regenerate when there is space. The Meadow creates that space — tasks fit quietly into your day. There is no commitment required, no reminders sent. But there is real, visible evidence that you showed up, participated, and earned something: a small, honest nudge that you are still here. We hope that nudge helps you feel like yourself again.</p>`
+    },
+    {
+      icon: 'fa-question-circle', title: 'Why This Exists', hint: 'The space between corporate & everyday',
+      html: `<h2><i class="fas fa-question-circle"></i> Why This Exists</h2>
+        <p>Most sustainability efforts operate at corporate or government scale and rely on information and innovation from the top down. Few address the architecture of everyday behaviour. The Meadow was built for that space.</p>
+        <p>It exists to prove that small, consistent actions can quietly rebuild lost habits and discipline into a stable, resilient lifestyle without moral pressure.</p>
+        <p>To test that at scale, it was first embedded in the founder's own daily life. She is a scientist by training. A systems designer driven by both instinct and situation. A mother watching how habits and discipline shape the next generation, without anyone meaning for it to happen.</p>`
+    },
+    {
+      icon: 'fa-ban', title: 'How This Is Different', hint: 'The design rules are simple',
+      html: `<h2><i class="fa-ban"></i> How This Is Different</h2>
+        <h4 style="margin:16px 0 8px;"><i class="fas fa-ban" style="color:var(--primary);"></i> What we don't do</h4>
+        <ul>
+          <li>No moral statements</li>
+          <li>No competitive language</li>
+          <li>No urgency framing</li>
+          <li>No 'hero' narratives</li>
+        </ul>
+        <h4 style="margin:16px 0 8px;"><i class="fas fa-seedling" style="color:var(--primary);"></i> Built on three observations</h4>
+        <ul>
+          <li>Humans are part of nature</li>
+          <li>When too much is extracted from a system's capacity to regenerate, fractures appear</li>
+          <li>Nature corrects imbalance over time, and so can we</li>
+        </ul>
+        <p><em>The Meadow is built as a micro-regenerative loop: repair instead of replace, cook instead of order, talk before you shout.</em></p>`
+    },
+    {
+      icon: 'fa-user-check', title: 'Founder Snapshot', hint: 'The story that started it all',
+      html: `<h2><i class="fas fa-user-check"></i> Founder Snapshot</h2>
+        <p>Before The Meadow existed, the founder experienced career stagnation after parental leave due to a newborn, a young child, and self-esteem that had quietly eroded. The fear of what came next was real, and what pulled her back was family.</p>
+        <p>The work happened in the margins — training courses squeezed into lunch breaks and late nights, dinner planned on the same kitchen bench as everything else. That is where The Meadow began.</p>
+        <p>Patterns emerged between lab work and school pick-ups, between spreadsheets and garden beds, between noticing the slow drift of norms and trusting the resilience of structure.</p>
+        <p>Behaviour compounds over time, but so does neglect, and faster. The system was first tested in her own daily loops, then refined into themes, stages, gates, and units. It is still being refined now.</p>
+        <p style="font-weight:600;color:var(--primary-dark);">— The Meadow Team</p>`
+    },
+    {
+      icon: 'fa-shield-alt', title: 'Credibility & Norm Shift', hint: 'Why behaviour quietly resets',
+      html: `<h2><i class="fas fa-shield-alt"></i> Credibility & Norm Shift</h2>
+        <p>The Meadow was designed with the weight of human burden in mind: daily pressure, mental load, the quiet imbalance that builds over time.</p>
+        <p>When that pressure accumulates, we stop recognising ourselves. We don't know who the person shouting at their kids is. We don't know how we got here.</p>
+        <p>This experience led to understanding the mechanism behind <strong>'Norm Shift'</strong>, the way behaviour quietly resets without us noticing. Raising your voice once becomes a pattern. Forgetting an anniversary once becomes annual. Norm Shift can move in either direction, depending on how it shapes your habits and character over time.</p>
+        <p style="font-weight:500;">The Meadow exists to help you notice the shift, and, if you choose, find your way back.</p>`
+    },
+    {
+      icon: 'fa-dice-d6', title: 'Design Values', hint: 'Coherence over performance',
+      html: `<h2><i class="fas fa-dice-d6"></i> Design Values</h2>
+        <p class="muted">Coherence over performance, regeneration over intensity.</p>
+        <ul>
+          <li><strong>Humans are part of nature</strong> — We are not separate from the natural world; our habits and rhythms echo its cycles.</li>
+          <li><strong>Regeneration over intensity</strong> — Repair instead of replace, cook instead of order, talk before you shout.</li>
+          <li><strong>Structure over motivation</strong> — Systems outlast willpower. We provide the architecture; you bring the presence.</li>
+          <li><strong>Optional visibility</strong> — You choose how visible you want to be. Comparison and competition are optional.</li>
+          <li><strong>Earned progression</strong> — Progression comes from behaviour, not instruction. You earn what you repeat.</li>
+          <li><strong>Physical evidence of impact</strong> — The jar, tokens, and cue card exist for you to interpret and assign meaning.</li>
+          <li><strong>Behavioural gates, not checkpoints</strong> — No forced milestones; you move forward when your actions naturally unlock the next stage.</li>
+          <li><strong>Coherence over performance</strong> — The system works because it is internally consistent, not because it is optimised for metrics.</li>
+        </ul>`
+    },
+    {
+      icon: 'fa-flask', title: 'PollenPop — First Product', hint: 'The first product from The Meadow',
+      html: `<h2><i class="fas fa-flask"></i> PollenPop — First Product</h2>
+        <p>PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>
+        <p>It provides access to daily sustainability tasks, Nectar points for real rewards, growth tracking, and a community of changemakers.</p>
+        <p><a href="pollenpop.html" class="btn" style="margin-top:8px;">Learn more <i class="fas fa-arrow-right"></i></a></p>`
+    },
+    {
+      icon: 'fa-gift', title: 'Member Benefits', hint: 'What you get when you join',
+      html: `<h2><i class="fas fa-gift"></i> PollenPop Member Benefits</h2>
+        <ul>
+          <li>Access to daily sustainability tasks</li>
+          <li>Earn Nectar points for real rewards</li>
+          <li>Track your growth & achievements</li>
+          <li>Join a community of changemakers</li>
+        </ul>
+        <p style="font-style:italic;">Everything here is optional and adjustable. The system does not tell you who to be. It shows you what you are capable of doing, repeatedly.</p>`
+    },
+  ];
+
+  // ── Accordion content (FAQ style) ──
+  const accordions = [
+    {
+      icon: 'fa-hive', title: 'What is The Meadow?',
+      body: `The Meadow is a living system built around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself. Work, family, kids, chores, deadlines, responsibilities — these endless loops exhaust us. The Meadow creates space to feel like yourself again.`
+    },
+    {
+      icon: 'fa-honey-pot', title: 'How does Nectar work?',
+      body: `Nectar is the energy unit inside The Meadow. It records your presence and marks your contribution. Nectar accumulates into Honey Units — effort-earned wealth that is yours alone, unexchangeable, and a living record of your impact. Your progress is shown on your profile, and you can share a card of it with friends.`
+    },
+    {
+      icon: 'fa-layer-group', title: 'What are the themes & growth stages?',
+      body: `Four core themes are available, based on your interest and curiosity. Each theme has growth stages, and there are no instructions for how to move through them. Over time, repetition happens naturally — without force, without conscious decision. You are both witness and participant. Progression comes from behaviour, not instruction: you earn what you repeat.`
+    },
+    {
+      icon: 'fa-brain', title: 'What is Norm Shift?',
+      body: `Norm Shift is the way behaviour quietly resets without us noticing. Raising your voice once becomes a pattern. Forgetting an anniversary once becomes annual. Norm Shift can move in either direction, depending on how it shapes your habits and character over time. The Meadow exists to help you notice the shift, and, if you choose, find your way back.`
+    },
+    {
+      icon: 'fa-user-shield', title: 'Is my progress visible to others?',
+      body: `You choose how visible you want to be. Comparison and competition are optional. With the optional collaboration feature (available for Collective tier), partners can see each other's task progress — but the choice to collaborate is always yours.`
+    },
+    {
+      icon: 'fa-hand-holding-heart', title: 'Why "physical evidence" of impact?',
+      body: `The jar, tokens, and cue card exist for you to interpret and assign meaning. There is real, visible evidence that you showed up, participated, and earned something — a small, honest nudge that you are still here.`
+    },
+  ];
+
+  // ── Render hive cards ──
+  const grid = document.getElementById('hiveGrid');
+  grid.innerHTML = hiveCards.map((c, i) => `
+    <div class="hive-card" onclick="openHiveModal(${i})" role="button" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' '){openHiveModal(${i});event.preventDefault();}">
+      <span class="hive-open"><i class="fas fa-expand"></i></span>
+      <div class="hive-icon"><i class="fas ${c.icon}"></i></div>
+      <h4>${c.title}</h4>
+      <div class="hive-hint">${c.hint}</div>
+    </div>`).join('');
+
+  // ── Render accordions ──
+  const accWrap = document.getElementById('accordionWrap');
+  accWrap.innerHTML = accordions.map((a, i) => `
+    <div class="accordion" id="acc-${i}">
+      <button class="accordion-header" onclick="toggleAcc(${i})">
+        <span class="acc-icon"><i class="fas ${a.icon}"></i></span>
+        ${a.title}
+        <i class="fas fa-chevron-down acc-chevron"></i>
+      </button>
+      <div class="accordion-body"><div class="accordion-body-inner">${a.body}</div></div>
+    </div>`).join('');
+
+  // ── Modal + accordion functions (exposed globally) ──
+  window.hiveCards = hiveCards;
+  window.openHiveModal = function (i) {
+    const card = hiveCards[i];
+    if (!card) return;
+    let modal = document.getElementById('hiveModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'hiveModal';
+      modal.className = 'hive-modal';
+      modal.innerHTML = `<div class="hive-modal-content">
+        <button class="hive-modal-close" onclick="closeHiveModal()" aria-label="Close">&times;</button>
+        <div class="hive-modal-body"></div>
+      </div>`;
+      document.body.appendChild(modal);
+    }
+    modal.querySelector('.hive-modal-body').innerHTML = card.html;
+    requestAnimationFrame(() => modal.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeHiveModal = function () {
+    const modal = document.getElementById('hiveModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  document.addEventListener('click', function (e) {
+    const modal = document.getElementById('hiveModal');
+    if (modal && e.target === modal) closeHiveModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeHiveModal();
+  });
+
+  window.toggleAcc = function (i) {
+    const el = document.getElementById(`acc-${i}`);
+    const body = el.querySelector('.accordion-body');
+    const isOpen = el.classList.contains('open');
+    // Close others (single-open accordion)
+    document.querySelectorAll('.accordion.open').forEach(a => {
+      if (a !== el) { a.classList.remove('open'); a.querySelector('.accordion-body').style.maxHeight = '0px'; }
+    });
+    el.classList.toggle('open', !isOpen);
+    body.style.maxHeight = !isOpen ? body.scrollHeight + 'px' : '0px';
+  };
+
+  // ── Signup sheet ──
+  window.openSignupSheet = function() {
+    const sheet = document.getElementById('signupSheet');
+    if (!sheet) return;
+    sheet.style.display = 'flex'; sheet.style.visibility = 'visible'; sheet.style.opacity = '1'; sheet.classList.add('active');
+  };
+  window.closeSignupSheet = function() {
+    const sheet = document.getElementById('signupSheet');
+    if (!sheet) return;
+    sheet.classList.remove('active'); sheet.style.visibility = 'hidden'; sheet.style.opacity = '0';
+    setTimeout(() => { sheet.style.display = 'none'; }, 350);
+  };
+  document.addEventListener('click', function(e) {
+    const sheet = document.getElementById('signupSheet');
+    if (sheet && e.target === sheet) closeSignupSheet();
+  });
+
+  // ── Stats from Supabase (removed — stats strip no longer shown) ──
 </script>
 
 <div id="global-loader" class="loader-overlay" style="display: none;">
-  <div class="loader-content">
-    <div class="buffering-icon"></div>
-    <p id="loader-text">Loading...</p>
-  </div>
+  <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
 </div>
 
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
