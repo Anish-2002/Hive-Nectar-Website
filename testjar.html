@@ -18,8 +18,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      /* Full-page dark scene background (extends the old canvas card) */
-      background: radial-gradient(ellipse 80% 90% at 50% 42%, #3d2212 0%, #1e1007 55%, #0c0704 100%) fixed;
+      background: var(--bg);
+      background-image: radial-gradient(circle at 20% 80%, rgba(200,169,110,0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(200,169,110,0.08) 0%, transparent 50%);
       overflow-y: auto;
       touch-action: none;
       user-select: none;
@@ -47,7 +48,9 @@
       width: 100%;
       max-width: min(96vw, calc((100dvh - 300px) * 0.6));
       aspect-ratio: 900 / 1500;
-      background: transparent;
+      background: radial-gradient(ellipse 80% 90% at 50% 42%, #3d2212 0%, #1e1007 55%, #0c0704 100%);
+      border-radius: 20px;
+      box-shadow: 0 12px 44px rgba(0,0,0,0.30), 0 0 34px rgba(212,160,23,0.14);
       cursor: pointer;
       touch-action: none;
       display: block;
@@ -59,23 +62,23 @@
       display: flex; flex-direction: column; align-items: center;
       width: 100%;
       padding: 10px 16px 12px;
-      background: rgba(24,13,5,0.72);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(212,160,23,0.28);
+      background: rgba(255,252,244,0.85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(200,169,110,0.35);
       z-index: 40;
       flex-shrink: 0;
     }
 
-    #token-count { font-size: 13px; font-weight: 800; color: #ffca3a; letter-spacing: .03em; }
-    #token-count span { color: #fff; font-size: 14px; }
+    #token-count { font-size: 13px; font-weight: 800; color: var(--primary-dark); letter-spacing: .03em; }
+    #token-count span { color: var(--fg); font-size: 14px; }
 
     #token-count-bar {
       display: flex; align-items: center; gap: 14px; margin-bottom: 8px;
     }
     #clear-btn {
-      background: rgba(212, 160, 23, 0.14);
-      border: 1px solid rgba(255, 200, 90, 0.4);
-      color: #ffca3a;
+      background: rgba(200, 120, 30, 0.12);
+      border: 1px solid rgba(180, 120, 40, 0.4);
+      color: var(--primary-dark);
       padding: 4px 12px;
       font-size: 11px;
       font-weight: 800;
@@ -83,7 +86,7 @@
       cursor: pointer;
       transition: all .15s;
     }
-    #clear-btn:hover { background: rgba(212, 160, 23, 0.3); color: #fff; }
+    #clear-btn:hover { background: rgba(200, 120, 30, 0.25); }
 
     #tray-tokens { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; max-width: 95vw; }
 
@@ -103,8 +106,8 @@
 
     #hint {
       font-size: 12px;
-      color: #e8a030;
-      opacity: .95;
+      color: var(--primary-dark);
+      opacity: .9;
       margin-top: 7px;
       font-weight: 700;
       min-height: 17px;
@@ -348,7 +351,7 @@
     ctx.save();
     ctx.globalAlpha = 0.14;
     ctx.strokeStyle = 'rgba(140,60,0,0.9)';
-    ctx.lineWidth = 0.8;
+    ctx.lineWidth = 2.2;
     HONEYCOMB_ROWS.forEach((p) => {
       ctx.beginPath();
       ctx.moveTo(jx(p[0]), jy(p[1]));
@@ -377,7 +380,7 @@
     ctx.clip();
 
     // Honey-core radial gradient (reference honeyCore)
-    const core = ctx.createRadialGradient(x, jy(280), 10, x, jy(300), 150);
+    const core = ctx.createRadialGradient(x, jy(280), 30, x, jy(300), 460);
     core.addColorStop(0, '#fffef0');
     core.addColorStop(0.06, '#fff5a0');
     core.addColorStop(0.18, '#ffe040');
@@ -390,20 +393,20 @@
 
     // Wavy honey surface: rolling sea-like waves at the fill level
     // Two sine components for organic motion; always animated once filled
-    const amp = 7 + honeySplash * 6;
-    const waveAmp = Math.max(3, amp * (0.55 + 0.45 * honeyDisplay));
+    const amp = 22 + honeySplash * 18;
+    const waveAmp = Math.max(9, amp * (0.55 + 0.45 * honeyDisplay));
     const leftX = jx(30), rightX = jx(250);
-    const topBand = fillTop - waveAmp * 2 - 10;
+    const topBand = fillTop - waveAmp * 2 - 30;
     // Darken the band above the wave so the wave reads as a surface edge
     ctx.fillStyle = 'rgba(120,40,0,0.35)';
-    ctx.fillRect(leftX, topBand, rightX - leftX, waveAmp * 3 + 16);
+    ctx.fillRect(leftX, topBand, rightX - leftX, waveAmp * 3 + 48);
 
     // Build the wave surface path (two summed sines = rolling sea)
     const surfPts = [];
-    for (let px = leftX; px <= rightX; px += 3) {
+    for (let px = leftX; px <= rightX; px += 6) {
       const wy = fillTop
-        + Math.sin(px * 0.035 + honeyWavePhase) * waveAmp
-        + Math.sin(px * 0.09 + honeyWavePhase * 1.7) * waveAmp * 0.45;
+        + Math.sin(px * 0.02 + honeyWavePhase) * waveAmp
+        + Math.sin(px * 0.05 + honeyWavePhase * 1.7) * waveAmp * 0.45;
       surfPts.push([px, wy]);
     }
     // Honey below the wave
@@ -417,25 +420,25 @@
     ctx.fill();
     // Wave crest foam line following the surface
     ctx.strokeStyle = 'rgba(255,250,190,0.85)';
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 6;
     ctx.beginPath();
     surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy) : ctx.lineTo(px, wy)));
     ctx.stroke();
     // Soft second foam edge just below the crest
     ctx.strokeStyle = 'rgba(255,235,140,0.35)';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
-    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy + 3) : ctx.lineTo(px, wy + 3)));
+    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy + 9) : ctx.lineTo(px, wy + 9)));
     ctx.stroke();
 
     // Surface shimmer line at honey level
-    const shimmer = ctx.createLinearGradient(0, fillTop - 6, 0, fillTop + 6);
+    const shimmer = ctx.createLinearGradient(0, fillTop - 18, 0, fillTop + 18);
     shimmer.addColorStop(0, 'rgba(255,250,180,0)');
     shimmer.addColorStop(0.5, 'rgba(255,255,200,0.9)');
     shimmer.addColorStop(1, 'rgba(255,230,100,0)');
     ctx.fillStyle = shimmer;
     ctx.beginPath();
-    ctx.ellipse(x, fillTop, jx(250) - x, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, fillTop, jx(250) - x, 21, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Honeycomb matrix behind honey
@@ -445,7 +448,7 @@
     honeyBubbles.forEach((b) => {
       if (b.y < fillTop) return;
       ctx.strokeStyle = `rgba(255,235,170,${b.alpha})`;
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
       ctx.stroke();
@@ -1193,7 +1196,7 @@
       honeyBubbles = Array.from({ length: 55 }, () => ({
         x: jx(24) + (jx(256) - jx(24)) * Math.random(),
         y: jy(120) + (jy(408) - jy(120)) * Math.random(),
-        r: Math.random() * 6 + 2,
+        r: Math.random() * 18 + 6,
         alpha: 0.3 + Math.random() * 0.5
       }));
     } catch (err) {

@@ -362,6 +362,7 @@ async function generateAchievementsHtml() {
         tokenCards += `
             <div class="achievement-container ${item.revealed ? 'earned' : 'token-unrevealed'}"
                  data-token-id="${item.displayId}"
+                 data-icon="${safeIcon}"
                  data-name="${safeName}"
                  data-theme="${safeTheme}"
                  data-desc="${safeDesc}"
@@ -517,6 +518,13 @@ window.revealToken = async (containerEl) => {
     const name = containerEl.dataset.name || '';
     const theme = containerEl.dataset.theme || '';
     const desc = containerEl.dataset.desc || '';
+    const icon = containerEl.dataset.icon || '';
+
+    // Already-revealed token: just show the detail popup, no reveal flow
+    if (containerEl.classList.contains('earned')) {
+        openAchievementDetail(icon, name, `${theme} · Token`, desc);
+        return;
+    }
 
     const overlay = containerEl.querySelector('.mystery-overlay');
     if (overlay) overlay.remove();
@@ -535,6 +543,8 @@ window.revealToken = async (containerEl) => {
         revealedTokens.add(tokenId);
         showToast(`🎖️ ${name} revealed!`, 'success');
         await updateAchievementsBadge();
+        // Show the same detail popup as milestones
+        openAchievementDetail(icon, name, `${theme} · Token`, desc);
     } catch (err) {
         console.error('Error revealing token:', err);
         showToast('Failed to reveal token. Please try again.', 'error');
@@ -596,7 +606,12 @@ window.viewMilestone = async (containerEl) => {
         await updateAchievementsBadge();
     }).catch(err => console.error('Error marking milestone as viewed:', err));
 
-    const modal   = document.getElementById('achievementModal');
+    openAchievementDetail(icon, name, sub, desc);
+};
+
+// Shared detail popup used by both milestones and tokens
+function openAchievementDetail(icon, name, sub, desc) {
+    const modal = document.getElementById('achievementModal');
     if (!modal) return;
     const imgEl   = modal.querySelector('#achievementModalImg');
     const titleEl = modal.querySelector('#achievementModalTitle');
