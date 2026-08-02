@@ -64,7 +64,7 @@
         <section id="layer-users" class="crm-layer">
           <div class="card">
             <h2 class="section-title">User Directory</h2>
-            <table class="crm-table">
+            <div style="overflow-x:auto;"><table class="crm-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -75,7 +75,7 @@
               </thead>
               <tbody id="crm-user-list">
                 </tbody>
-            </table>
+            </table></div>
           </div>
         </section>
 
@@ -110,7 +110,7 @@
                 <h3 id="current-category-title">Inquiry Category</h3>
                 <button class="text-link" onclick="closeInquiryDetail()">Back to Categories</button>
             </div>
-            <table class="crm-table">
+            <div style="overflow-x:auto;"><table class="crm-table">
               <thead>
                 <tr>
                   <th>From</th>
@@ -120,7 +120,7 @@
                 </tr>
               </thead>
               <tbody id="crm-inquiry-list"></tbody>
-            </table>
+            </table></div>
           </div>
         </section>
 
@@ -175,7 +175,8 @@
     }
   </script>
   
-  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/app.js"></script>
+<script type="module" src="js/admin.js"></script>
 <div id="global-loader" class="loader-overlay" style="display: none;">
   <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
 </div>

@@ -315,6 +315,32 @@
     }
   }
 
+  // Lid version of a token SVG: strips the full-bleed white background circle
+  // so the icon sits directly on the lid surface (tray keeps the original).
+  // All 60 bucket SVGs share the exact same disc: <circle cx="42" cy="42" r="42" fill="white"/>
+  async function buildLidImage(iconUrl) {
+    try {
+      const res = await fetch(iconUrl);
+      const svg = (await res.text())
+        .replace(/<circle\s+cx="42"\s+cy="42"\s+r="42"\s+fill="white"\s*\/>/i, '');
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      return img; // .complete flips when loaded; drawTokenImage checks it
+    } catch {
+      return null; // fall back to the original icon
+    }
+  }
+
+  // Sticker radius for a given sticker count on the lid (rx = wood-face radius).
+  // Each sticker fills its wedge: 1 = full cap, 2 = halves, 3 = sector slices
+  // (largest circle inscribed in the wedge — 2: d=r=rx/2, 3: d=0.536rx, r=0.464rx).
+  function stickerSize(count, rx) {
+    if (count <= 1) return rx * 1.02;
+    if (count === 2) return rx * 0.5;
+    return rx * 0.464;
+  }
+
   // ─── Honey fill: earned / total (0..1), animated height ───
   // Reference jar silhouette (280x430 viewBox) mapped to canvas coords
   const JAR_S = 2.6; // scale factor (bigger jar — 67% width, 64% height of canvas)
@@ -583,16 +609,17 @@
         ctx.fill();
         ctx.stroke();
 
-        let dist = 0, sc = 1.15;
-        if (count === 2) { dist = rx * 0.45; sc = 0.78; }
-        else if (count === 3) { dist = rx * 0.52; sc = 0.62; }
-        if (count === 1) { dist = 0; sc = 1.0; }
+        // Wedge centers match stickerSize: 1 → center, 2 → 0.5rx, 3 → 0.536rx
+        const dist = count === 1 ? 0 : (count === 2 ? rx * 0.5 : rx * 0.536);
 
         const ratio = (ry === rx) ? 1 : ry / rx;
         const lx = Math.cos(midA) * dist;
         const ly = Math.sin(midA) * dist * ratio;
         ctx.translate(lx, ly);
-        drawTokenImage(sticker.img, 0, 0, rx * 0.42 * (sc * 1.1));
+        // Squash the sticker with the lid surface so it reads as painted on,
+        // not a coin standing on top (top view: ratio = 1, no squash)
+        ctx.scale(1, ratio);
+        drawTokenImage(sticker.lidImg || sticker.img, 0, 0, stickerSize(count, rx));
         ctx.restore();
       });
     }
@@ -861,26 +888,32 @@
     let curX, curY;
     if (flyingToken.isPlacing) {
       curX = lerp(flyingToken.startX, jar.lidOpenX, t);
-      curY = lerp(flyingToken.startY, jar.lidOpenY, t) - Math.sin(t * Math.PI) * 60;
+      curY = lerp(flyingToken.startY, jar.lidOpenY, t) - Math.sin(t * Math.PI) * Math.abs(jar.lidOpenY - flyingToken.startY) * 0.45;
     } else {
       // Removal: fly from open lid position to the lid rest spot
       curX = lerp(jar.lidOpenX, jar.lidRestX, t);
-      curY = lerp(jar.lidOpenY, jar.lidRestY, t) - Math.sin(t * Math.PI) * 60;
+      curY = lerp(jar.lidOpenY, jar.lidRestY, t) - Math.sin(t * Math.PI) * Math.abs(jar.lidRestY - jar.lidOpenY) * 0.45;
     }
     ctx.save();
     ctx.translate(curX, curY);
+    // Halo + icon scale with the lid so the flying token matches the
+    // sticker it lands as (consistent on mobile + desktop)
+    const u = jar.lidRadius / 96;
+    const woodRx = 82 * u;
+    const flyIcon = stickerSize(placed.length + 1, woodRx); // size it lands as
+    const haloR = flyIcon * 1.85;
     ctx.fillStyle = 'rgba(255,215,0,0.4)';
     ctx.beginPath();
-    ctx.arc(0, 0, 48, 0, Math.PI * 2);
+    ctx.arc(0, 0, haloR, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#D1D1D1';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = Math.max(2.5, haloR * 0.07);
     ctx.beginPath();
-    ctx.arc(0, 0, 42, 0, Math.PI * 2);
+    ctx.arc(0, 0, flyIcon * 1.6, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    drawTokenImage(flyingToken.img, 0, 0, 26);
+    drawTokenImage(flyingToken.img, 0, 0, flyIcon);
     ctx.restore();
   }
 
@@ -1060,7 +1093,7 @@
         flyingToken = {
           targetSticker: { ...lastPlaced },
           startX: jar.lidOpenX, startY: jar.lidOpenY,
-          name: lastPlaced.name, img: lastPlaced.img,
+          name: lastPlaced.name, img: lastPlaced.lidImg || lastPlaced.img,
           progress: 0, isPlacing: false
         };
         lidState.status = 'OPENING';
@@ -1113,15 +1146,27 @@
         const rect = canvas.getBoundingClientRect();
         const bRect = btn.getBoundingClientRect();
         const sx = (bRect.left + bRect.width / 2 - rect.left) * (900 / rect.width);
-        const sy = (bRect.top + bRect.height / 2 - rect.top) * (1500 / rect.height);
+        // Clamp start so the token always begins just above the canvas,
+        // regardless of tray position (consistent on mobile + desktop)
+        const sy = Math.min(
+          (bRect.top + bRect.height / 2 - rect.top) * (1500 / rect.height),
+          jar.lidOpenY - 120
+        );
         flyingToken = {
           targetSticker: tk,
           startX: sx, startY: sy,
-          name: tk.name, img: tk.img,
+          name: tk.name, img: tk.lidImg || tk.img,
           progress: 0, isPlacing: true
         };
         lidState.status = 'OPENING';
         lidState.progress = 0;
+      });
+      // Mobile: pointerdown fires instantly on touch (no 300ms delay,
+      // reliable with touch-action:none) — guard against double-fire
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch') return;
+        e.preventDefault();
+        btn.click();
       });
       trayTokensEl.appendChild(btn);
     });
@@ -1236,11 +1281,18 @@
         const { data: tokenDefs } = await supabase
           .from('tokens')
           .select('id, name, icon_url')
-          .in('id', tokenIds);
+          .in('id', tokenIds)
+          .eq('active', true);
         tokens = (tokenDefs || []).map(t => {
           const img = new Image();
           if (t.icon_url) img.src = t.icon_url;
-          return { id: t.id, name: t.name, icon: t.icon_url || '', img };
+          const tk = { id: t.id, name: t.name, icon: t.icon_url || '', img, lidImg: img };
+          if (t.icon_url) {
+            buildLidImage(t.icon_url).then(lidImg => {
+              if (lidImg) tk.lidImg = lidImg;
+            });
+          }
+          return tk;
         });
       }
 

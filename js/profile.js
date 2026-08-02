@@ -107,9 +107,10 @@ async function updateAchievementsBadge() {
         .eq('viewed', false);
     if (!mError) count += (mCount || 0);
 
-    // Only count unviewed tokens that are VISIBLE for this user's tier
-    // (theme min_tier + stage allowed). Tokens outside tier access can't
-    // be revealed, so they must not keep the badge stuck.
+    // Only count tokens that are VISIBLE for this user's tier AND not yet
+    // revealed. Reveal-only design: user_tokens rows are created with
+    // viewed=true at reveal time, so "viewed=false" rows never exist —
+    // the notification is driven by tokens the user CAN reveal but hasn't.
     const tierNum = tierToNumber[userProfile.tier] || 0;
     const allowedStages = stagesForTier[tierNum] || [];
     const { data: tierThemes } = await supabase
@@ -118,25 +119,24 @@ async function updateAchievementsBadge() {
         .lte('min_tier', tierNum);
     const visibleThemeIds = new Set((tierThemes || []).map(t => t.theme_id));
 
-    const { data: unviewedTokens, error: tError } = await supabase
+    // Token ids the user has already revealed (any state — they're in user_tokens)
+    const { data: revealedRows, error: rError } = await supabase
         .from('user_tokens')
         .select('token_id')
-        .eq('user_id', userProfile.id)
-        .eq('viewed', false);
-    if (!tError) {
-        // token_id is the tokens table PK — need theme/stage; fetch token defs
+        .eq('user_id', userProfile.id);
+    if (!rError) {
+        const revealedIds = new Set((revealedRows || []).map(r => r.token_id));
         const { data: tokenDefs } = await supabase
             .from('tokens')
-            .select('id, theme_id, stage');
-        const defMap = new Map((tokenDefs || []).map(d => [d.id, d]));
-        const visibleUnviewed = (unviewedTokens || []).filter(ut => {
-            const def = defMap.get(ut.token_id);
-            if (!def) return false;
-            if (visibleThemeIds.size && !visibleThemeIds.has(def.theme_id)) return false;
-            if (allowedStages.length && !allowedStages.includes(def.stage)) return false;
+            .select('id, theme_id, stage')
+            .eq('active', true);
+        const revealable = (tokenDefs || []).filter(t => {
+            if (revealedIds.has(t.id)) return false;
+            if (visibleThemeIds.size && !visibleThemeIds.has(t.theme_id)) return false;
+            if (allowedStages.length && !allowedStages.includes(t.stage)) return false;
             return true;
         });
-        count += visibleUnviewed.length;
+        count += revealable.length;
     }
 
     const badgeElements = document.querySelectorAll('.achievements-badge');
@@ -283,6 +283,13 @@ async function generateAchievementsHtml() {
         };
     });
 
+    // Sort: revealed first, then by theme then stage (keeps grid grouped)
+    tokenItems.sort((a, b) => {
+        if (a.revealed !== b.revealed) return a.revealed ? -1 : 1;
+        if ((a.theme_id || '') !== (b.theme_id || '')) return (a.theme_id || '').localeCompare(b.theme_id || '');
+        return (a.stage || '').localeCompare(b.stage || '');
+    });
+
     // 8. Render milestone cards
     let milestoneCards = '';
     for (const item of milestoneItems) {
@@ -405,7 +412,7 @@ async function generateAchievementsHtml() {
                 box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2);
                 margin-bottom: 48px;
             }
-            .achievement-container { perspective: 1200px; margin-bottom: 24px; min-height: 380px; }
+            .achievement-container { perspective: 1200px; margin-bottom: 24px; min-height: clamp(280px, 60vw, 380px); }
             .achievement-container.earned { cursor: pointer; }
             .achievement-card {
                 position: relative;
@@ -442,9 +449,9 @@ async function generateAchievementsHtml() {
                 font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
                 letter-spacing: 1.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
-            .achievement-badge-img { width: 140px; height: 140px; margin: 0 auto; transform: translateZ(30px); border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); object-fit: cover; }
-            .achievement-badge-img.token-badge-img { width: 140px; height: 140px; border-radius: 50%; object-fit: contain; background: #fff; padding: 8px; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); flex-shrink: 0; display: block; }
-            .grid-achievements { display: grid; grid-template-columns: repeat(1, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+            .achievement-badge-img { width: min(140px, 42vw); height: min(140px, 42vw); aspect-ratio: 1; margin: 0 auto; transform: translateZ(30px); border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); object-fit: cover; }
+            .achievement-badge-img.token-badge-img { width: min(140px, 42vw); height: min(140px, 42vw); border-radius: 50%; object-fit: contain; background: #fff; padding: 8px; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); flex-shrink: 0; display: block; }
+            .grid-achievements { display: grid; grid-template-columns: repeat(1, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; padding: 0 clamp(8px, 3vw, 32px); }
             @media (min-width: 640px) { .grid-achievements { grid-template-columns: repeat(2, 1fr); } }
             @media (min-width: 1024px) { .grid-achievements { grid-template-columns: repeat(3, 1fr); } }
             .achievement-container.locked { cursor: default; opacity: 0.85; }
@@ -563,21 +570,33 @@ window.revealToken = async (containerEl) => {
 
 function attachAchievement3DEffects(container) {
     if (!container) return;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const cards = container.querySelectorAll('.achievement-card');
     cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const xc = rect.width / 2;
-            const yc = rect.height / 2;
-            const rotateX = (yc - y) / 10;
-            const rotateY = (x - xc) / 10;
-            card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(-10px)`;
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
-        });
+        if (fine) {
+            // Desktop mouse: live 3D tilt
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const rotateX = (yc - y) / 10;
+                const rotateY = (x - xc) / 10;
+                card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(-10px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+        } else {
+            // Touch: reset any transform after the tap so cards never stay tilted
+            card.addEventListener('pointerup', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+            card.addEventListener('pointercancel', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+        }
     });
 }
 
@@ -680,7 +699,8 @@ async function fetchBaseTasksForTier(tierNum) {
 
 // ======================== BOTTOM SHEET ========================
 function showBottomSheet(title, contentHtml, onClose) {
-    const existing = document.querySelector('.bottom-sheet-overlay');
+    // Only remove dynamic sheets — never the static ones (Edit Profile, Upgrade Tier)
+    const existing = document.querySelector('.bottom-sheet-overlay.active:not([data-static])');
     if (existing) existing.remove();
 
     const overlay = document.createElement('div');
@@ -697,10 +717,12 @@ function showBottomSheet(title, contentHtml, onClose) {
         </div>
     `;
     document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
 
     const closeBtn = overlay.querySelector('.bottom-sheet-close');
     const close = () => {
         overlay.classList.remove('active');
+        document.body.style.overflow = '';
         setTimeout(() => overlay.remove(), 300);
         if (onClose) onClose();
     };
@@ -718,9 +740,14 @@ function closeAllBottomSheets() {
   const sheets = document.querySelectorAll('.bottom-sheet-overlay');
   sheets.forEach(sheet => {
     sheet.classList.remove('active');
-    sheet.style.visibility = 'hidden';
-    sheet.style.opacity = '0';
+    if (sheet.dataset.static) {
+      sheet.style.visibility = 'hidden';
+      sheet.style.opacity = '0';
+    } else {
+      sheet.remove();
+    }
   });
+  document.body.style.overflow = '';
 }
 // ======================== TASK HELPER ========================
 function attachTaskEventListeners(container) {
@@ -963,12 +990,12 @@ function createTaskCard(task) {
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <button class="react-btn" data-id="${task.id}" data-type="like" 
-                        style="background:${likeBtnColor}; color:${likeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👍 Like</button>
+                        style="background:${likeBtnColor}; color:${likeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; min-height:44px; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👍 Like</button>
                     <button class="react-btn" data-id="${task.id}" data-type="dislike" 
-                        style="background:${dislikeBtnColor}; color:${dislikeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👎 Dislike</button>
+                        style="background:${dislikeBtnColor}; color:${dislikeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; min-height:44px; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👎 Dislike</button>
                 </div>
             </div>
-            <div style="padding: 0 20px 20px 68px; border-top: 1px solid ${rgbaBorder};">
+            <div style="padding: 0 20px 20px; border-top: 1px solid ${rgbaBorder};">
                 <div class="comments-list">${taskComments.map(c => `
                     <div id="comment-box-${c.id}" style="background: rgba(255,255,255,0.5); padding:8px 12px; border-radius:12px; margin-bottom:8px;">
                         <div>${c.comment_text}</div>
@@ -1657,8 +1684,8 @@ async function loadAchievementsModal() {
                 background: #f3f4f6;
                 border: none;
                 border-radius: 50%;
-                width: 32px;
-                height: 32px;
+                width: 44px;
+                height: 44px;
                 font-size: 14px;
                 color: #6b7280;
                 cursor: pointer;
@@ -1785,11 +1812,12 @@ async function generateCompletedTasksHtml() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -1946,11 +1974,12 @@ async function generatePendingSigmaHtml() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -2204,11 +2233,12 @@ async function showThemeSelectorModal() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -3183,11 +3213,12 @@ window.closeAchievementsModal = () => {
 window.closeUpgradePromptModal = closeUpgradePromptModal;
 window.startEditComment = (id, oldText) => {
     const box = document.getElementById(`comment-box-${id}`);
+    const escaped = String(oldText).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     box.innerHTML = `
-        <input type="text" id="edit-input-${id}" value="${oldText}" style="width:100%; padding:5px; border:1px solid #3b82f6; border-radius:4px;">
+        <input type="text" id="edit-input-${id}" value="${escaped}" style="width:100%; padding:5px; border:1px solid #3b82f6; border-radius:4px;">
         <div style="margin-top:5px;">
-            <button onclick="window.saveEditComment('${id}')" style="background:#22c55e; color:white; border:none; padding:3px 8px; border-radius:4px;">Save</button>
-            <button onclick="window.cancelEditComment('${id}')" style="background:#64748b; color:white; border:none; padding:3px 8px; border-radius:4px;">Cancel</button>
+            <button onclick="window.saveEditComment('${id}')" style="background:#22c55e; color:white; border:none; padding:10px 14px; border-radius:4px; min-height:44px;">Save</button>
+            <button onclick="window.cancelEditComment('${id}')" style="background:#64748b; color:white; border:none; padding:10px 14px; border-radius:4px; min-height:44px;">Cancel</button>
         </div>
     `;
 };

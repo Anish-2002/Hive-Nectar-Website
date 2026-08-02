@@ -127,7 +127,7 @@
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-overlay.active .modal-content { transform: scale(1); }
 
-        .modal-img-animated {
+        .modal-img-animated { max-width:100%; height:auto;
             width: 200px;
             height: 200px;
             margin: 0 auto;
@@ -158,7 +158,8 @@
         }
 
         .btn-claim:hover { transform: scale(1.03); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
-    </style>
+    @media (max-width:480px){ .modal-content { padding:28px 20px; } }
+</style>
 </head>
 <body>
 

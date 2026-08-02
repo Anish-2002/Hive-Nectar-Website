@@ -159,33 +159,79 @@ window.showUserDetail = async (userId) => {
 };
 
 window.awardPoints = async (userId) => {
-  const amount = prompt('How many nectar points to add?', '10');
-  if (!amount || isNaN(amount)) return;
-  const { data: p } = await supabase.from('profiles').select('nectar_points').eq('id', userId).single();
-  const pts = (p?.nectar_points || 0) + parseInt(amount);
-  await supabase.from('profiles').update({ nectar_points: pts }).eq('id', userId);
-  toast(`Added ${amount} points`, 'success');
-  loadUsers();
-  showUserDetail(userId);
+  // iOS Safari has no prompt() — use a small in-page modal instead
+  promptModal(
+    'Award Nectar Points',
+    'How many nectar points to add?',
+    '10',
+    async (amount) => {
+      if (!amount || isNaN(amount)) return;
+      const { data: p } = await supabase.from('profiles').select('nectar_points').eq('id', userId).single();
+      const pts = (p?.nectar_points || 0) + parseInt(amount);
+      await supabase.from('profiles').update({ nectar_points: pts }).eq('id', userId);
+      toast(`Added ${amount} points`, 'success');
+      loadUsers();
+      showUserDetail(userId);
+    }
+  );
 };
 
 window.changeUserTier = async (userId) => {
-  const tier = prompt('Enter tier (free / plus / steward / collective):', 'free');
-  if (!tier || !['free', 'plus', 'steward', 'collective'].includes(tier)) return;
-  const updates = { tier };
-  // If downgrading to free, clear subscription data too
-  if (tier === 'free') {
-    updates.subscription_status = null;
-    updates.subscription_tier = null;
-    updates.stripe_subscription_id = null;
-    updates.subscription_current_period_end = null;
-    updates.subscription_cancel_at_period_end = false;
-  }
-  await supabase.from('profiles').update(updates).eq('id', userId);
-  toast(`Tier changed to ${tier}`, 'success');
-  loadUsers();
-  showUserDetail(userId);
+  promptModal(
+    'Change Membership Tier',
+    'Enter tier (free / plus / steward / collective):',
+    'free',
+    async (tier) => {
+      if (!tier || !['free', 'plus', 'steward', 'collective'].includes(tier)) return;
+      const updates = { tier };
+      // If downgrading to free, clear subscription data too
+      if (tier === 'free') {
+        updates.subscription_status = null;
+        updates.subscription_tier = null;
+        updates.stripe_subscription_id = null;
+        updates.subscription_current_period_end = null;
+        updates.subscription_cancel_at_period_end = false;
+      }
+      await supabase.from('profiles').update(updates).eq('id', userId);
+      toast(`Tier changed to ${tier}`, 'success');
+      loadUsers();
+      showUserDetail(userId);
+    }
+  );
 };
+
+// Cross-device prompt replacement (prompt() is unsupported on iOS Safari)
+function promptModal(title, label, defaultValue, onSubmit) {
+  let modal = document.getElementById('promptModalRoot');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'promptModalRoot';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+  } else {
+    modal.innerHTML = '';
+    modal.style.display = 'flex';
+  }
+  modal.innerHTML = `
+    <div style="background:var(--card);border-radius:16px;padding:24px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <h3 style="margin:0 0 6px;font-size:1.1rem;color:var(--fg);">${title}</h3>
+      <p style="margin:0 0 14px;font-size:0.9rem;color:var(--fg-muted);">${label}</p>
+      <input id="promptModalInput" type="text" value="${defaultValue}"
+        style="width:100%;padding:12px;font-size:16px;border:2px solid var(--border);border-radius:10px;box-sizing:border-box;"
+        autocomplete="off">
+      <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+        <button id="promptModalCancel" class="btn btn-secondary" style="padding:10px 18px;">Cancel</button>
+        <button id="promptModalOk" class="btn" style="padding:10px 18px;">OK</button>
+      </div>
+    </div>`;
+  const input = modal.querySelector('#promptModalInput');
+  const ok = () => { const v = input.value; modal.remove(); onSubmit(v); };
+  modal.querySelector('#promptModalOk').addEventListener('click', ok);
+  modal.querySelector('#promptModalCancel').addEventListener('click', () => modal.remove());
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok(); });
+  input.focus();
+}
 
 // ======================== TASKS ========================
 let allTasks = [];
@@ -212,8 +258,8 @@ async function loadTasks() {
         </label>
       </td>
       <td>
-        <button class="btn btn-secondary" style="padding:3px 8px;font-size:0.7rem;" onclick="editTask('${t.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-secondary" style="padding:3px 8px;font-size:0.7rem;" onclick="deleteTask('${t.id}')"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-secondary" style="padding:10px 12px;font-size:0.75rem;min-height:44px;" onclick="editTask('${t.id}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-secondary" style="padding:10px 12px;font-size:0.75rem;min-height:44px;" onclick="deleteTask('${t.id}')"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('');
 }
@@ -296,7 +342,7 @@ async function loadAchievementsQuick() {
   const mActive = milestones?.filter(m => m.active !== false).length || 0;
   const tActive = tokens?.filter(t => t.active !== false).length || 0;
   document.getElementById('achievementsQuick').innerHTML = `
-    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-grid">
       <div class="stat-card"><div class="num">${milestones?.length || 0}</div><div class="label">Total Milestones</div></div>
       <div class="stat-card"><div class="num">${tokens?.length || 0}</div><div class="label">Total Tokens</div></div>
       <div class="stat-card"><div class="num">${mActive + tActive}</div><div class="label">Active</div></div>
@@ -455,12 +501,13 @@ async function loadActiveSubs() {
     .neq('tier', 'free')
     .order('subscription_status');
   const c = document.getElementById('activeSubsList');
+  const wrapTbl = (html) => `<div style="overflow-x:auto;">${html}</div>`;
   if (!c) return;
   if (error) { c.innerHTML = `<p class="tiny muted">Error loading: ${error.message}</p>`; return; }
   if (!data?.length) { c.innerHTML = '<p class="tiny muted">No active subscribers.</p>'; return; }
-  c.innerHTML = `<table class="admin-table"><thead><tr><th>Email</th><th>Tier</th><th>Status</th><th>Period End</th></tr></thead><tbody>
+  c.innerHTML = wrapTbl(`<table class="admin-table"><thead><tr><th>Email</th><th>Tier</th><th>Status</th><th>Period End</th></tr></thead><tbody>
     ${data.map(s => `<tr><td>${s.email || s.id.slice(0,12)}</td><td>${s.tier}</td><td><span class="pill ${s.subscription_status}">${s.subscription_status}</span></td><td class="tiny">${s.subscription_current_period_end ? new Date(s.subscription_current_period_end).toLocaleDateString() : '—'}</td></tr>`).join('')}
-  </tbody></table>`;
+  </tbody></table>`);
 }
 
 // ======================== ADMINS ========================
@@ -471,7 +518,7 @@ async function loadAdmins() {
     <tr>
       <td>${a.email}</td>
       <td class="tiny">${a.added_at ? new Date(a.added_at).toLocaleDateString() : '—'}</td>
-      <td>${a.email !== 'anhishgautam@gmail.com' ? `<button class="btn btn-secondary" style="padding:3px 8px;font-size:0.7rem;" onclick="removeAdmin('${a.email}')"><i class="fas fa-times"></i></button>` : '<span class="tiny muted">Owner</span>'}</td>
+      <td>${a.email !== 'anhishgautam@gmail.com' ? `<button class="btn btn-secondary" style="padding:10px 12px;font-size:0.75rem;min-height:44px;" onclick="removeAdmin('${a.email}')"><i class="fas fa-times"></i></button>` : '<span class="tiny muted">Owner</span>'}</td>
     </tr>`).join('');
 }
 

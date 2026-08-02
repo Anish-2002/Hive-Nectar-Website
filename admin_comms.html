@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   
 </head>
-<body class="page-admin" data-loadingdata-theme="classic">
+<body class="page-admin" data-loading data-theme="classic">
 
 <header class="header">
   <a href="the-meadow.html" class="logo-area" style="text-decoration: none; color: inherit;">
@@ -35,7 +35,7 @@
         <textarea id="desc" placeholder="Post Description" rows="4"></textarea>
         <button class="btn" onclick="savePost()">Publish to Board</button>
         <hr>
-        <button onclick="localStorage.removeItem('admin_comms'); alert('Cleared');" style="color:red; background:none; border:none; cursor:pointer;">Clear All Posts</button>
+        <button onclick="localStorage.removeItem('admin_comms'); showMsg('Cleared');" style="color:red; background:none; border:none; cursor:pointer; padding:8px; min-height:44px;">Clear All Posts</button>
     </div>
 
 <footer class="footer">
@@ -63,10 +63,26 @@
             data.posts.unshift(newPost);
             localStorage.setItem('admin_comms', JSON.stringify(data));
 
-            alert("Post Published!");
+            showMsg("Post Published!");
             document.getElementById('title').value = '';
             document.getElementById('desc').value = '';
         }
+    </script>
+    <script>
+      // Minimal toast replacement (alert() is suppressed in some mobile WebViews)
+      function showMsg(msg) {
+        let t = document.getElementById('adminMsg');
+        if (!t) {
+          t = document.createElement('div');
+          t.id = 'adminMsg';
+          t.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:100000;background:var(--card);border:1px solid var(--border);border-left:5px solid var(--primary);padding:14px 20px;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.15);font-weight:600;max-width:calc(100vw - 32px);';
+          document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.style.display = 'block';
+        clearTimeout(t._h);
+        t._h = setTimeout(() => { t.style.display = 'none'; }, 2200);
+      }
     </script>
 <script>
   // Auth guard — redirect to login if not authenticated
@@ -83,5 +99,6 @@
 <div id="global-loader" class="loader-overlay" style="display: none;">
   <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
 </div>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

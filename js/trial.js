@@ -295,7 +295,7 @@ async function loadBriefs() {
 
 function renderBriefsTable(briefs) {
   if (!briefs.length) return '<p class="tiny muted">No policy briefs yet.</p>';
-  let html = `<table class="briefs-table"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+  let html = `<div style="overflow-x:auto;"><table class="briefs-table"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
   for (const b of briefs) {
     const statusClass = b.status === 'published' ? 'status-published' : 'status-draft';
     html += `
@@ -310,7 +310,7 @@ function renderBriefsTable(briefs) {
       </tr>
     `;
   }
-  html += `</tbody></table>`;
+  html += `</tbody></table></div>`;
   return html;
 }
 

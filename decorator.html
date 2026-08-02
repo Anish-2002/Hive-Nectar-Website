@@ -45,12 +45,12 @@
     }
 
     #canvas {
-      width: min(94vw, 900px);
-      max-width: 900px;
-      aspect-ratio: 900 / 650;
+      width: 100%;
+      max-width: min(96vw, calc((100dvh - 300px) * 0.6));
+      aspect-ratio: 900 / 1500;
       background: radial-gradient(ellipse 80% 90% at 50% 42%, #3d2212 0%, #1e1007 55%, #0c0704 100%);
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.35), 0 0 30px rgba(212,160,23,0.12);
+      border-radius: 20px;
+      box-shadow: 0 12px 44px rgba(0,0,0,0.30), 0 0 34px rgba(212,160,23,0.14);
       cursor: pointer;
       touch-action: none;
       display: block;
@@ -69,12 +69,12 @@
       flex-shrink: 0;
     }
 
-    #token-count-bar {
-      display: flex; align-items: center; gap: 14px; margin-bottom: 8px;
-    }
     #token-count { font-size: 13px; font-weight: 800; color: var(--primary-dark); letter-spacing: .03em; }
     #token-count span { color: var(--fg); font-size: 14px; }
 
+    #token-count-bar {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 8px;
+    }
     #clear-btn {
       background: rgba(200, 120, 30, 0.12);
       border: 1px solid rgba(180, 120, 40, 0.4);
@@ -208,7 +208,7 @@
 </div>
 
 <div id="jar-scene">
-  <canvas id="canvas" width="900" height="650"></canvas>
+  <canvas id="canvas" width="900" height="1500"></canvas>
 </div>
 
 <!-- Action buttons: just below the jar -->
@@ -237,14 +237,14 @@
   const ctx = canvas.getContext('2d');
 
   const jar = {
-    cx: 520, cy: 380,
+    cx: 450, cy: 920,
     bodyRadius: 122,
     neckRadius: 100,
     neckTopY: 235,
-    lidRestX: 520, lidRestY: 189, // tilted low edge (left, -14°) sits on jar NECK TOP line (217.6)
-    lidOpenX: 520, lidOpenY: 100,
-    lidRadius: 62,      // fits over new jar rim (rim radius ≈ 55)
-    lidThickness: 20    // proportional skirt height
+    lidRestX: 450, lidRestY: 330, // tilted low edge on jar NECK TOP line (415.6)
+    lidOpenX: 450, lidOpenY: 190,
+    lidRadius: 187,    // fits bigger jar rim (rim radius ≈ 172)
+    lidThickness: 62   // proportional skirt height
   };
 
   const lidState = {
@@ -261,7 +261,7 @@
   let honeySplash = 0;    // splash intensity while filling settles
 
   const dustParticles = Array.from({ length: 45 }, () => ({
-    x: Math.random() * 900, y: Math.random() * 650,
+    x: Math.random() * 900, y: Math.random() * 1500,
     radius: Math.random() * 2 + 0.8, alpha: Math.random(),
     speedY: -0.2 - Math.random() * 0.3,
     pulseSpeed: 0.01 + Math.random() * 0.02
@@ -270,12 +270,12 @@
   let honeyBubbles = [];
 
   const bees = [
-    { x: 260, y: 150, scale: 0.85, angle: -0.2, orbitRadius: 20, speed: 1.2 },
-    { x: 380, y: 220, scale: 0.75, angle: 0.3, orbitRadius: 15, speed: 1.5 },
-    { x: 740, y: 240, scale: 0.9, angle: -0.4, orbitRadius: 25, speed: 0.9 },
-    { x: 250, y: 380, scale: 0.8, angle: 0.1, orbitRadius: 18, speed: 1.1 },
-    { x: 770, y: 460, scale: 0.85, angle: -0.3, orbitRadius: 22, speed: 1.3 },
-    { x: 310, y: 580, scale: 0.95, angle: -0.1, orbitRadius: 12, speed: 1.0 }
+    { x: 90,  y: 320,  scale: 1.0, angle: -0.2, orbitRadius: 24, speed: 1.2 },
+    { x: 105, y: 760,  scale: 0.9, angle: 0.3,  orbitRadius: 18, speed: 1.5 },
+    { x: 810, y: 360,  scale: 1.05, angle: -0.4, orbitRadius: 28, speed: 0.9 },
+    { x: 85,  y: 1180, scale: 0.95, angle: 0.1,  orbitRadius: 20, speed: 1.1 },
+    { x: 825, y: 800,  scale: 1.0, angle: -0.3, orbitRadius: 24, speed: 1.3 },
+    { x: 800, y: 1240, scale: 1.1, angle: -0.1, orbitRadius: 16, speed: 1.0 }
   ];
 
   function lerp(a, b, t) { return a + (b - a) * t; }
@@ -315,9 +315,35 @@
     }
   }
 
+  // Lid version of a token SVG: strips the full-bleed white background circle
+  // so the icon sits directly on the lid surface (tray keeps the original).
+  // All 60 bucket SVGs share the exact same disc: <circle cx="42" cy="42" r="42" fill="white"/>
+  async function buildLidImage(iconUrl) {
+    try {
+      const res = await fetch(iconUrl);
+      const svg = (await res.text())
+        .replace(/<circle\s+cx="42"\s+cy="42"\s+r="42"\s+fill="white"\s*\/>/i, '');
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+      return img; // .complete flips when loaded; drawTokenImage checks it
+    } catch {
+      return null; // fall back to the original icon
+    }
+  }
+
+  // Sticker radius for a given sticker count on the lid (rx = wood-face radius).
+  // Each sticker fills its wedge: 1 = full cap, 2 = halves, 3 = sector slices
+  // (largest circle inscribed in the wedge — 2: d=r=rx/2, 3: d=0.536rx, r=0.464rx).
+  function stickerSize(count, rx) {
+    if (count <= 1) return rx * 1.02;
+    if (count === 2) return rx * 0.5;
+    return rx * 0.464;
+  }
+
   // ─── Honey fill: earned / total (0..1), animated height ───
   // Reference jar silhouette (280x430 viewBox) mapped to canvas coords
-  const JAR_S = 0.837; // scale factor
+  const JAR_S = 2.6; // scale factor (bigger jar — 67% width, 64% height of canvas)
   const jx = (rx) => jar.cx + (rx - 140) * JAR_S;
   const jy = (ry) => jar.cy + (ry - 232) * JAR_S;
 
@@ -351,7 +377,7 @@
     ctx.save();
     ctx.globalAlpha = 0.14;
     ctx.strokeStyle = 'rgba(140,60,0,0.9)';
-    ctx.lineWidth = 0.8;
+    ctx.lineWidth = 2.2;
     HONEYCOMB_ROWS.forEach((p) => {
       ctx.beginPath();
       ctx.moveTo(jx(p[0]), jy(p[1]));
@@ -370,7 +396,7 @@
     // Drop shadow
     ctx.fillStyle = 'rgba(0,0,0,0.65)';
     ctx.beginPath();
-    ctx.ellipse(x, y + 175, 140, 28, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, jy(424) + 16, 300, 55, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Honey fill — level = honeyDisplay (animated, rises from bottom on load)
@@ -380,7 +406,7 @@
     ctx.clip();
 
     // Honey-core radial gradient (reference honeyCore)
-    const core = ctx.createRadialGradient(x, jy(280), 10, x, jy(300), 150);
+    const core = ctx.createRadialGradient(x, jy(280), 30, x, jy(300), 460);
     core.addColorStop(0, '#fffef0');
     core.addColorStop(0.06, '#fff5a0');
     core.addColorStop(0.18, '#ffe040');
@@ -393,20 +419,20 @@
 
     // Wavy honey surface: rolling sea-like waves at the fill level
     // Two sine components for organic motion; always animated once filled
-    const amp = 7 + honeySplash * 6;
-    const waveAmp = Math.max(3, amp * (0.55 + 0.45 * honeyDisplay));
+    const amp = 22 + honeySplash * 18;
+    const waveAmp = Math.max(9, amp * (0.55 + 0.45 * honeyDisplay));
     const leftX = jx(30), rightX = jx(250);
-    const topBand = fillTop - waveAmp * 2 - 10;
+    const topBand = fillTop - waveAmp * 2 - 30;
     // Darken the band above the wave so the wave reads as a surface edge
     ctx.fillStyle = 'rgba(120,40,0,0.35)';
-    ctx.fillRect(leftX, topBand, rightX - leftX, waveAmp * 3 + 16);
+    ctx.fillRect(leftX, topBand, rightX - leftX, waveAmp * 3 + 48);
 
     // Build the wave surface path (two summed sines = rolling sea)
     const surfPts = [];
-    for (let px = leftX; px <= rightX; px += 3) {
+    for (let px = leftX; px <= rightX; px += 6) {
       const wy = fillTop
-        + Math.sin(px * 0.035 + honeyWavePhase) * waveAmp
-        + Math.sin(px * 0.09 + honeyWavePhase * 1.7) * waveAmp * 0.45;
+        + Math.sin(px * 0.02 + honeyWavePhase) * waveAmp
+        + Math.sin(px * 0.05 + honeyWavePhase * 1.7) * waveAmp * 0.45;
       surfPts.push([px, wy]);
     }
     // Honey below the wave
@@ -420,25 +446,25 @@
     ctx.fill();
     // Wave crest foam line following the surface
     ctx.strokeStyle = 'rgba(255,250,190,0.85)';
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 6;
     ctx.beginPath();
     surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy) : ctx.lineTo(px, wy)));
     ctx.stroke();
     // Soft second foam edge just below the crest
     ctx.strokeStyle = 'rgba(255,235,140,0.35)';
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
-    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy + 3) : ctx.lineTo(px, wy + 3)));
+    surfPts.forEach(([px, wy], i) => (i === 0 ? ctx.moveTo(px, wy + 9) : ctx.lineTo(px, wy + 9)));
     ctx.stroke();
 
     // Surface shimmer line at honey level
-    const shimmer = ctx.createLinearGradient(0, fillTop - 6, 0, fillTop + 6);
+    const shimmer = ctx.createLinearGradient(0, fillTop - 18, 0, fillTop + 18);
     shimmer.addColorStop(0, 'rgba(255,250,180,0)');
     shimmer.addColorStop(0.5, 'rgba(255,255,200,0.9)');
     shimmer.addColorStop(1, 'rgba(255,230,100,0)');
     ctx.fillStyle = shimmer;
     ctx.beginPath();
-    ctx.ellipse(x, fillTop, jx(250) - x, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, fillTop, jx(250) - x, 21, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Honeycomb matrix behind honey
@@ -448,7 +474,7 @@
     honeyBubbles.forEach((b) => {
       if (b.y < fillTop) return;
       ctx.strokeStyle = `rgba(255,235,170,${b.alpha})`;
-      ctx.lineWidth = 1.2;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
       ctx.stroke();
@@ -583,16 +609,17 @@
         ctx.fill();
         ctx.stroke();
 
-        let dist = 0, sc = 1.15;
-        if (count === 2) { dist = rx * 0.45; sc = 0.78; }
-        else if (count === 3) { dist = rx * 0.52; sc = 0.62; }
-        if (count === 1) { dist = 0; sc = 1.0; }
+        // Wedge centers match stickerSize: 1 → center, 2 → 0.5rx, 3 → 0.536rx
+        const dist = count === 1 ? 0 : (count === 2 ? rx * 0.5 : rx * 0.536);
 
         const ratio = (ry === rx) ? 1 : ry / rx;
         const lx = Math.cos(midA) * dist;
         const ly = Math.sin(midA) * dist * ratio;
         ctx.translate(lx, ly);
-        drawTokenImage(sticker.img, 0, 0, rx * 0.42 * (sc * 1.1));
+        // Squash the sticker with the lid surface so it reads as painted on,
+        // not a coin standing on top (top view: ratio = 1, no squash)
+        ctx.scale(1, ratio);
+        drawTokenImage(sticker.lidImg || sticker.img, 0, 0, stickerSize(count, rx));
         ctx.restore();
       });
     }
@@ -861,26 +888,32 @@
     let curX, curY;
     if (flyingToken.isPlacing) {
       curX = lerp(flyingToken.startX, jar.lidOpenX, t);
-      curY = lerp(flyingToken.startY, jar.lidOpenY, t) - Math.sin(t * Math.PI) * 60;
+      curY = lerp(flyingToken.startY, jar.lidOpenY, t) - Math.sin(t * Math.PI) * Math.abs(jar.lidOpenY - flyingToken.startY) * 0.45;
     } else {
       // Removal: fly from open lid position to the lid rest spot
       curX = lerp(jar.lidOpenX, jar.lidRestX, t);
-      curY = lerp(jar.lidOpenY, jar.lidRestY, t) - Math.sin(t * Math.PI) * 60;
+      curY = lerp(jar.lidOpenY, jar.lidRestY, t) - Math.sin(t * Math.PI) * Math.abs(jar.lidRestY - jar.lidOpenY) * 0.45;
     }
     ctx.save();
     ctx.translate(curX, curY);
+    // Halo + icon scale with the lid so the flying token matches the
+    // sticker it lands as (consistent on mobile + desktop)
+    const u = jar.lidRadius / 96;
+    const woodRx = 82 * u;
+    const flyIcon = stickerSize(placed.length + 1, woodRx); // size it lands as
+    const haloR = flyIcon * 1.85;
     ctx.fillStyle = 'rgba(255,215,0,0.4)';
     ctx.beginPath();
-    ctx.arc(0, 0, 48, 0, Math.PI * 2);
+    ctx.arc(0, 0, haloR, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#D1D1D1';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = Math.max(2.5, haloR * 0.07);
     ctx.beginPath();
-    ctx.arc(0, 0, 42, 0, Math.PI * 2);
+    ctx.arc(0, 0, flyIcon * 1.6, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    drawTokenImage(flyingToken.img, 0, 0, 26);
+    drawTokenImage(flyingToken.img, 0, 0, flyIcon);
     ctx.restore();
   }
 
@@ -929,7 +962,7 @@
     dustParticles.forEach((p) => {
       p.y += p.speedY;
       p.alpha += Math.sin(p.y * 0.05) * p.pulseSpeed;
-      if (p.y < 0) p.y = 650;
+      if (p.y < 0) p.y = 1500;
       ctx.fillStyle = `rgba(255,220,130,${Math.max(0.1, Math.min(0.85, p.alpha))})`;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -1013,20 +1046,20 @@
 
   function render(time) {
     updateAnimations();
-    ctx.clearRect(0, 0, 900, 650);
+    ctx.clearRect(0, 0, 900, 1500);
 
     // Version stamp — tells us which build the browser is actually running
     ctx.fillStyle = 'rgba(255,220,130,0.35)';
     ctx.font = '10px Nunito, sans-serif';
-    ctx.fillText('v3-canvas', 860, 640);
+    ctx.fillText('v3-canvas', 850, 1490);
 
     // Background
-    const bgGrad = ctx.createRadialGradient(jar.cx, jar.cy - 50, 50, jar.cx, jar.cy, 600);
+    const bgGrad = ctx.createRadialGradient(jar.cx, jar.cy - 120, 80, jar.cx, jar.cy, 900);
     bgGrad.addColorStop(0, '#3d2212');
     bgGrad.addColorStop(0.5, '#1e1007');
     bgGrad.addColorStop(1, '#090402');
     ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, 900, 650);
+    ctx.fillRect(0, 0, 900, 1500);
 
     drawDust();
     drawMasonJar();
@@ -1042,7 +1075,7 @@
     const rect = canvas.getBoundingClientRect();
     return {
       x: (e.clientX - rect.left) * (900 / rect.width),
-      y: (e.clientY - rect.top) * (650 / rect.height)
+      y: (e.clientY - rect.top) * (1500 / rect.height)
     };
   }
 
@@ -1060,7 +1093,7 @@
         flyingToken = {
           targetSticker: { ...lastPlaced },
           startX: jar.lidOpenX, startY: jar.lidOpenY,
-          name: lastPlaced.name, img: lastPlaced.img,
+          name: lastPlaced.name, img: lastPlaced.lidImg || lastPlaced.img,
           progress: 0, isPlacing: false
         };
         lidState.status = 'OPENING';
@@ -1113,15 +1146,27 @@
         const rect = canvas.getBoundingClientRect();
         const bRect = btn.getBoundingClientRect();
         const sx = (bRect.left + bRect.width / 2 - rect.left) * (900 / rect.width);
-        const sy = (bRect.top + bRect.height / 2 - rect.top) * (650 / rect.height);
+        // Clamp start so the token always begins just above the canvas,
+        // regardless of tray position (consistent on mobile + desktop)
+        const sy = Math.min(
+          (bRect.top + bRect.height / 2 - rect.top) * (1500 / rect.height),
+          jar.lidOpenY - 120
+        );
         flyingToken = {
           targetSticker: tk,
           startX: sx, startY: sy,
-          name: tk.name, img: tk.img,
+          name: tk.name, img: tk.lidImg || tk.img,
           progress: 0, isPlacing: true
         };
         lidState.status = 'OPENING';
         lidState.progress = 0;
+      });
+      // Mobile: pointerdown fires instantly on touch (no 300ms delay,
+      // reliable with touch-action:none) — guard against double-fire
+      btn.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'touch') return;
+        e.preventDefault();
+        btn.click();
       });
       trayTokensEl.appendChild(btn);
     });
@@ -1196,7 +1241,7 @@
       honeyBubbles = Array.from({ length: 55 }, () => ({
         x: jx(24) + (jx(256) - jx(24)) * Math.random(),
         y: jy(120) + (jy(408) - jy(120)) * Math.random(),
-        r: Math.random() * 6 + 2,
+        r: Math.random() * 18 + 6,
         alpha: 0.3 + Math.random() * 0.5
       }));
     } catch (err) {
@@ -1236,11 +1281,18 @@
         const { data: tokenDefs } = await supabase
           .from('tokens')
           .select('id, name, icon_url')
-          .in('id', tokenIds);
+          .in('id', tokenIds)
+          .eq('active', true);
         tokens = (tokenDefs || []).map(t => {
           const img = new Image();
           if (t.icon_url) img.src = t.icon_url;
-          return { id: t.id, name: t.name, icon: t.icon_url || '', img };
+          const tk = { id: t.id, name: t.name, icon: t.icon_url || '', img, lidImg: img };
+          if (t.icon_url) {
+            buildLidImage(t.icon_url).then(lidImg => {
+              if (lidImg) tk.lidImg = lidImg;
+            });
+          }
+          return tk;
         });
       }
 

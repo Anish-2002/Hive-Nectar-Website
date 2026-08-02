@@ -113,7 +113,7 @@ window.invitePartner = async function () {
 
   const modal = document.createElement('div');
   modal.id = 'inviteModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;box-sizing:border-box;';
   modal.innerHTML = `
     <div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">
       <h3 style="margin:0 0 8px;font-size:1.3rem;">🤝 Invite a Partner</h3>
@@ -229,7 +229,7 @@ function showAcceptDialog(code) {
 
   const modal = document.createElement('div');
   modal.id = 'acceptModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;box-sizing:border-box;';
   modal.innerHTML = `
     <div style="background:#fff;border-radius:16px;padding:24px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">
       <div style="font-size:3rem;margin-bottom:8px;">🤝</div>
