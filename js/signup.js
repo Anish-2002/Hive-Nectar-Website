@@ -8,7 +8,7 @@ async function triggerWelcomeEmail(userId, email, firstName) {
   // Fetch sender name from config (changeable via Supabase without code edit)
   const senderName = await getConfig('sender_name') || 'The Meadow';
   const subject = await getConfig('welcome_email_subject') || 'Welcome to The Meadow! 🌿';
-  const siteUrl = await getConfig('site_url') || 'https://hivernectar.earth';
+  const siteUrl = await getConfig('site_url') || 'https://www.hivenectar.earth';
 
   await sendEmail(
     email,

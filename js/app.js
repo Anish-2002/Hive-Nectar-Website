@@ -220,10 +220,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         signupForm.addEventListener('submit', handleSignup);
     }
 
-    if (window.location.hash.includes('type=recovery')) {
+    // Recovery links point straight at reset-password.html. Only bounce pages that are
+    // NOT already the reset page: replacing the URL there drops the #access_token
+    // fragment before the SDK has stored the session, which breaks the reset.
+    if (window.location.hash.includes('type=recovery') && !path.includes('reset-password')) {
         supabase.auth.onAuthStateChange(async (event) => {
             if (event === "PASSWORD_RECOVERY") {
-                showToast("Verification Successful! Redirecting to reset page...");
                 window.location.replace('./reset-password.html');
             }
         });

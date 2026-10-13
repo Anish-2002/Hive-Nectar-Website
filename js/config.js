@@ -2,7 +2,7 @@
  * Config helper — fetches settings from the app_config table in Supabase.
  * Caches in memory so it's only fetched once per page load.
  */
-import { supabase } from './supabase-config.js';
+import { supabase, SUPABASE_URL } from './supabase-config.js';
 
 let configCache = null;
 let configPromise = null;
@@ -48,8 +48,9 @@ export function clearConfigCache() {
  * Used by contact form, broadcast notifications, and welcome email.
  */
 export async function sendEmail(to, subject, html) {
-  const siteUrl = await getConfig('site_url') || 'https://hivernectar.earth';
-  const functionUrl = `${siteUrl.replace(/\/$/, '')}/functions/v1/send-email`;
+  // The edge function lives on the Supabase project host, NOT on the website host.
+  // This used app_config.site_url -> https://www.hivenectar.earth/functions/v1/... -> 404.
+  const functionUrl = `${SUPABASE_URL}/functions/v1/send-email`;
 
   try {
     const { data: { session } } = await supabase.auth.getSession();

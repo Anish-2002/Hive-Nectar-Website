@@ -6,11 +6,15 @@
   <title>Communication Board | The Meadow</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" />
+  <link rel="stylesheet" href="meadow-theme.css" />
 </head>
-<body class="page-board" data-theme="classic">
+<body class="page-board" data-loading data-theme="classic">
 
 <header class="header" data-testid="main-header">
-  <a href="index.html" class="logo-area" data-testid="logo-link">
+  <a href="the-meadow.html" class="logo-area" data-testid="logo-link">
     <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
     <span class="brand-title">THE MEADOW</span>
   </a>
@@ -18,9 +22,8 @@
     <i class="fas fa-bars"></i>
   </button>
   <nav class="nav-links" id="navLinks" data-testid="nav-links">
-    <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
     <a href="the-meadow.html">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
     <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
@@ -91,7 +94,7 @@
       <div class="sidebar-card" style="background: var(--honey-gradient); color: white; border: none;">
         <h4 style="color: white;"><i class="fas fa-seedling" style="color: white;"></i> Not a Member?</h4>
         <p style="color: rgba(255,255,255,0.9); margin: 0 0 16px; font-size: 0.9rem;">Join The Meadow and start your journey today.</p>
-        <a href="join.html" class="btn" style="background: rgb(63, 71, 45); color: var(--primary-dark); width: 100%;">Join Now</a>
+        <a href="join.html" class="btn" style="background: rgb(63, 71, 45); color: #fff; width: 100%;">Join Now</a>
       </div>
     </aside>
   </div>
@@ -139,14 +142,11 @@
   }
 </script>
 
-<script>
-  (async () => {
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-    const supabase = createClient('https://gxboojbfmpejbjolfmjq.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4Ym9vamJmbXBlamJqb2xmbWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNjU3ODMsImV4cCI6MjA4ODk0MTc4M30.huabAJX_-DYFy06yrvjyBMR_bo6XC43B2O12zHt7Xos');
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) window.location.href = 'login.html';
-  })();
-</script>
+<!-- Communication Board is public: non-members can read every post.
+     Creating/editing posts is admin-only (enforced by RLS), so no sign-in gate here. -->
 
+<div id="global-loader" class="loader-overlay" style="display: none;">
+  <div class="loader-content"><div class="buffering-icon"></div><p id="loader-text">Loading...</p></div>
+</div>
 </body>
 </html>

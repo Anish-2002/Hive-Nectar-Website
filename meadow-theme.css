@@ -1,0 +1,297 @@
+@charset "UTF-8";
+/* ==========================================================================
+   THE MEADOW — SHARED THEME SHEET
+   Design port of files/profile.css · tokens: design/DESIGN.md (lint-clean)
+   Linked LAST in <head> of every page. On profile.html it is linked BEFORE
+   profile-meadow.css, which keeps owning the profile page's own components.
+
+   WHY !important: js/app.js applyTheme() writes the palette as INLINE custom
+   properties on <html>. Only an !important declaration can outrank inline
+   styles, so the app's own variable names are remapped here.
+
+   ADDITIVE ONLY: colour, typography, radii, borders, shadows, focus rings.
+   No display / position / size / margin rules — layout is untouched.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 1 · TOKENS
+   Design tokens are namespaced --m-* so they never collide with the
+   page-profile sheet's unprefixed tokens.                                   */
+html {
+  --m-bg: #F6F4EC;
+  --m-surface: #FDFCF8;
+  --m-topbar: #F9F7F1;
+  --m-ink: #2E4A37;
+  --m-text: #46564B;
+  --m-muted: #626C65;
+  --m-faint: #6A786C;
+  --m-line: #E4E7DA;
+  --m-soft: #F1F3E9;
+  --m-sage1: #E7ECDC;
+  --m-sage2: #DCE4CF;
+  --m-sage3: #C5D2BA;
+  --m-sage5: #7A9170;
+  --m-green: #3E5A44;
+  --m-gold: #F0E8CB;
+  --m-clay: #A8574A;
+  --m-clayb: #F4E3DA;
+  --m-t2: #C98B6B;
+  --m-t2ink: #8A4B2A;
+
+  --m-sh: 0 1px 2px rgba(50, 70, 50, .06), 0 8px 24px rgba(50, 70, 50, .05);
+  --m-sh-hover: 0 2px 4px rgba(50, 70, 50, .07), 0 14px 34px rgba(50, 70, 50, .10);
+  --m-ring: 0 0 0 3px rgba(122, 145, 112, .35);
+
+  /* remap the app's own variables (must outrank js/app.js inline vars) */
+  --bg: #F6F4EC !important;
+  --card: #FDFCF8 !important;
+  --primary: #3E5A44 !important;
+  --primary-dark: #3E5A44 !important;
+  --secondary: #E7ECDC !important;
+  --fg: #46564B !important;
+  --fg-muted: #626C65 !important;
+  --border: #E4E7DA !important;
+  --border-light: #E4E7DA !important;
+  --honey-gradient: linear-gradient(135deg, #3E5A44 0%, #2E4A37 100%) !important;
+  --honey-gradient-dark: linear-gradient(135deg, #2E4A37 0%, #151A16 100%) !important;
+  --honey-glow: 0 10px 30px rgba(62, 90, 68, .18) !important;
+  --card-shadow: var(--m-sh) !important;
+  --card-shadow-hover: var(--m-sh-hover) !important;
+  --error: #A8574A !important;
+  --error-light: #F4E3DA !important;
+  --success: #3E5A44 !important;
+}
+
+/* ------------------------------------------------------------------ 2 · BASE */
+body {
+  background-color: var(--m-bg) !important;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(122, 145, 112, .07) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(62, 90, 68, .06) 0%, transparent 50%) !important;
+  color: var(--m-text) !important;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6, .section-title {
+  font-family: Newsreader, Georgia, 'Times New Roman', serif !important;
+  color: var(--m-ink) !important;
+  letter-spacing: -.01em;
+  font-weight: 600 !important;
+}
+h1 { font-weight: 500 !important; line-height: 1.12; }
+h2 { line-height: 1.18; }
+
+/* body copy inherits, so surfaces that set their own colour (dark heroes,
+   gradient banners) keep readable text instead of being forced to ink */
+p, li, td, label, dd, dt { color: inherit; }
+.muted, .text-muted, small { color: var(--m-muted); }
+.section-title, .eyebrow, [class*="eyebrow"] { text-transform: none; }
+
+/* headings inside light-on-dark surfaces (the app paints these with
+   var(--honey-gradient) + color:white) must inherit that white, not ink */
+.hero-card h1, .hero-card h2, .hero-card h3, .hero-card h4, .hero-card p, .hero-card li, .hero-card span,
+.stats-banner h1, .stats-banner h2, .stats-banner h3, .stats-banner h4, .stats-banner p, .stats-banner div, .stats-banner span,
+.login-card h1, .login-card h2, .login-card h3, .login-card h4, .login-card p, .login-card span,
+.faq-teaser h1, .faq-teaser h2, .faq-teaser h3, .faq-teaser h4, .faq-teaser p, .faq-teaser span,
+.cta-section h1, .cta-section h2, .cta-section h3, .cta-section h4, .cta-section p, .cta-section span,
+.preview-header h1, .preview-header h2, .preview-header h3, .preview-header p, .preview-header span,
+.announcement-hero h1, .announcement-hero h2, .announcement-hero h3, .announcement-hero p, .announcement-hero span,
+.benefits-card h1, .benefits-card h2, .benefits-card h3, .benefits-card h4, .benefits-card p, .benefits-card span,
+.info-hero h1, .info-hero h2, .info-hero h3, .info-hero p, .info-hero span,
+.contact-cta h1, .contact-cta h2, .contact-cta h3, .contact-cta p, .contact-cta span,
+.signup-cta-card h1, .signup-cta-card h2, .signup-cta-card h3, .signup-cta-card p, .signup-cta-card span,
+.role-tag, .step-num, .messenger-circle,
+.profile-hero-mini h1, .profile-hero-mini h2, .profile-hero-mini h3, .profile-hero-mini h4, .profile-hero-mini p, .profile-hero-mini span {
+  color: inherit !important;
+}
+
+a { color: var(--m-green); }
+a:hover { color: var(--m-sage5); }
+
+::selection { background: var(--m-sage2); color: #243024; }
+
+:focus-visible {
+  outline: 2px solid var(--m-sage5);
+  outline-offset: 2px;
+}
+
+* { scrollbar-color: var(--m-sage3) transparent; scrollbar-width: thin; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--m-sage3);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--m-sage5); background-clip: content-box; }
+
+/* ------------------------------------------- 3 · COMPONENTS (all but profile) */
+body:not(.page-profile) .card,
+body:not(.page-profile) .post-card,
+body:not(.page-profile) .benefits-card,
+body:not(.page-profile) .highlight-card,
+body:not(.page-profile) .login-card,
+body:not(.page-profile) .panel {
+  background-color: var(--m-surface);
+  border: 1px solid var(--m-line);
+  border-radius: 20px;
+  box-shadow: var(--m-sh);
+}
+
+body:not(.page-profile) .card:hover,
+body:not(.page-profile) .post-card:hover {
+  box-shadow: var(--m-sh-hover);
+  border-color: var(--m-sage3);
+}
+
+body:not(.page-profile) .btn,
+body:not(.page-profile) [class*="btn"] {
+  font-family: Inter, system-ui, sans-serif;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+body:not(.page-profile) .btn:hover,
+body:not(.page-profile) [class*="btn"]:hover { box-shadow: var(--m-sh-hover); }
+body:not(.page-profile) .btn-secondary {
+  background: var(--m-surface);
+  color: var(--m-green);
+  border: 1px solid var(--m-line);
+}
+body:not(.page-profile) .btn-secondary:hover {
+  background: var(--m-sage1);
+  border-color: var(--m-sage3);
+}
+
+body:not(.page-profile) .pill,
+body:not(.page-profile) .filter-pill,
+body:not(.page-profile) .role-tag {
+  border-radius: 999px;
+  border: 1px solid var(--m-line);
+  background: var(--m-surface);
+  color: var(--m-muted);
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 600;
+}
+body:not(.page-profile) .pill:hover,
+body:not(.page-profile) .filter-pill:hover {
+  background: var(--m-sage1);
+  border-color: var(--m-sage3);
+  color: var(--m-green);
+}
+body:not(.page-profile) .pill.active,
+body:not(.page-profile) .filter-pill.active {
+  background: var(--honey-gradient);
+  border-color: transparent;
+  color: #fff;
+}
+
+input, textarea, select,
+body:not(.page-profile) input,
+body:not(.page-profile) textarea,
+body:not(.page-profile) select {
+  background-color: var(--m-surface);
+  border: 1px solid var(--m-line);
+  border-radius: 12px;
+  color: var(--m-text);
+  font-family: Inter, system-ui, sans-serif;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--m-sage5);
+  box-shadow: var(--m-ring);
+  outline: none;
+}
+input::placeholder, textarea::placeholder { color: var(--m-faint); }
+
+body:not(.page-profile) .modal-content,
+body:not(.page-profile) .bottom-sheet,
+body:not(.page-profile) .toast {
+  background: var(--m-surface);
+  border: 1px solid var(--m-line);
+  border-radius: 20px;
+  box-shadow: var(--m-sh-hover);
+  color: var(--m-text);
+}
+body:not(.page-profile) .bottom-sheet { border-radius: 20px 20px 0 0; }
+body:not(.page-profile) .modal-overlay,
+body:not(.page-profile) .bottom-sheet-overlay {
+  background: rgba(30, 42, 34, .45);
+}
+body:not(.page-profile) .toast { font-family: Inter, system-ui, sans-serif; }
+
+body:not(.page-profile) .topbar,
+body:not(.page-profile) header.topbar,
+body:not(.page-profile) .navbar {
+  background: var(--m-topbar);
+  border-bottom: 1px solid var(--m-line);
+}
+body:not(.page-profile) .nav-links a {
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 600;
+  border-radius: 10px;
+}
+body:not(.page-profile) .nav-links a.active { color: #fff; }
+
+body:not(.page-profile) table { border-color: var(--m-line); }
+body:not(.page-profile) th {
+  background: var(--m-soft);
+  color: var(--m-muted);
+  font-family: Inter, system-ui, sans-serif;
+  letter-spacing: .06em;
+}
+body:not(.page-profile) td { border-color: var(--m-line); }
+
+body:not(.page-profile) .hero-card,
+body:not(.page-profile) .stats-banner,
+body:not(.page-profile) .faq-teaser,
+body:not(.page-profile) .cta-section {
+  border-radius: 24px;
+}
+
+body:not(.page-profile) .badge,
+body:not(.page-profile) .tier-badge {
+  border-radius: 999px;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+footer { color: var(--m-muted); }
+footer a { color: var(--m-green); }
+footer a:hover { color: var(--m-sage5); }
+
+/* ------------------------------------------------- 4 · MOTION / PREFERENCES */
+button, .btn, .card, .pill, a { transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 2026-10-13: inline accent/dark surfaces -> light text (generic net) */
+/* the blanket heading rule above forces --m-ink !important on h1-h6, which blacked out
+   white-on-green text (board "Not a Member?" card, notif banner, Join Now). A surface the
+   app paints with an accent colour sets its own light text; scope is substring-exact so a
+   mere `border/color: var(--primary)` on a light card is NOT caught. */
+/* 2026-10-13: SCOPE = body descendants only. applyTheme() writes the theme vars
+   (incl. --honey-gradient) inline on <html>, so an unscoped [style*="honey-gradient"] *
+   matched <html> itself and forced color:#fff !important on EVERY element in the page;
+   only rules that also used !important escaped it, which is why completed-card titles
+   (body.page-profile .pbody h3, no !important) rendered white-on-cream = 1.03 contrast. */
+body [style*="honey-gradient"], body [style*="honey-gradient"] *,
+body [style*="rgb(63, 71, 45)"], body [style*="rgb(63, 71, 45)"] *,
+body [style*="#3E5A44"], body [style*="#3E5A44"] *,
+body [style*="#2E4A37"], body [style*="#2E4A37"] *,
+body [style*="background: var(--primary)"], body [style*="background: var(--primary)"] *,
+body [style*="background:var(--primary)"], body [style*="background:var(--primary)"] *,
+body [style*="background: var(--success)"], body [style*="background: var(--success)"] *,
+body [style*="background: var(--error)"], body [style*="background: var(--error)"] *,
+body [style*="background: #A8574A"], body [style*="background: #A8574A"] * {
+  color: #fff !important;
+}

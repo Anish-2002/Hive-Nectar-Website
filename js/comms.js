@@ -290,6 +290,7 @@ export async function initCommunicationBoard() {
         console.error("Critical Board Error:", err);
     } finally {
         Loader.hide();
+        document.body.classList.remove('data-loading');
     }
 }
 

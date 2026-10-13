@@ -1,5 +1,4 @@
 import { supabase } from './supabase-config.js';
-import { showToast } from './app.js';
 
 /**
  * Theme token award system.
@@ -58,33 +57,6 @@ export async function getEarnedTokenMap(userId) {
     const map = {};
     tokens.forEach(t => { map[t.token_id] = { viewed: t.viewed, awarded_at: t.awarded_at }; });
     return map;
-}
-
-/**
- * Server-side token award check — runs the RPC that the complete_task
- * RPC already calls internally. Use this for initial-page-load catch-up.
- * Returns array of newly awarded token objects.
- */
-export async function checkAndAwardThemeTokens(userId, updateBadgeFn) {
-    if (!userId) return [];
-
-    const { data, error } = await supabase.rpc('award_theme_tokens', {
-        p_user_id: userId
-    });
-
-    if (error) {
-        console.warn('Theme token award RPC failed:', error.message);
-        return [];
-    }
-
-    const awarded = data || [];
-    if (awarded.length) {
-        awarded.forEach(t => {
-            showToast(`🎁 New token: ${t.token_name} (${t.stage})`, 'success');
-        });
-        if (updateBadgeFn) await updateBadgeFn();
-    }
-    return awarded;
 }
 
 /**

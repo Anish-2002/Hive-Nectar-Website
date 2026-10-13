@@ -1,9 +1,24 @@
 import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
-import { checkAndAwardThemeTokens, getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
+import { getAchievementSubtext, getMilestoneDisplayDescription } from './theme-tokens.js';
 import { isPartnerDone, partnerInfo, partnerCompletedTasks, hasCollabAccess } from './collaboration.js';
 
 // ======================== HELPER FUNCTIONS ========================
+// Module-scope XSS guard. profile.html does NOT load js/trial.js, and trial.js is an
+// ES module (it uses `import`), so its `function escapeHtml` never becomes a global.
+// Without this definition the call sites below throw "escapeHtml is not defined"
+// while rendering a task card.
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>"']/g, m => {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return '&#39;';
+    });
+}
+
 function hexToRgba(hex, alpha) {
     if (!hex || typeof hex !== 'string') hex = '#F59E0B';
     const r = parseInt(hex.slice(1, 3), 16);
@@ -91,8 +106,6 @@ async function checkAndAwardMilestones() {
             });
             await updateAchievementsBadge();
         }
-
-        await checkAndAwardThemeTokens(userProfile.id, updateAchievementsBadge);
     } catch (err) {
         console.error('Failed to check milestones:', err);
     }
@@ -109,13 +122,37 @@ async function updateAchievementsBadge() {
         .eq('viewed', false);
     if (!mError) count += (mCount || 0);
 
-    const { count: tCount, error: tError } = await supabase
+    // Only count tokens that are VISIBLE for this user's tier AND not yet
+    // revealed. Reveal-only design: user_tokens rows are created with
+    // viewed=true at reveal time, so "viewed=false" rows never exist —
+    // the notification is driven by tokens the user CAN reveal but hasn't.
+    const tierNum = tierToNumber[userProfile.tier] || 0;
+    const allowedStages = stagesForTier[tierNum] || [];
+    const { data: tierThemes } = await supabase
+        .from('themes')
+        .select('theme_id')
+        .lte('min_tier', tierNum);
+    const visibleThemeIds = new Set((tierThemes || []).map(t => t.theme_id));
+
+    // Token ids the user has already revealed (any state — they're in user_tokens)
+    const { data: revealedRows, error: rError } = await supabase
         .from('user_tokens')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userProfile.id)
-        .eq('viewed', false);
-    const revealedCount = revealedTokens.size;
-    if (!tError) count += Math.max(0, (tCount || 0) - revealedCount);
+        .select('token_id')
+        .eq('user_id', userProfile.id);
+    if (!rError) {
+        const revealedIds = new Set((revealedRows || []).map(r => r.token_id));
+        const { data: tokenDefs } = await supabase
+            .from('tokens')
+            .select('id, theme_id, stage')
+            .eq('active', true);
+        const revealable = (tokenDefs || []).filter(t => {
+            if (revealedIds.has(t.id)) return false;
+            if (visibleThemeIds.size && !visibleThemeIds.has(t.theme_id)) return false;
+            if (allowedStages.length && !allowedStages.includes(t.stage)) return false;
+            return true;
+        });
+        count += revealable.length;
+    }
 
     const badgeElements = document.querySelectorAll('.achievements-badge');
     badgeElements.forEach(el => {
@@ -183,7 +220,20 @@ async function generateAchievementsHtml() {
         earnedMap.set(um.milestone_id, { viewed: um.viewed });
     });
 
-    // 4. Fetch ALL token definitions (only active)
+    // 3b. Tier → theme + stage access: themes where min_tier <= user tier,
+    //     stages allowed per tier (stagesForTier)
+    const tierNum = tierToNumber[userProfile.tier] || 0;
+    const allowedStages = stagesForTier[tierNum] || [];
+    let accessibleThemeIds = null; // null = no filter (all themes)
+    const { data: tierThemes } = await supabase
+        .from('themes')
+        .select('theme_id')
+        .lte('min_tier', tierNum);
+    if (tierThemes && tierThemes.length) {
+        accessibleThemeIds = new Set(tierThemes.map(t => t.theme_id));
+    }
+
+    // 4. Fetch ALL active token definitions
     const { data: allTokens } = await supabase
         .from('tokens')
         .select('*')
@@ -191,25 +241,29 @@ async function generateAchievementsHtml() {
         .order('theme_id')
         .order('stage');
 
-    // 5. Fetch user's earned tokens
+    // 4b. Filter tokens by tier-accessible themes AND tier-accessible stages
+    const visibleTokens = (allTokens || []).filter(t =>
+        (!accessibleThemeIds || accessibleThemeIds.has(t.theme_id)) &&
+        allowedStages.includes(t.stage)
+    );
+
+    // 5. Fetch user's revealed tokens
     const { data: userTokens } = await supabase
         .from('user_tokens')
         .select('token_id, awarded_at, viewed')
         .eq('user_id', userProfile.id);
 
-    // 6. Build earned token map
-    const earnedTokenMap = new Map();
+    // 6. Build revealed token map
+    const revealedTokenMap = new Map();
     (userTokens || []).forEach(ut => {
-        earnedTokenMap.set(ut.token_id, { viewed: ut.viewed, awarded_at: ut.awarded_at });
+        revealedTokenMap.set(ut.token_id, { viewed: ut.viewed, awarded_at: ut.awarded_at });
     });
 
-    // 7. Build unified item list: milestones first, then tokens
-    const allItems = [];
-
+    // 7. Build milestone items (earn-to-unlock, unchanged)
+    const milestoneItems = [];
     allMilestones.forEach(m => {
         const earned = earnedMap.has(m.id);
-        allItems.push({
-            type: 'milestone',
+        milestoneItems.push({
             displayId: m.id,
             name: m.name,
             category: m.category,
@@ -221,11 +275,17 @@ async function generateAchievementsHtml() {
         });
     });
 
-    (allTokens || []).forEach(t => {
-        const earned = earnedTokenMap.has(t.id);
-        allItems.push({
-            type: 'token',
-            displayId: `token_${t.id}`,
+    // Sort: earned first, then by requirement_value ascending within each group
+    milestoneItems.sort((a, b) => {
+        if (a.earned !== b.earned) return a.earned ? -1 : 1;
+        return (a.requirement_value || 0) - (b.requirement_value || 0);
+    });
+
+    // 7b. Build token items (reveal-only, tier-filtered)
+    const tokenItems = (visibleTokens || []).map(t => {
+        const revealed = revealedTokenMap.has(t.id);
+        return {
+            displayId: t.id,
             name: t.name,
             category: 'theme_token',
             requirement_value: t.tasks_required,
@@ -233,50 +293,35 @@ async function generateAchievementsHtml() {
             description: t.description,
             stage: t.stage,
             theme_id: t.theme_id,
-            earned,
-            viewed: earned ? (earnedTokenMap.get(t.id)?.viewed ?? false) || revealedTokens.has(t.id) : false,
-        });
+            revealed,
+            viewed: revealed ? (revealedTokenMap.get(t.id)?.viewed ?? false) || revealedTokens.has(t.id) : false,
+        };
     });
 
-    // 8. Sort: earned first
-    allItems.sort((a, b) => {
-        if (a.earned !== b.earned) return a.earned ? -1 : 1;
-        return 0;
+    // Sort: revealed first, then by theme then stage (keeps grid grouped)
+    tokenItems.sort((a, b) => {
+        if (a.revealed !== b.revealed) return a.revealed ? -1 : 1;
+        if ((a.theme_id || '') !== (b.theme_id || '')) return (a.theme_id || '').localeCompare(b.theme_id || '');
+        return (a.stage || '').localeCompare(b.stage || '');
     });
 
-    if (allItems.length === 0) {
-        return '<p class="tiny muted">No achievements available yet.</p>';
-    }
-
-    // 9. Build cards
-    let cardsHtml = '';
-    for (const item of allItems) {
+    // 8. Render milestone cards
+    let milestoneCards = '';
+    for (const item of milestoneItems) {
         const icon = item.icon_url || '';
         const safeIcon = icon.replace(/"/g, '%22');
         const safeName = item.name.replace(/"/g, '&quot;');
 
         if (item.earned) {
-            let description, subText;
-            if (item.type === 'token') {
-                let meta = {};
-                try { meta = JSON.parse(item.description); } catch {}
-                description = meta.copy || 'Great achievement!';
-                subText = `${item.stage} · ${TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token'}`;
-            } else {
-                description = getMilestoneDisplayDescription(item);
-                subText = getAchievementSubtext(item);
-            }
-            const safeDesc = description.replace(/"/g, '&quot;');
-            const safeSub = subText.replace(/"/g, '&quot;');
-
+            const safeDesc = getMilestoneDisplayDescription(item).replace(/"/g, '&quot;');
+            const safeSub = getAchievementSubtext(item).replace(/"/g, '&quot;');
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img" alt="${safeName}">`
                 : `<div class="no-icon-placeholder earned-placeholder">🏆</div>`;
-
-            cardsHtml += `
+            milestoneCards += `
                 <div class="achievement-container earned"
                      data-milestone-id="${item.displayId}"
-                     data-type="${item.type}"
+                     data-type="milestone"
                      data-icon="${safeIcon}"
                      data-name="${safeName}"
                      data-sub="${safeSub}"
@@ -298,20 +343,11 @@ async function generateAchievementsHtml() {
                     </div>
                 </div>`;
         } else {
-            let unlockText;
-            if (item.type === 'token') {
-                const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'this theme';
-                unlockText = `Complete ${item.requirement_value} tasks in ${themeName}`;
-            } else {
-                unlockText = getUnlockCondition(item);
-            }
-            const safeUnlock = unlockText.replace(/"/g, '&quot;');
-
+            const safeUnlock = getUnlockCondition(item).replace(/"/g, '&quot;');
             const imgTag = icon
-                ? `<img src="${icon}" class="achievement-badge-img locked-img${item.type === 'token' || item.category === 'theme_token' ? ' token-badge-img' : ''}" alt="${safeName}">`
+                ? `<img src="${icon}" class="achievement-badge-img locked-img" alt="${safeName}">`
                 : `<div class="no-icon-placeholder locked-placeholder">🏆</div>`;
-
-            cardsHtml += `
+            milestoneCards += `
                 <div class="achievement-container locked">
                     <div class="achievement-card locked-card">
                         <div class="badge-icon-wrap">
@@ -327,6 +363,51 @@ async function generateAchievementsHtml() {
                     </div>
                 </div>`;
         }
+    }
+
+    // 8b. Render token cards (reveal-only, always visible if tier allows)
+    let tokenCards = '';
+    for (const item of tokenItems) {
+        const icon = item.icon_url || '';
+        const safeIcon = icon.replace(/"/g, '%22');
+        const safeName = item.name.replace(/"/g, '&quot;');
+        const themeName = TOKEN_THEME_NAMES[item.theme_id] || item.theme_id || 'Theme Token';
+        const safeTheme = themeName.replace(/"/g, '&quot;');
+        let meta = {};
+        try { meta = JSON.parse(item.description); } catch {}
+        const safeDesc = (meta.copy || 'A free token from The Meadow.').replace(/"/g, '&quot;');
+
+        const imgTag = icon
+            ? `<img src="${icon}" class="achievement-badge-img token-badge-img" alt="${safeName}">`
+            : `<div class="no-icon-placeholder earned-placeholder">🎖️</div>`;
+
+        tokenCards += `
+            <div class="achievement-container ${item.revealed ? 'earned' : 'token-unrevealed'}"
+                 data-token-id="${item.displayId}"
+                 data-icon="${safeIcon}"
+                 data-name="${safeName}"
+                 data-theme="${safeTheme}"
+                 data-desc="${safeDesc}"
+                 onclick="revealToken(this)">
+                <div class="achievement-card ${item.revealed ? '' : 'token-card'}">
+                    ${!item.revealed ? `
+                        <div class="mystery-overlay">
+                            <div class="reveal-msg">Click To Reveal</div>
+                        </div>
+                    ` : ''}
+                    <div class="badge-icon-wrap">
+                        ${imgTag}
+                    </div>
+                    <div class="achievement-card-text">
+                        <h3 class="font-bold text-gray-800 text-xl italic">${item.name}</h3>
+                        <p class="text-[10px] text-amber-600 font-black uppercase tracking-[0.2em] mt-2 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-100">${item.stage} · ${safeTheme}</p>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    if (milestoneCards === '' && tokenCards === '') {
+        return '<p class="tiny muted">No achievements available yet.</p>';
     }
 
     return `
@@ -346,7 +427,7 @@ async function generateAchievementsHtml() {
                 box-shadow: 0 15px 40px rgba(245, 158, 11, 0.2);
                 margin-bottom: 48px;
             }
-            .achievement-container { perspective: 1200px; margin-bottom: 24px; min-height: 380px; }
+            .achievement-container { perspective: 1200px; margin-bottom: 24px; min-height: clamp(280px, 60vw, 380px); }
             .achievement-container.earned { cursor: pointer; }
             .achievement-card {
                 position: relative;
@@ -383,9 +464,9 @@ async function generateAchievementsHtml() {
                 font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
                 letter-spacing: 1.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
-            .achievement-badge-img { width: 140px; height: 140px; margin: 0 auto; transform: translateZ(30px); border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); object-fit: cover; }
-            .achievement-badge-img.token-badge-img { width: 140px; height: 140px; border-radius: 50%; object-fit: contain; background: #fff; padding: 8px; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); flex-shrink: 0; display: block; }
-            .grid-achievements { display: grid; grid-template-columns: repeat(1, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+            .achievement-badge-img { width: min(140px, 42vw); height: min(140px, 42vw); aspect-ratio: 1; margin: 0 auto; transform: translateZ(30px); border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); object-fit: cover; }
+            .achievement-badge-img.token-badge-img { width: min(140px, 42vw); height: min(140px, 42vw); border-radius: 50%; object-fit: contain; background: #fff; padding: 8px; border: 4px solid white; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3), 0 0 15px rgba(251, 191, 36, 0.2); flex-shrink: 0; display: block; }
+            .grid-achievements { display: grid; grid-template-columns: repeat(1, 1fr); gap: 32px; max-width: 1280px; margin: 0 auto; padding: 0 clamp(8px, 3vw, 32px); }
             @media (min-width: 640px) { .grid-achievements { grid-template-columns: repeat(2, 1fr); } }
             @media (min-width: 1024px) { .grid-achievements { grid-template-columns: repeat(3, 1fr); } }
             .achievement-container.locked { cursor: default; opacity: 0.85; }
@@ -399,34 +480,138 @@ async function generateAchievementsHtml() {
             .achievement-name-locked { color: #a3a3a3 !important; font-size: 1.25rem; font-style: italic; }
             .no-icon-placeholder { width: 140px; height: 140px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: #fef3c7; border: 4px solid white; }
             .no-icon-placeholder.locked-placeholder { background: #e5e5e4; filter: grayscale(1); opacity: 0.5; }
+            .achievement-tabs { display: flex; justify-content: center; gap: 12px; margin: -20px 0 32px; flex-wrap: wrap; }
+            .achievement-tab {
+                background: white; border: 2px solid var(--honey-border); border-radius: 100px; padding: 10px 22px;
+                font-size: 0.85rem; font-weight: 800; color: #78716c; cursor: pointer; transition: all 0.3s;
+                display: inline-flex; align-items: center; gap: 8px;
+            }
+            .achievement-tab:hover { border-color: #f59e0b; color: var(--honey-amber); }
+            .achievement-tab.active { background: var(--honey-gradient); color: white; border-color: transparent; box-shadow: 0 6px 16px rgba(245,158,11,0.3); }
+            .tab-count { background: rgba(0,0,0,0.08); border-radius: 100px; padding: 2px 10px; font-size: 0.7rem; font-weight: 800; }
+            .achievement-tab.active .tab-count { background: rgba(255,255,255,0.25); }
+            .achievement-container.token-unrevealed { cursor: pointer; }
+            .achievement-container.token-unrevealed .achievement-card { background: linear-gradient(160deg, #fffdf6, #f8f0dd); border-style: dashed; }
         </style>
         <div class="profile-hero-mini">
             <h1 class="text-4xl font-black uppercase tracking-tighter italic">Nectar Artefacts</h1>
-            <p class="opacity-90 font-medium text-sm tracking-widest mt-2 uppercase">Unlock your garden milestones</p>
+            <p class="opacity-90 font-medium text-sm tracking-widest mt-2 uppercase">Earn milestones, reveal tokens</p>
         </div>
-        <div class="grid-achievements" id="achievementsGrid">
-            ${cardsHtml}
+        <div class="achievement-tabs">
+            <button class="achievement-tab active" id="tabMilestones" onclick="switchAchievementTab('milestones')">
+                🏆 Milestones ${milestoneItems.length ? `<span class="tab-count">${milestoneItems.filter(i => i.earned).length}/${milestoneItems.length}</span>` : ''}
+            </button>
+            <button class="achievement-tab" id="tabTokens" onclick="switchAchievementTab('tokens')">
+                🎖️ Tokens ${tokenItems.length ? `<span class="tab-count">${tokenItems.filter(i => i.revealed).length}/${tokenItems.length}</span>` : ''}
+            </button>
+        </div>
+        <div id="achievementsGrid">
+            <div id="milestoneSection">
+                ${milestoneCards ? `<div class="grid-achievements">${milestoneCards}</div>` : '<p class="tiny muted" style="text-align:center;padding:30px;">No milestones yet.</p>'}
+            </div>
+            <div id="tokenSection" style="display:none;">
+                ${tokenCards ? `<div class="grid-achievements">${tokenCards}</div>` : '<p class="tiny muted" style="text-align:center;padding:30px;">No tokens available for your tier yet.</p>'}
+            </div>
         </div>
     `;
 }
 
+window.switchAchievementTab = (tab) => {
+    const tabM = document.getElementById('tabMilestones');
+    const tabT = document.getElementById('tabTokens');
+    const secM = document.getElementById('milestoneSection');
+    const secT = document.getElementById('tokenSection');
+    if (!tabM || !tabT || !secM || !secT) return;
+    if (tab === 'tokens') {
+        tabT.classList.add('active');
+        tabM.classList.remove('active');
+        secT.style.display = 'block';
+        secM.style.display = 'none';
+    } else {
+        tabM.classList.add('active');
+        tabT.classList.remove('active');
+        secM.style.display = 'block';
+        secT.style.display = 'none';
+    }
+};
+
+window.revealToken = async (containerEl) => {
+    const tokenId = containerEl.dataset.tokenId;
+    const name = containerEl.dataset.name || '';
+    const theme = containerEl.dataset.theme || '';
+    const desc = containerEl.dataset.desc || '';
+    const icon = containerEl.dataset.icon || '';
+
+    // Already-revealed token: just show the detail popup, no reveal flow
+    if (containerEl.classList.contains('earned')) {
+        openAchievementDetail(icon, name, `${theme} · Token`, desc);
+        return;
+    }
+
+    const overlay = containerEl.querySelector('.mystery-overlay');
+    if (overlay) overlay.remove();
+    containerEl.classList.remove('token-unrevealed');
+    containerEl.classList.add('earned');
+    const card = containerEl.querySelector('.achievement-card');
+    if (card) card.classList.remove('token-card');
+
+    try {
+        const { data, error } = await supabase.rpc('reveal_token', {
+            p_user_id: userProfile.id,
+            p_token_id: tokenId
+        });
+        if (error) throw error;
+        if (data && data.success === false) throw new Error(data.error || 'Reveal failed');
+        revealedTokens.add(tokenId);
+        showToast(`🎖️ ${name} revealed!`, 'success');
+        await updateAchievementsBadge();
+        // Show the same detail popup as milestones
+        openAchievementDetail(icon, name, `${theme} · Token`, desc);
+    } catch (err) {
+        console.error('Error revealing token:', err);
+        showToast('Failed to reveal token. Please try again.', 'error');
+        // Revert UI on failure
+        containerEl.classList.add('token-unrevealed');
+        containerEl.classList.remove('earned');
+        if (card) card.classList.add('token-card');
+        if (!containerEl.querySelector('.mystery-overlay')) {
+            const ov = document.createElement('div');
+            ov.className = 'mystery-overlay';
+            ov.innerHTML = '<div class="reveal-msg">Click To Reveal</div>';
+            containerEl.querySelector('.achievement-card').prepend(ov);
+        }
+    }
+};
+
 function attachAchievement3DEffects(container) {
     if (!container) return;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     const cards = container.querySelectorAll('.achievement-card');
     cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const xc = rect.width / 2;
-            const yc = rect.height / 2;
-            const rotateX = (yc - y) / 10;
-            const rotateY = (x - xc) / 10;
-            card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(-10px)`;
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
-        });
+        if (fine) {
+            // Desktop mouse: live 3D tilt
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const rotateX = (yc - y) / 10;
+                const rotateY = (x - xc) / 10;
+                card.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateY(-10px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+        } else {
+            // Touch: reset any transform after the tap so cards never stay tilted
+            card.addEventListener('pointerup', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+            card.addEventListener('pointercancel', () => {
+                card.style.transform = 'rotateY(0deg) rotateX(0deg) translateY(0)';
+            });
+        }
     });
 }
 
@@ -455,7 +640,12 @@ window.viewMilestone = async (containerEl) => {
         await updateAchievementsBadge();
     }).catch(err => console.error('Error marking milestone as viewed:', err));
 
-    const modal   = document.getElementById('achievementModal');
+    openAchievementDetail(icon, name, sub, desc);
+};
+
+// Shared detail popup used by both milestones and tokens
+function openAchievementDetail(icon, name, sub, desc) {
+    const modal = document.getElementById('achievementModal');
     if (!modal) return;
     const imgEl   = modal.querySelector('#achievementModalImg');
     const titleEl = modal.querySelector('#achievementModalTitle');
@@ -518,13 +708,18 @@ async function fetchBaseTasksForTier(tierNum) {
 
     return filteredTasks.map(task => ({
         ...task,
+        // tasks.subcategory does not exist in the live schema - the value lives in
+        // tasks.category (rendered as the "Subcategory" pill). Normalise it once here
+        // so every filter/dropdown that reads t.subcategory works.
+        subcategory: task.subcategory ?? task.category ?? null,
         primary_color: themeColorMap[task.theme_id] || '#F59E0B'
     }));
 }
 
 // ======================== BOTTOM SHEET ========================
 function showBottomSheet(title, contentHtml, onClose) {
-    const existing = document.querySelector('.bottom-sheet-overlay');
+    // Only remove dynamic sheets — never the static ones (Edit Profile, Upgrade Tier)
+    const existing = document.querySelector('.bottom-sheet-overlay.active:not([data-static])');
     if (existing) existing.remove();
 
     const overlay = document.createElement('div');
@@ -541,10 +736,12 @@ function showBottomSheet(title, contentHtml, onClose) {
         </div>
     `;
     document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
 
     const closeBtn = overlay.querySelector('.bottom-sheet-close');
     const close = () => {
         overlay.classList.remove('active');
+        document.body.style.overflow = '';
         setTimeout(() => overlay.remove(), 300);
         if (onClose) onClose();
     };
@@ -562,9 +759,14 @@ function closeAllBottomSheets() {
   const sheets = document.querySelectorAll('.bottom-sheet-overlay');
   sheets.forEach(sheet => {
     sheet.classList.remove('active');
-    sheet.style.visibility = 'hidden';
-    sheet.style.opacity = '0';
+    if (sheet.dataset.static) {
+      sheet.style.visibility = 'hidden';
+      sheet.style.opacity = '0';
+    } else {
+      sheet.remove();
+    }
   });
+  document.body.style.overflow = '';
 }
 // ======================== TASK HELPER ========================
 function attachTaskEventListeners(container) {
@@ -575,8 +777,34 @@ function attachTaskEventListeners(container) {
         el.onclick = (e) => handleReact(e.target);
     });
     container.querySelectorAll('.comment-btn:not([disabled])').forEach(el => {
-        el.onclick = (e) => handleComment(e.target);
+        // 2026-10-13: e.target is the <i class="fa-paper-plane"> icon (no data-id) -> comments
+        // silently did nothing. Bind the BUTTON itself via currentTarget.
+        el.onclick = (e) => handleComment(e.currentTarget || el);
     });
+    container.querySelectorAll('.go-task-btn').forEach(el => {
+        el.onclick = (e) => { e.preventDefault(); e.stopPropagation(); goToBlockerTask(el.dataset.blocker, el); };
+    });
+}
+
+// Jump to the task that must be completed first (locked card -> "Go to task").
+function goToBlockerTask(blockerId, btn) {
+    if (blockerId === null || blockerId === undefined || blockerId === '') return;
+    const cardId = `post-${String(blockerId)}`;
+    const scope = (btn && btn.closest && btn.closest('#tasks, .bottom-sheet-content')) || document;
+    let target = scope.querySelector('#' + CSS.escape(cardId)) || document.getElementById(cardId);
+    if (!target && !locksExpanded) {
+        locksExpanded = true;
+        renderTaskList(lastRenderedTasks);
+        target = document.getElementById(cardId);
+    }
+    if (!target) {
+        showToast('That task is hidden by the current filters. Reset filters to see it.', 'error');
+        return;
+    }
+    if (target.closest('.bottom-sheet-content')) closeAllBottomSheets();
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.add('flash');
+    setTimeout(() => target.classList.remove('flash'), 2200);
 }
 
 // ======================== TASK RENDERING ========================
@@ -599,7 +827,7 @@ async function refreshTasks() {
 
         // First task in a theme is always unlocked if not completed
         if (idx === 0) {
-            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '' };
+            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '', blocker_id: null, blocker_title: null, unlock_at: null };
         }
 
         // Check if the immediately previous task in this theme is completed
@@ -608,7 +836,7 @@ async function refreshTasks() {
         const prevCompletedAt = prevCompleted ? completedAtMap[prevTask.id] : null;
 
         if (!prevCompleted) {
-            return { ...task, is_unlocked: false, unlock_message: `🔒 Complete "${prevTask.task_title}" to unlock` };
+            return { ...task, is_unlocked: false, unlock_message: `🔒 Complete "${prevTask.task_title}" to unlock`, blocker_id: prevTask.id, blocker_title: prevTask.task_title, unlock_at: null };
         }
 
         // Previous task completed — check 24h cooldown
@@ -620,12 +848,12 @@ async function refreshTasks() {
 
         if (hoursSincePrev >= cooldownHours) {
             // Check if this task itself is already completed
-            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '' };
+            return { ...task, is_unlocked: !completedSet.has(task.id), unlock_message: '', blocker_id: null, blocker_title: null, unlock_at: null };
         } else {
             const lockMsg = hoursLeft > 1
                 ? `🔒 "${prevTask.task_title}" completed — ${hoursLeft}h until unlocked`
                 : `🔒 "${prevTask.task_title}" completed — ${Math.ceil(hoursLeft * 60)}m until unlocked`;
-            return { ...task, is_unlocked: false, unlock_message: lockMsg };
+            return { ...task, is_unlocked: false, unlock_message: lockMsg, blocker_id: null, blocker_title: null, unlock_at: prevCompletedAt ? new Date(prevCompletedAt).getTime() + cooldownHours * 60 * 60 * 1000 : null };
         }
     });
 
@@ -669,17 +897,49 @@ async function applyFiltersAndRender() {
     }
 
     const completedSet = showingExperienced ? completedExperienced : completedNovice;
-    const unlockedAll = filteredWithCompleted.filter(t => t.is_unlocked);
-    const unlockedShown = filtered.filter(t => t.is_unlocked);
-    const lockedTasks = filtered.filter(t => !t.is_unlocked);
+    // Nectar-bar denominator = the visible scope (completed tasks included) - never shrinks.
+    let visible = filteredWithCompleted.slice();
+    if (storyFilter === 'mine') {
+        visible = visible.filter(t => completedSet.has(t.id));
+    } else if (storyFilter === 'partner') {
+        visible = visible.filter(t => typeof isPartnerDone === 'function' && isPartnerDone(t.id));
+    } else if (storyFilter && storyFilter !== 'All') {
+        visible = visible.filter(t => t.core_theme === storyFilter);
+    }
+    // A completed task is stored with is_unlocked = false, so it is part of the
+    // visible head - never the locked tail.
+    // 2026-10-13: a DONE task must never be rendered in the Daily Tasks list — it is
+    // still counted below (progress bar reads `visible`), just not shown as a card.
+    // Exception: the explicit "mine" story chip is a completed-only view, so keep it working.
+    const completedOnlyView = (storyFilter === 'mine');
+    const headTasks = completedOnlyView
+        ? visible.filter(t => completedSet.has(t.id))
+        : visible.filter(t => t.is_unlocked && !completedSet.has(t.id));
+    const lockedTasks = visible.filter(t => !t.is_unlocked && !completedSet.has(t.id));
 
-    totalVisibleTasks = unlockedAll.length;
-    completedVisibleTasks = unlockedAll.filter(t => completedSet.has(t.id)).length;
+    totalVisibleTasks = visible.length;
+    completedVisibleTasks = visible.filter(t => completedSet.has(t.id)).length;
 
-    const tasksToShow = [...unlockedShown, ...lockedTasks];
-    // Sort each group by task_order ascending
-    tasksToShow.sort((a, b) => a.task_order - b.task_order);
+    // 2026-10-13: locked cards are ordered by TIME TO UNLOCK (soonest first: 3h -> 6h -> 12h),
+    // chain-locked cards (no clock, "complete X first") go last; task_order breaks ties.
+    const unlockTs = (t) => {
+        if (!t.unlock_at) return Infinity;
+        const ms = new Date(t.unlock_at).getTime();
+        return isNaN(ms) ? Infinity : ms;
+    };
+    const soonestFirst = (a, b) => {
+        const ua = unlockTs(a), ub = unlockTs(b);
+        if (ua !== ub) return ua - ub;
+        if (String(a.theme_id) !== String(b.theme_id)) return String(a.theme_id).localeCompare(String(b.theme_id));
+        return a.task_order - b.task_order;
+    };
+    const tasksToShow = [
+        ...headTasks.slice().sort((a, b) => a.task_order - b.task_order),
+        ...lockedTasks.slice().sort(soonestFirst)
+    ];
     renderTaskList(tasksToShow);
+    renderStories();
+    updateFilterBadge();
 
     const pct = totalVisibleTasks ? Math.min(Math.round((completedVisibleTasks / totalVisibleTasks) * 100), 100) : 0;
 
@@ -701,160 +961,162 @@ async function applyFiltersAndRender() {
     updateProfileUI();
     updateCompletedBadge();
     updatePendingSigmaBadge();
+    updateTabCounts();
+    updatePartnerCompare();
 }
 
 function renderTaskList(tasks) {
     const container = document.getElementById('tasks');
     if (!container) return;
 
+    const completedNow = showingExperienced ? completedExperienced : completedNovice;
+
     if (!tasks.length) {
-        container.innerHTML = '<p class="tiny muted" style="padding:20px;">No missions available with current filters.</p>';
+        container.innerHTML = `
+            <div class="card empty">
+                <h3>Nothing here yet</h3>
+                <p class="muted">No tasks match the current filters.</p>
+                <button type="button" class="btn pri" id="emptyResetBtn">Reset filters</button>
+            </div>`;
+        const resetBtn = document.getElementById('emptyResetBtn');
+        if (resetBtn) resetBtn.addEventListener('click', resetFilters);
         return;
     }
 
-    container.innerHTML = '';
-    tasks.forEach(task => {
-        const taskDiv = createTaskCard(task);
-        container.appendChild(taskDiv);
+    const inScope = t => t.is_unlocked || completedNow.has(t.id);
+    const headTasks = tasks.filter(inScope);
+    const tailTasks = tasks.filter(t => !inScope(t));
+    // Locked tasks: soonest-to-unlock first (3h -> 6h -> 12h -> chain-locked), then natural order.
+    const unlockKey = t => (typeof t.unlock_at === 'number' && isFinite(t.unlock_at)) ? t.unlock_at : Infinity;
+    tailTasks.sort((a, b) => {
+        const av = unlockKey(a), bv = unlockKey(b);
+        if (av !== bv) return av - bv;
+        if (a.theme_id !== b.theme_id) return String(a.theme_id).localeCompare(String(b.theme_id));
+        return (a.task_order || 0) - (b.task_order || 0);
     });
+    lastRenderedTasks = tasks;
+    const HIDDEN_LIMIT = 3;
+    const showTail = locksExpanded ? tailTasks : tailTasks.slice(0, HIDDEN_LIMIT);
+
+    container.innerHTML = '';
+    [...headTasks, ...showTail].forEach(task => {
+        const card = createTaskCard(task);
+        if (justCompletedId && String(task.id) === String(justCompletedId)) card.classList.add('pop');
+        container.appendChild(card);
+    });
+
+    if (tailTasks.length > HIDDEN_LIMIT) {
+        const rest = tailTasks.length - HIDDEN_LIMIT;
+        const moreBtn = document.createElement('button');
+        moreBtn.type = 'button';
+        moreBtn.className = 'more';
+        moreBtn.innerText = locksExpanded ? 'Show fewer locked tasks' : `Show ${rest} more locked task${rest === 1 ? '' : 's'}`;
+        moreBtn.addEventListener('click', () => { locksExpanded = !locksExpanded; renderTaskList(tasks); });
+        container.appendChild(moreBtn);
+    }
+
+    justCompletedId = null;
     attachTaskEventListeners(container);
 }
 
 function createTaskCard(task) {
-    const isLocked = !task.is_unlocked;
     const completedSet = showingExperienced ? completedExperienced : completedNovice;
     const isCompleted = completedSet.has(task.id);
+    // A completed task is persisted with is_unlocked = false (completion locks it), so a
+    // done card must never be styled as locked: lock icon + empty lockbox + disabled controls.
+    // NOTE: isLocked must stay AFTER isCompleted - referencing it earlier is a TDZ crash.
+    const isLocked = !task.is_unlocked && !isCompleted;
     const currentReaction = userReactions[task.id];
     const taskComments = userComments.filter(c => c.task_id === task.id);
 
-    const primaryColor = task.primary_color;
-    const rgbaBg = hexToRgba(primaryColor, 0.08);
-    const rgbaBorder = hexToRgba(primaryColor, 0.25);
-
-    const stagePill = `<span style="background:#f1f7ff; color:#3b82f6; border:1px solid #dbeafe; padding:2px 8px; border-radius:12px;">${task.stage || 'Stage'}</span>`;
-    const corePill = `<span style="background:#3b82f6; color:white; padding:2px 8px; border-radius:12px;">${task.core_theme || 'Theme'}</span>`;
-    const subcategoryPill = `<span style="background:#f0fdf4; color:#15803d; border:1px solid #dcfce7; padding:2px 8px; border-radius:12px;">${task.category || 'Subcategory'}</span>`;
-    const audiencePill = `<span style="background:#f3f0ff; color:#7c3aed; border:1px solid #ede9fe; padding:2px 8px; border-radius:12px;">${task.audience || 'All'}</span>`;
-
     const description = showingExperienced ? (task.experienced_description || task.task_description) : (task.novice_description || task.task_description);
 
-    // Partner progress badge — only for collective tier+
+    // Partner context (collective tier and above)
     const partnerName = hasCollabAccess && partnerInfo.length > 0 ? partnerInfo[0].username : 'Partner';
     const partnerHasAnyCompleted = hasCollabAccess && partnerCompletedTasks.size > 0;
     const partnerDoneThis = hasCollabAccess && typeof isPartnerDone === 'function' && isPartnerDone(task.id);
-    const partnerBadge = partnerDoneThis && isCompleted
-      ? `<div style="margin-top:4px;font-size:.7rem;color:#16a34a;display:flex;align-items:center;gap:4px;">
-           <span>✅</span><span>You & ${partnerName} both completed</span>
-         </div>`
-      : partnerDoneThis && isLocked
-        ? `<div style="margin-top:4px;font-size:.7rem;color:#b8860b;display:flex;align-items:center;gap:4px;">
-             <span>🔒</span><span>${partnerName} completed — you haven't reached this yet</span>
-           </div>`
-        : partnerDoneThis
-          ? `<div style="margin-top:4px;font-size:.7rem;color:#b8860b;display:flex;align-items:center;gap:4px;">
-               <span>🐝</span><span>${partnerName} completed</span>
-             </div>`
-          : partnerHasAnyCompleted && !isCompleted && !isLocked
-            ? `<div style="margin-top:4px;font-size:.7rem;color:#888;display:flex;align-items:center;gap:4px;">
-                 <span>⏳</span><span>Due for you — ${partnerName} completed other tasks</span>
-               </div>`
-            : '';
 
-    const likeBtnColor = (currentReaction === 'like') ? '#22c55e' : (isLocked ? '#ccc' : '#ffcc00');
-    const dislikeBtnColor = (currentReaction === 'dislike') ? '#ef4444' : (isLocked ? '#ccc' : '#ffcc00');
-    const likeTextColor = (currentReaction === 'like') ? 'white' : (isLocked ? '#666' : '#1e293b');
-    const dislikeTextColor = (currentReaction === 'dislike') ? 'white' : (isLocked ? '#666' : '#1e293b');
+    // Card state drives the design's 5 looks (business logic unchanged)
+    const state = (isCompleted && partnerDoneThis) ? 'both'
+        : isCompleted ? 'done'
+        : isLocked ? 'locked'
+        : partnerHasAnyCompleted ? 'due'
+        : 'available';
 
-    let leftColumn = '';
-    if (isLocked) {
-        leftColumn = `<div style="margin-right: 15px;"><i class="fas fa-lock" style="font-size: 1.4rem; color: ${primaryColor};"></i></div>`;
-    } else if (isCompleted) {
-        leftColumn = `<div style="margin-right: 15px;"><i class="fas fa-check-circle" style="color: var(--success); font-size: 1.4rem;"></i></div>`;
-    } else {
-        leftColumn = `<div style="margin-right: 15px;">
-            <input type="checkbox" class="task-check" data-id="${task.id}" data-version="${showingExperienced ? 'experienced' : 'novice'}"
-                style="width: 24px; height: 24px; cursor: pointer;">
-        </div>`;
-    }
+    // Per-task partner line (design)
+    const partnerLine = partnerDoneThis
+        ? (isCompleted
+            ? `<div class="pst good"><span class="av sg">${escapeHtml((partnerName || 'P')[0].toUpperCase())}</span><span class="tx"><b>You and ${escapeHtml(partnerName)}</b> both completed this</span></div>`
+            : isLocked
+                ? `<div class="pst turn"><span class="av sg">${escapeHtml((partnerName || 'P')[0].toUpperCase())}</span><span class="tx"><b>${escapeHtml(partnerName)}</b> completed &mdash; you have not reached this yet</span></div>`
+                : `<div class="pst good"><span class="av sg">${escapeHtml((partnerName || 'P')[0].toUpperCase())}</span><span class="tx"><b>${escapeHtml(partnerName)}</b> completed this</span></div>`)
+        : (partnerHasAnyCompleted && !isCompleted && !isLocked
+            ? `<div class="pst turn"><span class="av sg">${escapeHtml((partnerName || 'P')[0].toUpperCase())}</span><span class="tx">Due for you &mdash; <b>${escapeHtml(partnerName)}</b> completed other tasks</span></div>`
+            : '');
+
+    const mark = isLocked
+        ? `<span class="nd locked"><i class="fas fa-lock"></i></span>`
+        : isCompleted
+            ? `<span class="nd done"><i class="fas fa-check"></i></span>`
+            : `<input type="checkbox" class="task-check" data-id="${task.id}" data-version="${showingExperienced ? 'experienced' : 'novice'}" aria-label="Mark complete">`;
+
+    const pills = `<div class="filters">
+                    <span class="pill core">${task.core_theme || 'Theme'}</span>
+                    <span class="pill stage">${task.stage || 'Stage'}</span>
+                    <span class="pill aud">${task.audience || 'All'}</span>
+                    <span class="pill sub">${task.category || 'Subcategory'}</span>
+                </div>`;
 
     const taskDiv = document.createElement('div');
-    taskDiv.style.marginBottom = "20px";
-    taskDiv.style.position = "relative";
+    taskDiv.className = `post card task-item ${state}`;
+    taskDiv.dataset.id = task.id;
+    taskDiv.id = `post-${task.id}`;
+
+    const blockerId = (task.blocker_id === null || task.blocker_id === undefined) ? null : String(task.blocker_id);
+    const blockerDone = blockerId !== null && completedSet.has(blockerId) === true;
+    const showGo = isLocked && blockerId !== null && !blockerDone;
 
     const cardHtml = `
-        <div style="border-radius: 24px; background: ${rgbaBg}; border: 1px solid ${rgbaBorder}; box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.2s ease;">
-            <div style="display: flex; align-items: center; padding: 20px;">
-                ${leftColumn}
-                <div style="flex-grow: 1;">
-                    <div style="font-weight: 800; font-size: 1.05rem; color: var(--fg);">
-                        ${task.task_title || 'Task'}
-                    </div>
-                    <div style="font-size: 0.9rem; margin: 6px 0; color: var(--fg-muted);">
-                        ${description}
-                    </div>
-                    ${partnerBadge}
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
-                        ${corePill}
-                        ${stagePill}
-                        ${audiencePill}
-                        ${subcategoryPill}
-                    </div>
-                    <div style="font-size: 0.8rem; font-style: italic; color: var(--fg-muted);">
-                        <strong>Impact :</strong> ${task.impact_value || 'N/A'}. 
-                        ${isLocked ? `<span class="tiny muted">${task.unlock_message}</span>` : ''}
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button class="react-btn" data-id="${task.id}" data-type="like" 
-                        style="background:${likeBtnColor}; color:${likeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👍 Like</button>
-                    <button class="react-btn" data-id="${task.id}" data-type="dislike" 
-                        style="background:${dislikeBtnColor}; color:${dislikeTextColor}; border:none; padding:8px 16px; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.2s; ${isLocked ? 'opacity:0.6; cursor:not-allowed;' : ''}" ${isLocked ? 'disabled' : ''}>👎 Dislike</button>
-                </div>
+        <div class="phd">
+            ${mark}
+            <div class="pw">
+                <b>${task.core_theme || 'Theme'}</b>
+                <small>${[task.stage, task.category, state === 'both' ? 'You + ' + partnerName : state === 'done' ? 'Completed' : state === 'locked' ? 'Locked' : state === 'due' ? 'Due for you' : 'Ready now'].filter(Boolean).join(' \u00b7 ')}</small>
             </div>
-            <div style="padding: 0 20px 20px 68px; border-top: 1px solid ${rgbaBorder};">
-                <div class="comments-list">${taskComments.map(c => `
-                    <div id="comment-box-${c.id}" style="background: rgba(255,255,255,0.5); padding:8px 12px; border-radius:12px; margin-bottom:8px;">
-                        <div>${c.comment_text}</div>
-                        <div><button onclick="window.startEditComment('${c.id}', '${c.comment_text.replace(/'/g, "\\'")}')">Edit</button>
-                        <button onclick="window.deleteComment('${c.id}')">Delete</button></div>
-                    </div>
-                `).join('')}</div>
-                <div style="display: flex; gap: 10px; margin-top: 8px;">
-                    <input type="text" class="comment-input" data-id="${task.id}" placeholder="Write a comment..." style="flex-grow:1; padding:8px; border:1px solid ${rgbaBorder}; border-radius:12px; background: rgba(255,255,255,0.5);" ${isLocked ? 'disabled' : ''}>
-                    <button class="comment-btn" data-id="${task.id}" style="background:${primaryColor}; color:white; padding:8px 16px; border-radius:12px; font-weight:600; border:none; cursor:pointer;" ${isLocked ? 'disabled' : ''}>Post</button>
+        </div>
+        <div class="pbody">
+            <h3>${task.task_title || 'Task'}</h3>
+            <p>${description}</p>
+            ${pills}
+            <div class="imp"><b>Impact:</b> ${task.impact_value || 'N/A'}</div>
+            ${isLocked && (task.unlock_message || showGo) ? `<div class="lockbox"><span>${task.unlock_message || ''}${showGo ? '<br><small class="tiny">Complete this task first</small>' : ''}</span>${showGo ? `<button type="button" class="btn pri go-task-btn" data-blocker="${escapeHtml(blockerId)}">Go to task</button>` : ''}</div>` : ''}
+        </div>
+        <div class="abar">
+            <button class="ab react-btn${currentReaction === 'like' ? ' on' : ''}" data-id="${task.id}" data-type="like" ${isLocked ? 'disabled' : ''}><i class="fas fa-thumbs-up"></i> Like</button>
+            <button class="ab react-btn clay${currentReaction === 'dislike' ? ' on' : ''}" data-id="${task.id}" data-type="dislike" ${isLocked ? 'disabled' : ''}><i class="fas fa-thumbs-down"></i> Dislike</button>
+        </div>
+        ${partnerLine}
+        ${(hasCollabAccess && partnerHasAnyCompleted && !partnerDoneThis && !isCompleted && !isLocked) ? `<button type="button" class="mini" data-nudge="${task.id}"><i class="fas fa-bell ic"></i> Nudge ${escapeHtml(partnerName)}</button>` : ''}
+        <div class="reacts">
+            <span class="rc">${currentReaction ? `<span class="stack"><span class="av">${escapeHtml((userProfile.first_name || 'Y')[0].toUpperCase())}</span></span>` : ''}${currentReaction === 'like' ? 'You liked this' : currentReaction === 'dislike' ? 'You disliked this' : isCompleted ? 'You completed this' : 'No reaction yet'}</span>
+            <span class="rc">${taskComments.length} comment${taskComments.length === 1 ? '' : 's'}</span>
+        </div>
+        <div class="thread">
+            ${taskComments.map(c => `
+                <div id="comment-box-${c.id}" class="cmt">
+                    <div class="bub"><div>${escapeHtml(c.comment_text)}</div></div>
                 </div>
+                <div class="cact"><button onclick="window.startEditComment('${c.id}', '${escapeHtml(c.comment_text).replace(/'/g, "\\'")}')">Edit</button>
+                <button onclick="window.deleteComment('${c.id}')">Delete</button></div>
+            `).join('')}
+            <div class="ci">
+                <input type="text" class="comment-input" data-id="${task.id}" placeholder="Write a comment..." ${isLocked ? 'disabled' : ''}>
+                <button class="comment-btn ci-send" data-id="${task.id}" aria-label="Post comment" ${isLocked ? 'disabled' : ''}><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     `;
 
-    if (isLocked) {
-        const overlay = document.createElement('div');
-        overlay.style.position = "absolute";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0,0,0,0.7)";
-        overlay.style.borderRadius = "24px";
-        overlay.style.display = "flex";
-        overlay.style.flexDirection = "column";
-        overlay.style.alignItems = "center";
-        overlay.style.justifyContent = "center";
-        overlay.style.color = "white";
-        overlay.style.textAlign = "center";
-        overlay.style.padding = "20px";
-        overlay.style.zIndex = "2";
-        overlay.style.backdropFilter = "blur(2px)";
-        overlay.innerHTML = `
-            <i class="fas fa-lock" style="font-size: 48px; margin-bottom: 16px;"></i>
-            <strong>${task.unlock_message}</strong>
-            <p class="tiny" style="margin-top: 8px;">Complete tasks in this theme to unlock</p>
-        `;
-        taskDiv.innerHTML = cardHtml;
-        taskDiv.appendChild(overlay);
-    } else {
-        taskDiv.innerHTML = cardHtml;
-    }
+    taskDiv.innerHTML = cardHtml;
 
     return taskDiv;
 }
@@ -884,6 +1146,8 @@ async function handleDone(checkbox) {
             completedExperienced.add(taskId);
             completedAtMap[taskId] = new Date().toISOString();
         }
+
+        justCompletedId = taskId;
 
         const pointsEarned = result.points_earned;
         userProfile.total_points = (userProfile.total_points || 0) + pointsEarned;
@@ -948,9 +1212,9 @@ async function handleDone(checkbox) {
                     attachTaskEventListeners(tasksContainer);
                 }
                 const completedSet = showingExperienced ? completedExperienced : completedNovice;
-                const unlockedAll = allTasksWithCompleted.filter(t => t.is_unlocked);
-                const completedVisible = unlockedAll.filter(t => completedSet.has(t.id)).length;
-                const totalVisible = unlockedAll.length;
+                const scopeAll = allTasksWithCompleted;
+                const completedVisible = scopeAll.filter(t => completedSet.has(t.id)).length;
+                const totalVisible = scopeAll.length;
                 const pct = totalVisible ? Math.min(Math.round((completedVisible / totalVisible) * 100), 100) : 0;
                 const progressBar = document.getElementById('mobileProgressBarCopy');
                 const progressPct = document.getElementById('mobileProgressPctCopy');
@@ -1003,15 +1267,17 @@ async function handleReact(btn) {
 
     userReactions[taskId] = reactionType;
 
-    const taskCard = btn.closest('.task') || btn.closest('[style*="border-radius"]').parentElement;
+    const taskCard = btn.closest('.task-item');
     if (taskCard) {
         const likeBtn = taskCard.querySelector(`.react-btn[data-id="${taskId}"][data-type="like"]`);
         const dislikeBtn = taskCard.querySelector(`.react-btn[data-id="${taskId}"][data-type="dislike"]`);
         if (likeBtn) {
+            likeBtn.classList.toggle('on', reactionType === 'like');
             likeBtn.style.background = reactionType === 'like' ? '#22c55e' : '#ffcc00';
             likeBtn.style.color = reactionType === 'like' ? 'white' : '#1e293b';
         }
         if (dislikeBtn) {
+            dislikeBtn.classList.toggle('on', reactionType === 'dislike');
             dislikeBtn.style.background = reactionType === 'dislike' ? '#ef4444' : '#ffcc00';
             dislikeBtn.style.color = reactionType === 'dislike' ? 'white' : '#1e293b';
         }
@@ -1019,14 +1285,30 @@ async function handleReact(btn) {
 }
 
 async function handleComment(btn) {
-    const taskId = btn.dataset.id;
+    // 2026-10-13: resolve the real button + task id no matter what was clicked inside it,
+    // and surface failures instead of dying silently on a null input.
+    const el = (btn && btn.closest && btn.closest('.comment-btn')) || btn;
+    const taskId = el && el.dataset ? el.dataset.id : null;
+    if (!taskId) { console.warn('[comment] no task id on', btn); return; }
     const input = document.querySelector(`.comment-input[data-id="${taskId}"]`);
-    if (!input.value.trim()) return;
-    await supabase.from('task_comments').insert([{
+    if (!input) { console.warn('[comment] composer missing for task', taskId); return; }
+    const text = (input.value || '').trim();
+    if (!text) return;
+    const { data, error } = await supabase.from('task_comments').insert([{
         user_id: userProfile.id,
         task_id: taskId,
-        comment_text: input.value.trim()
-    }]);
+        comment_text: text
+    }]).select();
+    if (error) {
+        console.error('[comment] insert failed', error);
+        if (typeof showToast === 'function') showToast('Could not post that comment.', 'error');
+        return;
+    }
+    input.value = '';
+    // 2026-10-13: refreshTasks() renders from the in-memory userComments list, so a posted
+    // comment only appeared after a full page reload. Add it locally so it shows instantly.
+    const row = (data && data[0]) || { id: 'local-' + Date.now(), user_id: userProfile.id, task_id: taskId, comment_text: text };
+    userComments.push(row);
     refreshTasks();
 }
 
@@ -1041,11 +1323,14 @@ function updateProfileUI() {
     const userNameShort = document.getElementById('userNameDisplayShort');
     if (userNameShort) userNameShort.innerText = `${userProfile.first_name} ${userProfile.last_name}`;
 
+    const heroName = document.getElementById('heroName');
+    if (heroName) heroName.innerText = (userProfile.first_name || userProfile.username || 'Your meadow');
+
     const rankCompact = document.getElementById('rankNameDisplayCompact');
     if (rankCompact) rankCompact.innerText = `Meadow Level ${userProfile.member_tier || 0}`;
 
     const tierCompact = document.getElementById('userTierBadgeCompact');
-    if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : 'Steward';
+    if (tierCompact) tierCompact.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : tier === 'steward' ? 'Steward' : 'Collective';
 
     const pointsVal = document.getElementById('pointsVal');
     if (pointsVal) pointsVal.innerText = nectarEarned;
@@ -1082,11 +1367,23 @@ function updateProfileUI() {
     if (mobileRankDisplay) mobileRankDisplay.innerText = `Meadow Level ${userProfile.member_tier || 0}`;
 
     const mobileTierBadge = document.querySelector('.mobile-hero .tier-badge');
-    if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : 'Steward';
+    if (mobileTierBadge) mobileTierBadge.innerText = tier === 'free' ? 'Free' : tier === 'plus' ? 'Meadow+' : tier === 'steward' ? 'Steward' : 'Collective';
 
     const avatarImg = document.getElementById('profileAvatar');
     if (avatarImg && userProfile.avatar_url) {
         avatarImg.src = userProfile.avatar_url;
+    }
+    // Profile design layer: mirror the avatar into the topbar + composer discs
+    const avatarUrl = (userProfile && userProfile.avatar_url) || (avatarImg ? avatarImg.src : '');
+    if (avatarUrl) {
+        ['topbarAvatar', 'composerAvatar'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.backgroundImage = `url("${avatarUrl}")`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+            }
+        });
     }
 }
 function showCustomLevelModal(newLevel) {
@@ -1159,10 +1456,10 @@ function renderMobileTasksInSheet(suffix, tasks = allTasks) {
     const container = document.getElementById(`mobileTasksContainer${suffix}`);
     if (!container) return;
     const sourceTasks = tasks;
-    const unlockedTasks = sourceTasks.filter(t => t.is_unlocked);
     const completedSet = showingExperienced ? completedExperienced : completedNovice;
-    const completedVisible = unlockedTasks.filter(t => completedSet.has(t.id)).length;
-    const totalVisible = unlockedTasks.length;
+    const scopeAll = allTasksWithCompleted;
+    const completedVisible = scopeAll.filter(t => completedSet.has(t.id)).length;
+    const totalVisible = scopeAll.length;
     const pct = totalVisible ? Math.min(Math.round((completedVisible / totalVisible) * 100), 100) : 0;
     const progressBar = document.getElementById(`mobileProgressBarCopy`);
     const progressPct = document.getElementById(`mobileProgressPctCopy`);
@@ -1376,10 +1673,10 @@ async function openMissionsModal() {
             if (themes.length) filteredAll = filteredAll.filter(t => themes.includes(t.core_theme));
             if (stages.length) filteredAll = filteredAll.filter(t => stages.includes(t.stage));
             if (tags.length) filteredAll = filteredAll.filter(t => tags.includes(t.subcategory));
-            const unlockedAll = filteredAll.filter(t => t.is_unlocked);
             const completedSet = showingExperienced ? completedExperienced : completedNovice;
-            const total = unlockedAll.length;
-            const completed = unlockedAll.filter(t => completedSet.has(t.id)).length;
+            const scopeAll = filteredAll;
+            const total = scopeAll.length;
+            const completed = scopeAll.filter(t => completedSet.has(t.id)).length;
             const pct = total ? Math.min(Math.round((completed / total) * 100), 100) : 0;
             const progressBar = document.getElementById('mobileProgressBar');
             const progressPct = document.getElementById('mobileProgressPct');
@@ -1500,8 +1797,8 @@ async function loadAchievementsModal() {
                 background: #f3f4f6;
                 border: none;
                 border-radius: 50%;
-                width: 32px;
-                height: 32px;
+                width: 44px;
+                height: 44px;
                 font-size: 14px;
                 color: #6b7280;
                 cursor: pointer;
@@ -1628,11 +1925,12 @@ async function generateCompletedTasksHtml() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -1789,11 +2087,12 @@ async function generatePendingSigmaHtml() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -2047,11 +2346,12 @@ async function showThemeSelectorModal() {
 
     const escapeHtml = (str) => {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => {
+        return String(str).replace(/[&<>"']/g, m => {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
-            return m;
+            if (m === '"') return '&quot;';
+            return '&#39;';
         });
     };
 
@@ -2336,8 +2636,9 @@ async function loadSubscriptionInfo() {
   const container = document.getElementById('subscriptionInfo');
   if (!container) return;
 
-  // Only show for paying tiers (plus, steward, collective) and if they have a subscription
-  if (userProfile.member_tier === 0 || !userProfile.stripe_subscription_id) {
+  // Show the panel for anyone on a paid tier. Early-access upgrades are granted
+  // without Stripe, so a missing stripe_subscription_id must NOT hide it.
+  if (userProfile.member_tier === 0 && !userProfile.stripe_subscription_id) {
     container.style.display = 'none';
     return;
   }
@@ -2345,19 +2646,36 @@ async function loadSubscriptionInfo() {
   container.style.display = 'block';
   document.getElementById('subTier').innerText = tier === 'plus' ? 'Meadow+' : tier === 'steward' ? 'Steward' : 'Collective';
 
-  if (periodEnd) {
-    const renewDate = new Date(periodEnd).toLocaleDateString();
-    document.getElementById('subRenewalDate').innerText = renewDate;
+  // Renewal date: profiles.subscription_current_period_end first, then the
+  // subscriptions row. Never leave the field blank.
+  const hasStripeSub = !!userProfile.stripe_subscription_id;
+  let effectivePeriodEnd = periodEnd || null;
+  if (!effectivePeriodEnd && hasStripeSub) {
+    const { data: subRow } = await supabase
+      .from('subscriptions')
+      .select('current_period_end')
+      .eq('user_id', userProfile.id)
+      .maybeSingle();
+    if (subRow && subRow.current_period_end) effectivePeriodEnd = subRow.current_period_end;
+  }
+
+  const renewalEl = document.getElementById('subRenewalDate');
+  if (effectivePeriodEnd) {
+    renewalEl.innerText = new Date(effectivePeriodEnd).toLocaleDateString();
+  } else if (hasStripeSub) {
+    renewalEl.innerText = 'awaiting confirmation from Stripe';
+  } else {
+    renewalEl.innerText = 'Free during early access - no renewal charge';
   }
 
   if (status === 'canceled' || cancelAtPeriodEnd) {
-    const endDate = new Date(periodEnd).toLocaleDateString();
+    const endDate = effectivePeriodEnd ? new Date(effectivePeriodEnd).toLocaleDateString() : 'the end of the current period';
     document.getElementById('subscriptionCancelMsg').style.display = 'block';
     document.getElementById('subscriptionCancelMsg').innerHTML = `⚠️ Your subscription will end on ${endDate}. You will be downgraded to Free tier after that date.`;
     document.getElementById('cancelSubscriptionBtn').style.display = 'none';
   } else {
     document.getElementById('subscriptionCancelMsg').style.display = 'none';
-    document.getElementById('cancelSubscriptionBtn').style.display = 'inline-block';
+    document.getElementById('cancelSubscriptionBtn').style.display = hasStripeSub ? 'inline-block' : 'none';
   }
 }
 
@@ -2770,13 +3088,12 @@ function setThemeFromTier() {
 
 // ======================== INIT ========================
 export async function initProfile() {
+    Loader.show("Gathering your nectar...");
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
         window.location.replace(getBaseURL() + 'login.html');
         return;
     }
-
-    Loader.show("Gathering your nectar...");
 
     try {
         const { data: profile, error: profileError } = await supabase
@@ -2794,15 +3111,22 @@ export async function initProfile() {
 
         const { data: userTasks, error: userTasksError } = await supabase
             .from('user_tasks')
-            .select('task_id, version')
+            .select('task_id, version, completed_at')
             .eq('user_id', user.id);
         if (userTasksError) throw userTasksError;
 
         completedNovice.clear();
         completedExperienced.clear();
+        // Rebuild the completion-time map from the DB on every load. It drives the 24h
+        // sequential cooldown in refreshTasks(); previously it was filled ONLY when a task
+        // was completed in the current session, so after any refresh it was empty and
+        // `hoursSincePrev` fell through to 999 -> every task whose predecessor was done
+        // unlocked instantly. That is why the cooldown appeared to be gone.
+        completedAtMap = {};
         userTasks.forEach(t => {
             if (t.version === 'novice') completedNovice.add(t.task_id);
             else if (t.version === 'experienced') completedExperienced.add(t.task_id);
+            if (t.completed_at) completedAtMap[t.task_id] = t.completed_at;
         });
 
         const { data: progressData, error: progressError } = await supabase
@@ -2978,16 +3302,8 @@ export async function initProfile() {
             }, 500);
         }
 
-        // Floating button for mobile (optional – not required if you use the left column button)
-        const floatingBtn = document.getElementById('mobileFloatingMissionsBtn');
-        if (floatingBtn) {
-            const updateVisibility = () => {
-                floatingBtn.style.display = window.innerWidth <= 767 ? 'flex' : 'none';
-            };
-            updateVisibility();
-            window.addEventListener('resize', updateVisibility);
-            floatingBtn.addEventListener('click', () => openMissionsModal());
-        }
+        // 2026-10-13: dead code removed — #mobileFloatingMissionsBtn is not in the DOM and
+        // duplicated the mobile 'Go to Missions' action button (overlap risk).
 
         // ========== NEW: Load subscription info and attach cancel button ==========
         await loadSubscriptionInfo();
@@ -3001,6 +3317,7 @@ export async function initProfile() {
         showToast("Failed to load profile data.", "error");
     } finally {
         Loader.hide();
+        document.body.classList.remove('data-loading');
     }
 }
 
@@ -3026,11 +3343,12 @@ window.closeAchievementsModal = () => {
 window.closeUpgradePromptModal = closeUpgradePromptModal;
 window.startEditComment = (id, oldText) => {
     const box = document.getElementById(`comment-box-${id}`);
+    const escaped = String(oldText).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     box.innerHTML = `
-        <input type="text" id="edit-input-${id}" value="${oldText}" style="width:100%; padding:5px; border:1px solid #3b82f6; border-radius:4px;">
+        <input type="text" id="edit-input-${id}" value="${escaped}" style="width:100%; padding:5px; border:1px solid #3b82f6; border-radius:4px;">
         <div style="margin-top:5px;">
-            <button onclick="window.saveEditComment('${id}')" style="background:#22c55e; color:white; border:none; padding:3px 8px; border-radius:4px;">Save</button>
-            <button onclick="window.cancelEditComment('${id}')" style="background:#64748b; color:white; border:none; padding:3px 8px; border-radius:4px;">Cancel</button>
+            <button onclick="window.saveEditComment('${id}')" style="background:#22c55e; color:white; border:none; padding:10px 14px; border-radius:4px; min-height:44px;">Save</button>
+            <button onclick="window.cancelEditComment('${id}')" style="background:#64748b; color:white; border:none; padding:10px 14px; border-radius:4px; min-height:44px;">Cancel</button>
         </div>
     `;
 };
@@ -3047,3 +3365,179 @@ window.deleteComment = async (id) => {
         refreshTasks();
     }
 };
+
+// ======================== DESIGN LAYER (profile page) ========================
+// Purely presentational: story rail, filter toggle/badge, tab counts, hero CTA,
+// nudge. All of it reads/writes the same state the page already used.
+var storyFilter = 'All';
+var locksExpanded = false;
+var lastRenderedTasks = [];
+var justCompletedId = null;
+
+function activeFilterCount() {
+    return activeFilters.core_theme.length + activeFilters.stage.length + activeFilters.subcategory.length;
+}
+
+function updateFilterBadge() {
+    const badge = document.getElementById('filterBadge');
+    if (badge) badge.innerText = activeFilterCount();
+}
+
+function updateTabCounts() {
+    const pending = document.getElementById('pendingSigmaCountBadge');
+    const completed = document.getElementById('completedCountBadge');
+    const ach = document.querySelector('.achievements-badge');
+    const t1 = document.getElementById('tabTaskCount');
+    const t2 = document.getElementById('tabReflectionCount');
+    const t3 = document.getElementById('tabCompletedCount');
+    const t4 = document.getElementById('tabAchievementCount');
+    if (t1) t1.innerText = (typeof totalVisibleTasks === 'number' && totalVisibleTasks) ? totalVisibleTasks : '';
+    if (t2) t2.innerText = (pending && pending.innerText) ? pending.innerText : '';
+    if (t3) t3.innerText = (typeof completedVisibleTasks === 'number' && completedVisibleTasks) ? completedVisibleTasks : '';
+    if (t4) t4.innerText = (ach && ach.innerText) ? ach.innerText : '';
+}
+
+function updatePartnerCompare() {
+    const el = document.getElementById('partnerCmp');
+    if (!el) return;
+    if (!hasCollabAccess || !partnerInfo || partnerInfo.length === 0) { el.innerText = ''; return; }
+    const mine = completedNovice.size + completedExperienced.size;
+    const theirs = (typeof partnerCompletedTasks !== 'undefined' && partnerCompletedTasks) ? partnerCompletedTasks.size : 0;
+    el.innerHTML = `<b>You</b> ${mine} completed &nbsp;\u00b7&nbsp; <b>${escapeHtml(partnerInfo[0].username || 'Partner')}</b> ${theirs}`;
+}
+window.updatePartnerCompare = updatePartnerCompare;
+
+function renderStories() {
+    const rail = document.getElementById('storiesRail');
+    if (!rail) return;
+    const themes = [...new Set(allTasksWithCompleted.map(t => t.core_theme).filter(Boolean))].slice(0, 6);
+    const partnerLabel = (typeof partnerInfo !== 'undefined' && partnerInfo.length > 0 && partnerInfo[0].username) ? partnerInfo[0].username : 'Partner';
+    const items = [{ v: 'All', label: 'All tasks', icon: 'fa-seedling', ring: 'var(--sage5)' }];
+    if (hasCollabAccess) items.push({ v: 'partner', label: partnerLabel, icon: 'fa-user-group', ring: 'var(--clay)' });
+    items.push({ v: 'mine', label: 'Tended', icon: 'fa-check', ring: 'var(--green)' });
+    themes.forEach(t => items.push({ v: t, label: t, icon: 'fa-hashtag', ring: 'var(--sage4)' }));
+
+    rail.innerHTML = items.map(it => {
+        const on = (storyFilter === it.v) || (it.v !== 'All' && it.v !== 'mine' && it.v !== 'partner' && storyFilter === 'All' && activeFilters.core_theme.length === 1 && activeFilters.core_theme[0] === it.v);
+        return `<button type="button" class="story${on ? ' on' : ''}" style="--ring:${it.ring}" data-story="${escapeHtml(it.v)}" aria-pressed="${on}">
+            <span class="rg"><span class="in"><i class="fas ${it.icon}"></i></span></span>
+            <span>${escapeHtml(it.label)}</span>
+        </button>`;
+    }).join('');
+    rail.querySelectorAll('.story').forEach(btn => {
+        btn.addEventListener('click', () => setStoryFilter(btn.dataset.story));
+    });
+}
+
+function setStoryFilter(value) {
+    if (value === 'mine' || value === 'partner') {
+        storyFilter = value;
+        activeFilters.core_theme.length = 0;
+    } else if (value === 'All') {
+        storyFilter = 'All';
+        activeFilters.core_theme.length = 0;
+    } else {
+        storyFilter = 'All';
+        activeFilters.core_theme.length = 0;
+        activeFilters.core_theme.push(value);
+    }
+    syncFilterCheckboxes();
+    applyFiltersAndRender();
+}
+
+// Reflect story/filter state onto the page's real dropdown checkboxes + summaries.
+function syncFilterCheckboxes() {
+    const map = [
+        { field: 'core_theme', listId: 'coreFilterList', summaryId: 'coreFilterSummary', empty: 'Themes' },
+        { field: 'stage', listId: 'stageFilterList', summaryId: 'stageFilterSummary', empty: 'Stages' },
+        { field: 'subcategory', listId: 'tagFilterList', summaryId: 'tagFilterSummary', empty: 'Tags' }
+    ];
+    map.forEach(m => {
+        const list = document.getElementById(m.listId);
+        if (list) list.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.checked = activeFilters[m.field].includes(cb.value); });
+        const summary = document.getElementById(m.summaryId);
+        if (summary) {
+            const n = activeFilters[m.field].length;
+            summary.innerText = n === 0 ? m.empty : (n === 1 ? activeFilters[m.field][0] : `${n} selected`);
+        }
+    });
+}
+
+function resetFilters() {
+    activeFilters.core_theme.length = 0;
+    activeFilters.stage.length = 0;
+    activeFilters.subcategory.length = 0;
+    storyFilter = 'All';
+    syncFilterCheckboxes();
+    applyFiltersAndRender();
+    showToast('Filters cleared');
+}
+
+function initDesignExtras() {
+    if (window.__designExtrasBound) return;
+    window.__designExtrasBound = true;
+
+    // Filters toggle (panel is open by default, exactly like before)
+    const toggle = document.getElementById('filterToggle');
+    const panel = document.getElementById('filterPanel');
+    if (toggle && panel) {
+        toggle.addEventListener('click', () => {
+            const hidden = panel.style.display === 'none';
+            panel.style.display = hidden ? '' : 'none';
+            toggle.setAttribute('aria-expanded', hidden ? 'true' : 'false');
+        });
+    }
+    const reset = document.getElementById('filterReset');
+    if (reset) reset.addEventListener('click', resetFilters);
+
+    // Hero CTA: jump to the next task that is actually actionable
+    const heroCta = document.getElementById('heroCta');
+    if (heroCta) {
+        heroCta.addEventListener('click', () => {
+            const next = document.querySelector('#tasks .post.next') || document.querySelector('#tasks .post:not(.done):not(.locked)') || document.querySelector('#tasks .post');
+            if (next) {
+                next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const check = next.querySelector('.task-check');
+                if (check && !check.disabled) check.focus({ preventScroll: true });
+            } else {
+                showToast('No tasks in this view', 'error');
+            }
+        });
+    }
+
+    // Tab bars (desktop tabs + mobile tab bar) reuse the page's own controls
+    document.querySelectorAll('.tabs button, .tab button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bar = btn.closest('.tabs, .tab');
+            if (bar && bar.classList.contains('tabs')) bar.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+            btn.classList.add('on');
+            const scroll = btn.dataset.scrollTo;
+            if (scroll) {
+                const target = document.getElementById(scroll);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                else showToast('Nothing to show yet', 'error');
+                return;
+            }
+            const nav = btn.dataset.nav;
+            if (nav) {
+                const el = document.getElementById(nav);
+                if (el) el.click();
+                return;
+            }
+            const href = btn.dataset.href;
+            if (href) window.location.href = href;
+        });
+    });
+
+    // Nudge (cosmetic: no partner-facing API exists yet)
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('.mini[data-nudge]');
+        if (!btn || btn.disabled) return;
+        btn.disabled = true;
+        showToast('Nudge noted - your partner will see it on the board');
+    });
+}
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(() => { renderStories(); initDesignExtras(); }, 400));
+}

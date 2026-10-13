@@ -1,0 +1,689 @@
+/* ==========================================================================
+   THE MEADOW — PROFILE PAGE (design port from /files/ProfilePage.jsx + profile.css)
+   Scope: body.page-profile ONLY. Loaded last, after style.css + tester.css.
+   Palette tokens are !important because js/app.js writes theme colours as INLINE
+   custom properties on <html> (applyTheme) — inline beats any plain rule.
+   ========================================================================== */
+
+body.page-profile{--bg:#F6F4EC;--surface:#FDFCF8;--topbar:#F9F7F1;--ink:#2E4A37;--text:#46564B;--muted:#626C65;--faint:#6A786C;--line:#E4E7DA;--soft:#F1F3E9;--sage1:#E7ECDC;--sage2:#DCE4CF;--sage3:#C5D2BA;--sage5:#7A9170;--green:#3E5A44;--green-ink:#FFFFFF;--gold:#F0E8CB;--clayb:#F4E3DA;--t1:#7A9170;--t1-soft:#E3E8D8;--t1-ink:#3E5A44;--t2:#C98B6B;--t2-soft:#F4E3DA;--t2-ink:#8A4B2A;--sh:0 1px 2px rgba(50,70,50,.06),0 8px 24px rgba(50,70,50,.05);--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151A16;--surface:#1D241F;--topbar:#181E1A;--ink:#DDE8DC;--text:#BCC8BD;--muted:#94A297;--faint:#7F8D82;--line:#2D372F;--soft:#242D26;--sage1:#26322A;--sage2:#2C3A30;--sage3:#3B4D40;--sage5:#8FAE84;--green:#7FA486;--green-ink:#101612;--gold:#3A3622;--clayb:#3B2B22;--t1-soft:#26322A;--t1-ink:#A9C79F;--t2-soft:#3B2B22;--t2-ink:#E3A98A;--sh:0 8px 24px rgba(0,0,0,.35)}}
+body.page-profile[data-theme="dark"]{--bg:#151A16;--surface:#1D241F;--topbar:#181E1A;--ink:#DDE8DC;--text:#BCC8BD;--muted:#94A297;--faint:#7F8D82;--line:#2D372F;--soft:#242D26;--sage1:#26322A;--sage2:#2C3A30;--sage3:#3B4D40;--sage5:#8FAE84;--green:#7FA486;--green-ink:#101612;--gold:#3A3622;--clayb:#3B2B22;--t1-soft:#26322A;--t1-ink:#A9C79F;--t2-soft:#3B2B22;--t2-ink:#E3A98A;--sh:0 8px 24px rgba(0,0,0,.35)}
+body.page-profile *{box-sizing:border-box}
+body.page-profile{margin:0;background:var(--bg);color:var(--text);font:400 15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding-top:var(--safe-t);-webkit-font-smoothing:antialiased}
+body.page-profile button,body.page-profile input,body.page-profile select{font:inherit;color:inherit}
+body.page-profile button{cursor:pointer}
+body.page-profile .h{font-family:Newsreader,Georgia,serif;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+body.page-profile .eb{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+body.page-profile .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+body.page-profile .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh)}
+body.page-profile .topbar{position:sticky;top:0;z-index:30;background:var(--topbar);border-bottom:1px solid var(--line);height:64px;padding:0 32px;display:flex;align-items:center;gap:16px}
+body.page-profile .logo{display:flex;align-items:center;gap:12px}
+body.page-profile .logo i{width:40px;height:40px;border-radius:11px;background:var(--green);color:var(--green-ink);display:flex;align-items:center;justify-content:center}
+body.page-profile .logo span{display:flex;flex-direction:column;line-height:1.1;font-size:11px;font-weight:600;letter-spacing:.2em;color:var(--ink)}
+body.page-profile .logo span b{font-size:16px;letter-spacing:.22em}
+@media (min-width:769px){
+body.page-profile .tl{display:flex;gap:32px;margin:0 auto}
+}
+body.page-profile .tl a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 2px;border-bottom:2px solid transparent}
+body.page-profile .tl a.on{color:var(--ink);border-color:var(--sage5)}
+body.page-profile .tl a:hover{color:var(--ink)}
+body.page-profile .me{display:flex;align-items:center;gap:8px;color:var(--muted)}
+body.page-profile .av{border-radius:50%;background:var(--gold);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none;border:1px solid var(--sage3)}
+body.page-profile .av.sg{background:var(--sage2)}
+body.page-profile .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+body.page-profile .crumb{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 18px;font-size:13px}
+body.page-profile .crumb nav{display:flex;align-items:center;gap:10px;color:var(--muted)}
+body.page-profile .crumb nav b{font-weight:500;color:var(--ink)}
+body.page-profile .crumb .ic{width:14px;height:14px}
+body.page-profile .btn{border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-weight:600;font-size:14px;background:var(--surface);color:var(--ink);display:inline-flex;gap:8px;align-items:center;min-height:44px}
+body.page-profile .btn:hover{background:var(--soft)}
+body.page-profile .btn.pri{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+body.page-profile .btn.pri:hover{filter:brightness(1.08)}
+body.page-profile .btn .ic{width:16px;height:16px}
+body.page-profile .hero{position:relative;overflow:hidden;border-radius:28px;background:var(--sage1);min-height:360px;padding:48px 56px;display:flex;align-items:center}
+body.page-profile .hl{position:relative;z-index:1;max-width:46%}
+body.page-profile .who{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+body.page-profile .who .av{width:56px;height:56px;font-size:18px;box-shadow:0 0 0 4px rgba(255,255,255,.5)}
+body.page-profile .who .nm{font-size:30px;line-height:1.1}
+body.page-profile .who .pill{margin-left:6px}
+body.page-profile .pill{border-radius:999px;font-weight:600;font-size:12px;padding:5px 12px;white-space:nowrap;display:inline-block;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+body.page-profile .hl h1{margin:0 0 14px;font-size:46px;line-height:1.05}
+body.page-profile .hl p{margin:0 0 26px;font-size:15px;color:var(--text);max-width:420px}
+body.page-profile .art{position:absolute;right:0;top:0;bottom:0;width:56%;height:100%}
+body.page-profile .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+body.page-profile .sc{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:18px}
+body.page-profile .sc .v{font-size:32px;line-height:1.1;margin-top:6px}
+body.page-profile .sc .v small{font-family:Inter,sans-serif;font-size:13px;color:var(--muted);margin-left:6px;font-weight:400}
+body.page-profile .sc .ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+body.page-profile .tabs{display:flex;gap:4px;padding:0 12px;overflow-x:auto;border-radius:16px}
+body.page-profile .tabs button{border:0;background:none;padding:15px 16px;font-weight:600;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;min-height:50px}
+body.page-profile .tabs button.on{color:var(--ink);border-color:var(--sage5)}
+body.page-profile .tabs button:hover:not(.on){color:var(--ink)}
+body.page-profile .tabs em{font-style:normal;color:var(--faint);margin-left:6px;font-size:13px}
+/* 2026-10-13: partner + meadow-circles moved into the LEFT rail (under Upgrade Tier);
+   the Daily Tasks column now extends right into the freed space (no 720px cap). */
+body.page-profile .cols{display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:min-content 1fr;grid-template-areas:"left feed" "right feed";gap:20px;padding:20px 0 64px;align-items:start}
+body.page-profile .left{grid-area:left;position:static;display:flex;flex-direction:column;gap:16px}
+body.page-profile .right{grid-area:right;position:static;display:flex;flex-direction:column;gap:16px}
+body.page-profile .feed{grid-area:feed;display:flex;flex-direction:column;gap:16px;max-width:none;width:100%;margin:0}
+body.page-profile .box{padding:22px}
+body.page-profile .box h2{margin:6px 0 14px;font-size:24px;line-height:1.2}
+body.page-profile .xp{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+body.page-profile .xp b{font-family:Newsreader,Georgia,serif;font-size:30px;color:var(--ink);font-weight:500}
+body.page-profile .xp span{color:var(--muted);font-size:14px}
+body.page-profile .bar{height:12px;border-radius:999px;background:var(--sage2);overflow:hidden}
+body.page-profile .bar b{display:block;height:100%;background:var(--sage5);border-radius:999px;transition:width .8s}
+body.page-profile .bn{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:10px;gap:8px}
+body.page-profile .sl{display:flex;flex-direction:column;gap:2px;padding:10px}
+body.page-profile .sl button{display:flex;align-items:center;gap:12px;border:0;background:none;padding:10px;border-radius:12px;font-weight:600;text-align:left;min-height:44px;color:var(--ink)}
+body.page-profile .sl button:hover{background:var(--soft)}
+body.page-profile .sl .ic{background:var(--sage1);padding:8px;border-radius:50%;width:36px;height:36px}
+body.page-profile .co{display:flex;align-items:center;gap:12px;padding:4px 0}
+body.page-profile .co .av{width:44px;height:44px;position:relative}
+body.page-profile .dot:after{content:"";position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--sage5);border:2px solid var(--surface)}
+body.page-profile .co small{display:block;color:var(--muted)}
+body.page-profile .cmp{margin:10px 0 14px;font-size:13px;color:var(--muted)}
+body.page-profile .right .box{background:var(--sage1)}
+body.page-profile .composer{padding:14px 18px;display:flex;gap:12px;align-items:center}
+body.page-profile .composer .av{width:44px;height:44px}
+body.page-profile .pillb{flex:1;text-align:left;border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:11px 18px;color:var(--muted);min-height:44px}
+body.page-profile .pillb:hover{background:var(--sage1)}
+body.page-profile .fbar{padding:22px;display:flex;flex-direction:column;gap:16px}
+body.page-profile .fh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+body.page-profile .fh h2{margin:6px 0 4px;font-size:28px;line-height:1.1}
+body.page-profile .fh p{margin:0;color:var(--muted)}
+body.page-profile .cnt{background:var(--sage1);border-radius:14px;padding:12px 20px;text-align:right}
+body.page-profile .cnt b{font-family:Newsreader,Georgia,serif;font-size:26px;color:var(--ink);font-weight:500}
+body.page-profile #progressPct{color:var(--ink)} /* pin: 26px metric was rendering #7A9170 (2.85:1 on sage1) */
+body.page-profile .cnt b span{color:var(--muted)}
+body.page-profile .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+body.page-profile .fl{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-weight:600;font-size:13px;min-height:40px;color:var(--text)}
+body.page-profile .fl:hover{background:var(--soft)}
+body.page-profile .fl.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+body.page-profile select.fl{border-radius:999px}
+body.page-profile .post{overflow:hidden}
+body.page-profile .phd{display:flex;align-items:center;gap:12px;padding:16px 18px 6px}
+body.page-profile .nd{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+body.page-profile .nd.next{background:var(--sage5);color:#fff}
+body.page-profile .nd.done{background:var(--green);color:var(--green-ink)}
+body.page-profile .nd.locked{background:var(--soft);color:var(--faint)}
+body.page-profile .pw{flex:1;min-width:0}
+body.page-profile .pw b{display:block;font-weight:600;color:var(--ink)}
+body.page-profile .pw small{color:var(--muted);font-size:13px}
+body.page-profile .pbody{padding:6px 18px 14px;display:flex;flex-direction:column;gap:10px}
+body.page-profile .pbody h3{margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px;line-height:1.25;color:var(--ink)}
+body.page-profile .pbody p{margin:0;color:var(--text)}
+body.page-profile .imp{background:var(--sage1);border-radius:12px;padding:10px 14px;font-size:14px}
+body.page-profile .imp b{color:var(--green)}
+body.page-profile .lockbox{background:var(--soft);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;color:var(--muted)}
+body.page-profile .post.locked .pbody h3{color:var(--muted)}
+body.page-profile .reacts{display:flex;justify-content:space-between;padding:2px 18px 8px;color:var(--muted);font-size:14px}
+body.page-profile .reacts button{border:0;background:none;color:inherit;padding:0}
+body.page-profile .reacts button:hover{text-decoration:underline}
+body.page-profile .rc{display:inline-flex;align-items:center;gap:6px}
+body.page-profile .rc i{width:20px;height:20px;border-radius:50%;background:var(--sage5);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+body.page-profile .rc i .ic{width:12px;height:12px;stroke-width:2.4}
+body.page-profile .abar{display:grid;grid-template-columns:repeat(4,1fr);margin:0 14px;padding:6px 0;border-top:1px solid var(--line);gap:4px}
+body.page-profile .ab{border:0;background:none;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 4px;border-radius:12px;font-weight:600;color:var(--muted);min-height:44px;font-size:14px}
+body.page-profile .ab:hover:not(:disabled){background:var(--soft)}
+body.page-profile .ab:disabled{opacity:.55;cursor:default}
+body.page-profile .ab.on{color:var(--green)}
+body.page-profile .ab.cm{background:var(--green);color:var(--green-ink)}
+body.page-profile .ab.cm:hover{background:var(--green)!important;filter:brightness(1.08)}
+body.page-profile .ab.ok{color:var(--green)}
+body.page-profile .pst{margin:0 14px 14px;border-top:1px solid var(--line);padding-top:12px;display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+body.page-profile .pst .av{width:28px;height:28px;font-size:12px}
+body.page-profile .pst.good{color:var(--green)}
+body.page-profile .pst.turn{color:var(--t2-ink)}
+body.page-profile .pst b{font-weight:600}
+body.page-profile .thread{padding:2px 18px 16px;display:flex;flex-direction:column;gap:10px}
+body.page-profile .cmt{display:flex;gap:8px;align-items:flex-start}
+body.page-profile .cmt .av{width:32px;height:32px;font-size:12px}
+body.page-profile .bub{background:var(--soft);border-radius:16px;padding:8px 14px}
+body.page-profile .bub b{display:block;font-size:13px;color:var(--ink)}
+body.page-profile .cact{font-size:12px;color:var(--muted);padding:2px 12px;display:flex;gap:12px;margin-left:40px}
+body.page-profile .cact button{border:0;background:none;color:inherit;font-weight:600;padding:0}
+body.page-profile .cact button:hover{text-decoration:underline}
+body.page-profile .ci{display:flex;gap:8px;align-items:center}
+body.page-profile .ci input{flex:1;min-width:0;border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:10px 16px;min-height:44px}
+body.page-profile .ci input:focus{outline:2px solid var(--sage5)}
+body.page-profile .tab{display:none}
+/* (.toast rule removed — app.js owns #toast-container toasts; redesigning them is out of scope) */
+@media (max-width:1199px){
+body.page-profile .cols{grid-template-columns:300px minmax(0,1fr);grid-template-areas:"left feed" "right feed"}
+body.page-profile .right{position:static}
+body.page-profile .hl{max-width:52%}
+}
+@media (max-width:899px){body.page-profile .me{margin-left:auto}body.page-profile .topbar{padding:0 20px}body.page-profile .hl h1{font-size:38px}}
+@media (max-width:719px){
+body.page-profile .topbar{padding:0 14px}
+body.page-profile .wrap{padding:0 12px}
+body.page-profile .crumb{padding:18px 0 12px}body.page-profile .crumb .btn.sh{display:none}
+body.page-profile .hero{flex-direction:column;align-items:stretch;padding:26px 22px 0;min-height:0}
+body.page-profile .hl{max-width:100%}
+body.page-profile .hl h1{font-size:34px}
+body.page-profile .who .nm{font-size:24px}
+body.page-profile .art{position:static;width:calc(100% + 44px);margin:12px -22px 0;height:200px}
+body.page-profile .stats{grid-template-columns:1fr;gap:10px}
+body.page-profile .cols{display:flex;flex-direction:column;padding:12px 0 calc(100px + var(--safe-b));gap:14px}
+body.page-profile .left{order:1;position:static}body.page-profile .feed{order:2}body.page-profile .right{order:3}
+body.page-profile .sl{display:none}
+body.page-profile .fh{flex-direction:column}body.page-profile .cnt{text-align:left;align-self:stretch}
+body.page-profile .abar{margin:0 8px}body.page-profile .ab{flex-direction:column;gap:2px;font-size:12px;padding:8px 2px}
+body.page-profile .tab{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px 8px calc(10px + var(--safe-b));justify-content:space-around;align-items:flex-end;z-index:30}
+body.page-profile .tab button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);min-width:56px;min-height:44px}
+body.page-profile .tab .fab{width:56px;height:56px;border-radius:50%;background:var(--green);color:var(--green-ink);margin-top:-24px;justify-content:center;box-shadow:var(--sh)}
+}
+
+/* ==========================================================================
+   ADAPTER v1 — maps the design sheet onto the LIVE profile DOM.
+   Every rule here exists for one of three reasons:
+     (a) style.css contains `!important` button rules (L285/286/1635-1648) that
+         force color/border on every <button>; they are out-specified here.
+     (b) live widgets carry INLINE styles (partnerSection, badges, subscription
+         box) that only `!important` can override.
+     (c) live widgets own behaviour via classes (`dropdown-container.open`,
+         `.mobile-actions` in media queries) — display is never forced here.
+   Scope: body.page-profile for every rule. Nothing here leaks to other pages.
+   ========================================================================== */
+
+/* (a) neutralise the inherited button rules --------------------------------- */
+body.page-profile button,body.page-profile .btn,body.page-profile .reflect-btn,
+body.page-profile .comment-btn,body.page-profile .react-btn{
+  color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:none!important;
+}
+body.page-profile .btn.pri,body.page-profile .ab.cm{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important}
+body.page-profile .btn.pri:hover{color:#fff!important;filter:brightness(1.08)}
+body.page-profile #desktopMissionsBtn{background:var(--green)!important;border-color:var(--green)!important;color:#fff!important}
+body.page-profile .brand-title{color:var(--ink)!important;-webkit-text-fill-color:var(--ink)!important;background:none!important;text-shadow:none!important}
+body.page-profile .brandmark{background:var(--green);border-radius:11px;padding:5px;display:flex;align-items:center;justify-content:center}
+body.page-profile .logo-img{border-radius:8px!important;height:30px!important}
+
+/* borderless controls must stay borderless (base sheet sets border:0) ------ */
+body.page-profile .sl button,body.page-profile .tabs button,body.page-profile .ab,
+body.page-profile .cact button,body.page-profile .reacts button,body.page-profile .bottom-sheet-close,
+body.page-profile .close-modal-btn,body.page-profile .sl button:hover,body.page-profile .tabs button:hover{
+  border:0!important;background:none!important;
+}
+body.page-profile .tabs button.on{color:var(--ink)!important}
+
+/* (b) inline-styled live widgets ------------------------------------------- */
+body.page-profile #partnerSection{
+  background:var(--surface)!important;border:1px solid var(--line)!important;
+  border-radius:20px!important;padding:18px!important;margin:0!important;box-shadow:var(--sh)!important;
+}
+body.page-profile #partnerSection h3,body.page-profile #partnerSection h4{
+  font-family:Newsreader,Georgia,serif;font-weight:500;color:var(--ink);margin:0 0 10px;
+}
+body.page-profile .action-badge,body.page-profile #pendingSigmaCountBadge,
+body.page-profile #completedCountBadge,body.page-profile .pending-sigma-badge{
+  background:var(--sage2)!important;color:var(--ink)!important;border-radius:999px!important;
+  padding:2px 10px!important;font-size:12px!important;font-weight:700!important;min-width:24px;text-align:center;
+}
+body.page-profile .achievements-badge{background:var(--green)!important;color:#fff!important;border-radius:999px!important;padding:2px 8px!important}
+body.page-profile #subscriptionInfo > div,body.page-profile #subscriptionInfo div[style*="background"]{
+  background:var(--sage1)!important;border-radius:16px!important;border:1px solid var(--line)!important;
+}
+body.page-profile #cancelSubscriptionBtn{border-color:var(--line)!important;color:var(--ink)!important}
+
+/* (c) live widgets that own their own display ------------------------------- */
+body.page-profile .dropdown-header{
+  display:flex!important;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:999px!important;
+  padding:9px 16px!important;font-weight:600!important;font-size:13px!important;color:var(--text)!important;
+  cursor:pointer;min-height:40px;
+}
+body.page-profile .dropdown-header:hover{background:var(--soft)!important}
+body.page-profile .dropdown-list{
+  background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:14px!important;
+  box-shadow:var(--sh)!important;padding:6px!important;margin-top:6px!important;
+}
+body.page-profile .dropdown-list label,body.page-profile .dropdown-list .filter-item{
+  border-radius:10px!important;padding:8px 10px!important;font-size:13px!important;color:var(--text)!important;
+}
+body.page-profile .dropdown-list input[type="checkbox"]{accent-color:var(--sage5)}
+body.page-profile .filter-row{gap:10px!important;display:flex!important;flex-wrap:wrap!important;align-items:end!important}
+body.page-profile .filter-row > div > span{
+  font-size:10px!important;color:var(--muted)!important;letter-spacing:.12em!important;font-weight:700!important;
+}
+
+/* (d) live progress + task list -------------------------------------------- */
+@media (min-width:900px){body.page-profile #tasks{max-height:none!important;overflow:visible!important}}
+body.page-profile progress{
+  width:100%;height:12px;border:0!important;border-radius:999px;appearance:none;-webkit-appearance:none;
+  background:var(--sage2);overflow:hidden;display:block;
+}
+body.page-profile progress::-webkit-progress-bar{background:var(--sage2);border-radius:999px}
+body.page-profile progress::-webkit-progress-value{background:var(--sage5);border-radius:999px;transition:width .8s}
+body.page-profile progress::-moz-progress-bar{background:var(--sage5);border-radius:999px}
+body.page-profile #progressBar{height:12px!important;width:100%!important}
+body.page-profile .progressWrap{background:none!important;border:0!important;padding:0!important;margin:14px 0!important}
+body.page-profile .progressWrap > div span{color:var(--muted)!important;font-size:12px!important}
+
+/* the de-inlined task card (createTaskCard) --------------------------------- */
+body.page-profile .task-item{margin:0 0 18px;position:relative}
+body.page-profile .post .task-check{
+  appearance:none;-webkit-appearance:none;width:44px;height:44px;border-radius:50%;margin:0;
+  border:2px solid var(--sage3)!important;background:var(--soft)!important;cursor:pointer;position:relative;flex:none;
+}
+body.page-profile .post .task-check:hover{border-color:var(--sage5)!important;background:var(--sage1)!important}
+body.page-profile .post .task-check:checked{background:var(--green)!important;border-color:var(--green)!important}
+body.page-profile .post .task-check:checked::after{
+  content:"";position:absolute;left:14px;top:9px;width:11px;height:19px;
+  border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg);
+}
+body.page-profile .post .task-check:disabled{opacity:.5;cursor:not-allowed}
+body.page-profile .nd{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;border:2px solid var(--line)}
+body.page-profile .nd.done{background:var(--green);color:#fff;border-color:var(--green)}
+body.page-profile .nd.locked{background:var(--soft);color:var(--faint)}
+body.page-profile .abar{grid-template-columns:repeat(3,1fr)}
+body.page-profile .react-btn{border:0!important;background:transparent!important;color:var(--muted)!important}
+body.page-profile .react-btn:hover:not(:disabled){background:var(--soft)!important}
+body.page-profile .react-btn.on{color:var(--green)!important}
+body.page-profile .ab.clay,body.page-profile .react-btn.clay{color:var(--t2-ink)!important}
+body.page-profile .comment-btn.ci-send{
+  border:1px solid var(--green)!important;background:var(--green)!important;color:#fff!important;
+  width:44px;height:44px;border-radius:50%!important;display:inline-flex!important;align-items:center;justify-content:center;flex:none;
+}
+body.page-profile .lock-scrim{
+  position:absolute;inset:0;z-index:2;border-radius:20px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;
+  background:rgba(246,244,236,.92);backdrop-filter:blur(3px);color:var(--muted);
+}
+body.page-profile .lock-scrim i{font-size:32px;color:var(--sage5)}
+body.page-profile .lock-scrim strong{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:19px;color:var(--ink)}
+body.page-profile .lock-scrim p{margin:0;font-size:13px;color:var(--muted);max-width:320px}
+body.page-profile .comment-btn:disabled,body.page-profile .react-btn:disabled{opacity:.5;cursor:not-allowed}
+body.page-profile #toast-container .toast{color:var(--ink)}
+
+/* left rail rows (real live controls) -------------------------------------- */
+body.page-profile .sl button{color:var(--ink)!important;font-weight:600}
+body.page-profile .sl button:hover{background:var(--soft)!important}
+body.page-profile .sl a{display:flex;align-items:center;gap:12px;border:0;background:none;padding:10px;border-radius:12px;font-weight:600;text-align:left;min-height:44px;color:var(--ink);text-decoration:none}
+body.page-profile .sl a:hover{background:var(--soft)}
+body.page-profile .sl .badge{background:var(--sage2)!important;color:var(--ink)!important;border-radius:999px!important;padding:2px 10px!important}
+body.page-profile .sl hr{border:0;border-top:1px solid var(--line);margin:8px 4px}
+
+/* composer (Add Sigma Log is the live #addSigmaBtnDesktop) ------------------ */
+body.page-profile .pillb{
+  border:1px solid var(--line)!important;border-radius:999px!important;background:var(--soft)!important;
+  color:var(--muted)!important;padding:11px 18px!important;font-weight:500!important;text-align:left;
+  flex:1;min-height:44px;display:flex;align-items:center;gap:10px;
+}
+body.page-profile .pillb:hover{background:var(--sage1)!important;color:var(--ink)!important}
+
+/* mobile action panel (kept: it is the mobile nav) -------------------------- */
+body.page-profile .mobile-actions{gap:10px;margin:8px 0 12px}
+body.page-profile .mobile-action-btn{
+  display:flex!important;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:16px!important;
+  padding:14px 16px!important;font-weight:600!important;color:var(--ink)!important;min-height:52px;
+  box-shadow:var(--sh);text-decoration:none;
+}
+body.page-profile .mobile-action-btn:hover{background:var(--soft)!important}
+
+/* sheets + modals + footer (visual only; display untouched) ---------------- */
+body.page-profile .modal-content{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:24px!important;padding:32px!important}
+body.page-profile .bottom-sheet{background:var(--surface)!important;border:1px solid var(--line)!important}
+body.page-profile .bottom-sheet-header{border-bottom:1px solid var(--line)!important}
+body.page-profile .bottom-sheet-close{color:var(--muted)!important;border-radius:50%;width:44px;height:44px}
+body.page-profile .bottom-sheet-content{color:var(--text)}
+body.page-profile .tier-option{
+  background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:4px;
+}
+body.page-profile .tier-option:hover{background:var(--sage1)}
+body.page-profile .tier-option h4{font-family:Newsreader,Georgia,serif;font-weight:500;color:var(--ink);font-size:20px}
+body.page-profile .form-field label{font-size:13px;color:var(--muted);font-weight:600}
+body.page-profile .form-field input,body.page-profile .form-field textarea{
+  background:var(--soft)!important;border:1px solid var(--line)!important;border-radius:14px!important;
+  padding:11px 14px!important;color:var(--text)!important;width:100%;min-height:44px;
+}
+body.page-profile .form-field input:focus,body.page-profile .form-field textarea:focus{outline:2px solid var(--sage5)!important}
+body.page-profile .footer{background:var(--surface)!important;border-top:1px solid var(--line)!important;padding:34px 5%!important}
+body.page-profile .footer-links a{color:var(--sage5)!important}
+body.page-profile .footer p{color:var(--muted)!important}
+body.page-profile .loader-overlay{background:rgba(246,244,236,.94)!important}
+body.page-profile .loader-content{color:var(--muted)!important}
+
+/* dark-mode counterparts for the rules above ------------------------------- */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) body.page-profile .lock-scrim{background:rgba(21,26,22,.9)}
+  :root:not([data-theme="light"]) body.page-profile .loader-overlay{background:rgba(21,26,22,.94)!important}
+}
+body.page-profile[data-theme="dark"] .lock-scrim{background:rgba(21,26,22,.9)}
+body.page-profile[data-theme="dark"] .loader-overlay{background:rgba(21,26,22,.94)!important}
+
+
+/* ============================================================================
+   PAGE ADAPTER — binds the live profile.html to the design sheet above.
+   Scope is body.page-profile only; no other page loads this file.
+   Token source: design/DESIGN.md
+   ============================================================================ */
+
+/* legacy palette vars the live page still uses -> sage/cream */
+body.page-profile{
+  --card:#FDFCF8; --bg-card:#FDFCF8; --bg-secondary:#F1F3E9; --secondary:#F1F3E9;
+  --border:#E4E7DA; --fg:#46564B; --fg-muted:#626C65; --primary:#3E5A44; --primary-dark:#7A9170;
+  --success:#3E5A44; --error:#A8443A; --honey-gradient:linear-gradient(135deg,#7FA486,#5C7A5F);
+  --card-shadow:var(--sh);
+  --card-shadow-hover:0 2px 4px rgba(50,70,50,.08), 0 18px 40px rgba(50,70,50,.11);
+  --radius-sm:8px; --radius-md:12px; --radius-lg:16px; --radius-xl:20px; --radius-full:999px;
+  --transition-fast:all .15s ease; --transition-smooth:all .2s ease;
+}
+
+/* ---- shell ---- */
+body.page-profile .wrap{max-width:1180px;margin:0 auto;padding:0 20px 64px;width:100%}
+body.page-profile .header.topbar{margin:0;gap:14px}
+body.page-profile .logo-area{display:flex;align-items:center;gap:10px;text-decoration:none}
+body.page-profile .topbar .me{margin-left:auto;position:relative;cursor:pointer;display:flex;align-items:center;
+  gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 5px;
+  color:var(--ink);font-weight:600;font-size:14px}
+body.page-profile .topbar .me .av{width:30px;height:30px;font-size:12px;background:var(--sage2);overflow:hidden}
+body.page-profile .topbar .me .fa-chevron-down{font-size:10px;color:var(--muted)}
+body.page-profile img.av{object-fit:cover;display:block}
+body.page-profile .topbar .dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;min-width:200px;
+  z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:6px}
+body.page-profile .topbar .dropdown-menu a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  color:var(--ink);text-decoration:none;font-size:14px;font-weight:500}
+body.page-profile .topbar .dropdown-menu a:hover{background:var(--soft)}
+body.page-profile .topbar .dropdown-menu a i{color:var(--muted);width:16px}
+
+/* ---- hero + journey art ---- */
+body.page-profile .hl{position:relative;z-index:1;max-width:46%}
+body.page-profile .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+body.page-profile .art svg{width:100%;height:100%;display:block}
+body.page-profile .who .pill{background:var(--surface)}
+
+/* ---- stats: the 4 live values in the design's card grid ---- */
+body.page-profile .stats{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin:20px 0}
+body.page-profile .sc.card{padding:16px 20px}
+body.page-profile .sc .ico{background:var(--sage1);color:var(--green)}
+body.page-profile .sc .v{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+body.page-profile .sc .v b{font-family:Newsreader,Georgia,serif;font-size:28px;font-weight:500;color:var(--ink);line-height:1.1}
+body.page-profile .sc .v small{margin-left:0}
+body.page-profile #userTierBadgeCompact{color:var(--ink)!important;font-size:24px!important}
+body.page-profile #userTierBadgeCompact,body.page-profile #rankLevel,body.page-profile #pointsVal{
+  background:none!important;border:0!important;padding:0!important}
+
+/* ---- sidebar rows (the live ids are divs, not buttons) ---- */
+body.page-profile .sl>div{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;font-weight:600;
+  min-height:44px;color:var(--ink);cursor:pointer}
+body.page-profile .sl>div:hover{background:var(--soft)}
+body.page-profile .sl>div i{color:var(--green);width:20px;text-align:center}
+body.page-profile .sl>div>span:last-child{margin-left:auto;background:var(--sage2);border-radius:999px;padding:2px 10px;font-size:12px}
+body.page-profile #desktopMissionsBtn{background:var(--green)!important;color:#fff!important;border:0!important}
+body.page-profile #desktopMissionsBtn i{color:#fff!important}
+body.page-profile .achievements-badge{background:var(--green);color:#fff}
+
+/* ---- composer + daily-task panel ---- */
+body.page-profile #addSigmaBtnDesktop{background:var(--soft)!important;color:var(--muted)!important;border:1px solid var(--line)!important}
+body.page-profile #addSigmaBtnDesktop:hover{background:var(--sage1)!important;color:var(--ink)!important}
+body.page-profile .progressWrap{display:block;margin-top:2px}
+body.page-profile .progressWrap #progressBar{width:100%}
+body.page-profile .filter-row{gap:12px;align-items:flex-end}
+body.page-profile .filter-row>div>span{color:var(--muted)}
+body.page-profile .dropdown-header{background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:9px 16px;font-weight:600;font-size:13px;min-height:40px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;cursor:pointer}
+body.page-profile .dropdown-list{border:1px solid var(--line);border-radius:16px;background:var(--surface);
+  box-shadow:var(--sh);padding:8px}
+body.page-profile #tasks{display:flex;flex-direction:column;gap:16px;max-height:none;overflow:visible}
+
+/* ---- task cards ---- */
+body.page-profile .post.card{border-radius:20px;background:var(--surface)}
+body.page-profile .pw small{display:block;margin-top:2px}
+body.page-profile .pbody h3{font-size:22px}
+body.page-profile .pbody .filters{gap:8px;margin-top:2px;align-items:center}
+body.page-profile .pill.core{background:var(--green);border-color:var(--green);color:#fff}
+body.page-profile .pill.stage{background:var(--sage1);border-color:var(--sage3);color:var(--ink)}
+body.page-profile .pill.aud{background:var(--soft);color:var(--text)}
+body.page-profile .pill.sub{background:var(--sage2);border-color:var(--sage3);color:var(--ink)}
+body.page-profile .pst{margin:0 14px 12px}
+body.page-profile .pst .av{display:inline-flex;align-items:center;justify-content:center;background:var(--sage2)}
+body.page-profile .abar{margin:0 14px;grid-template-columns:repeat(2,1fr)}
+body.page-profile .ab.clay{color:var(--t2-ink)}
+body.page-profile .thread{gap:8px}
+body.page-profile .ci-send{width:44px;height:44px;flex:none}
+body.page-profile .lock-scrim{position:absolute;inset:0;z-index:2;border-radius:20px;background:rgba(246,244,236,.86);
+  backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:8px;padding:20px;color:var(--ink)}
+body.page-profile .lock-scrim i{font-size:30px;color:var(--green)}
+body.page-profile .lock-scrim strong{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:18px}
+body.page-profile .empty{color:var(--muted);font-size:14px;margin:0}
+
+/* ---- surfaces + responsive ---- */
+body.page-profile .modal-content{border-radius:24px}
+body.page-profile .bottom-sheet{border-radius:24px 24px 0 0}
+body.page-profile .loader-overlay{background:rgba(246,244,236,.95)!important}
+body.page-profile .loader-content{background:var(--surface)}
+@media (max-width:980px){ body.page-profile .hl{max-width:100%} }
+
+
+/* ---- display typography: the design's serif must win over the site's Fredoka ---- */
+body.page-profile .hl h1,
+body.page-profile h1,
+body.page-profile h2,
+body.page-profile h3,
+body.page-profile h4,
+body.page-profile .brand-title,
+body.page-profile .pbody h3,
+body.page-profile .pw b{
+  font-family:Newsreader,Georgia,'Times New Roman',serif!important;
+}
+body.page-profile .hl h1{font-weight:500!important;letter-spacing:-.015em;line-height:1.06}
+body.page-profile h2,body.page-profile h3,body.page-profile h4{font-weight:500!important}
+/* UI type stays sans (buttons / fields / chips) */
+body.page-profile button,
+body.page-profile .btn,
+body.page-profile input,
+body.page-profile select,
+body.page-profile textarea,
+body.page-profile .pill,
+body.page-profile .dropdown-header,
+body.page-profile .sl>div{
+  font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif!important;
+}
+/* exactly 4 stat cards, no phantom tracks */
+body.page-profile .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+@media (max-width:760px){ body.page-profile .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important} }
+
+
+/* ---- reaction buttons: design wins over handleReact's inline greens/yellows ---- */
+body.page-profile .ab{
+  background:var(--soft)!important;color:var(--text)!important;border:1px solid var(--line)!important;
+}
+body.page-profile .ab:hover{background:var(--sage1)!important;color:var(--ink)!important}
+body.page-profile .ab.on{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
+body.page-profile .ab.clay.on{background:#A8574A!important;color:#fff!important;border-color:#A8574A!important}
+body.page-profile .ab:disabled{opacity:.55!important;background:var(--soft)!important;color:var(--muted)!important}
+body.page-profile .comment-btn.ci-send{background:var(--green)!important;color:#fff!important;border:0!important}
+
+
+/* ---- left XP block: show only the live #expText (design's extra label removed) ---- */
+body.page-profile .xp{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+body.page-profile .xp b{font:600 21px/1.25 'Newsreader',Georgia,serif!important;color:var(--ink)!important}
+body.page-profile .xp span{display:none!important}
+
+/* ---- right column: circle rows (label + description stacked, chevron right) ---- */
+body.page-profile .rl{display:flex!important;align-items:center;gap:10px;padding:11px 4px;
+  border-bottom:1px solid var(--line);text-decoration:none!important}
+
+
+/* ---- card header: no duplicate title (.pw b repeats the serif h3) ---- */
+body.page-profile .phd .pw b{display:block!important}
+body.page-profile .phd .pw small{font:500 11.5px/1.35 Inter,system-ui,sans-serif!important;color:var(--muted)!important}
+body.page-profile .phd{align-items:center}
+
+/* ============ 2026-10-13b · NEW reference additions (design-only, profile page) ============ */
+body.page-profile button,body.page-profile input,body.page-profile select{font:inherit;color:inherit}
+
+/* — stories rail (quick filters) — */
+body.page-profile .stories{display:flex;gap:16px;padding:16px 20px;overflow-x:auto}
+body.page-profile .story{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:72px;font-size:12px;font-weight:600;color:var(--muted)!important;min-height:44px;--ring:var(--sage5);cursor:pointer}
+body.page-profile .story .rg{width:62px;height:62px;border-radius:50%;padding:3px;border:2px solid var(--ring);display:flex;align-items:center;justify-content:center}
+body.page-profile .story .in{width:100%;height:100%;border-radius:50%;background:var(--sage1);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+body.page-profile .story.on{color:var(--ink)!important}
+body.page-profile .story.on .rg{border-width:4px}
+body.page-profile .story.on .in{background:var(--ring);color:#fff}
+
+/* — filter toggle row — */
+body.page-profile .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+body.page-profile .ftg{display:inline-flex;align-items:center;gap:8px}
+body.page-profile .ftg .ic{width:16px;height:16px}
+body.page-profile .bd{background:var(--green);color:var(--green-ink);border-radius:999px;padding:0 8px;font-size:12px;line-height:18px}
+body.page-profile .lnk{border:0;background:none;color:var(--muted)!important;font-weight:600;text-decoration:underline;min-height:40px;cursor:pointer}
+
+/* — partner line + nudge — */
+body.page-profile .pst span.tx{flex:1;min-width:0}
+body.page-profile .mini{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:600;font-size:13px;color:var(--ink)!important;display:inline-flex;gap:6px;align-items:center;min-height:40px;cursor:pointer}
+body.page-profile .mini:hover:not(:disabled){background:var(--soft)}
+body.page-profile .mini:disabled{opacity:.6;cursor:default}
+body.page-profile .mini .ic{width:14px;height:14px}
+
+/* — reaction summary + avatar stack — */
+body.page-profile .reacts{display:flex;justify-content:space-between;padding:2px 18px 8px;color:var(--muted);font-size:14px}
+body.page-profile .reacts button{border:0;background:none;color:inherit;padding:0;font-weight:600;cursor:pointer}
+body.page-profile .reacts button:hover{text-decoration:underline}
+body.page-profile .rc{display:inline-flex;align-items:center;gap:8px}
+body.page-profile .stack{display:inline-flex}
+body.page-profile .stack .av{width:22px;height:22px;font-size:10px;border:2px solid var(--surface);margin-left:-6px}
+body.page-profile .stack .av:first-child{margin-left:0}
+
+/* — show-more / empty / skeleton / pop — */
+body.page-profile .more{border:1px dashed var(--sage3);background:none;border-radius:20px;padding:14px;font-weight:600;color:var(--muted)!important;min-height:48px;cursor:pointer}
+body.page-profile .more:hover{background:var(--soft)}
+body.page-profile .empty h3{margin:0;font-size:24px}
+body.page-profile .sk{padding:20px;display:flex;flex-direction:column;gap:12px}
+body.page-profile .sk i{display:block;border-radius:10px;height:14px;background:linear-gradient(90deg,var(--soft),var(--sage1),var(--soft));background-size:200% 100%;animation:shm 1.2s infinite}
+@keyframes shm{to{background-position:-200% 0}}
+@keyframes pop{0%{transform:scale(.985);box-shadow:0 0 0 0 rgba(122,145,112,.55)}60%{transform:scale(1.008);box-shadow:0 0 0 14px rgba(122,145,112,0)}100%{transform:scale(1)}}
+body.page-profile .post.pop{animation:pop 1s ease-out}
+@media (prefers-reduced-motion:reduce){body.page-profile .post.pop,body.page-profile .sk i{animation:none}}
+
+/* — tabs bar — */
+body.page-profile .tabs{display:flex;gap:4px;padding:0 12px;overflow-x:auto;border-radius:16px}
+body.page-profile .tabs button{border:0;background:none;padding:15px 16px;font-weight:600;color:var(--muted)!important;white-space:nowrap;border-bottom:3px solid transparent;min-height:50px;cursor:pointer}
+body.page-profile .tabs button.on{color:var(--ink)!important;border-color:var(--sage5)}
+body.page-profile .tabs button:hover:not(.on){color:var(--ink)!important}
+body.page-profile .tabs em{font-style:normal;color:var(--faint);margin-left:6px;font-size:13px}
+
+/* — right rail: partner dot + compare + link row — */
+body.page-profile .co .av.dot{position:relative}
+body.page-profile .co .av.dot:after{content:"";position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:var(--sage5);border:2px solid var(--surface)}
+body.page-profile .cmp{margin:10px 0 14px;font-size:13px;color:var(--muted)}
+body.page-profile .rl{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted);padding:6px 6px}
+body.page-profile .rl a{color:inherit;text-decoration:none}
+body.page-profile .rl a:hover{color:var(--ink);text-decoration:underline}
+
+/* — card node = circle for the open state too — */
+body.page-profile .phd .pw b{display:block!important}
+body.page-profile .task-check{appearance:none;-webkit-appearance:none;width:44px;height:44px;border-radius:50%;border:3px solid var(--surface)!important;box-shadow:0 0 0 1px var(--line);background:var(--sage5);cursor:pointer;flex:none;position:relative;margin:0}
+body.page-profile .task-check:checked{background:var(--green)}
+body.page-profile .task-check:checked:after{content:"\2713";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700}
+body.page-profile .task-check:disabled{opacity:.5}
+
+body.page-profile .who{gap:14px}
+body.page-profile .who .nm{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+
+/* — mobile tab bar tint — */
+@media (max-width:719px){
+  body.page-profile .tab button{color:var(--muted)!important}
+  body.page-profile .stories{padding:12px 14px}
+}
+
+/* ==========================================================================
+   FIX PASS 2026-10-13 (local) — appended last so equal-specificity rules win.
+   1. Account dropdown was invisible: the base sheet hides .dropdown-menu at a
+      higher specificity than the `.show` toggle, so Edit Profile / Logout
+      could never be seen or clicked.
+   2. Locked card action: "Go to task" + destination highlight.
+   3. Breathing room — the page read as one dense block.
+   ========================================================================== */
+
+/* 1. account dropdown ------------------------------------------------------ */
+body.page-profile .topbar .dropdown-menu.show{display:block;animation:pm-dd-in .18s ease-out}
+body.page-profile .topbar .dropdown-menu.show a{color:var(--ink)}
+body.page-profile .topbar .dropdown-menu.show a:hover{background:var(--soft);color:var(--ink)}
+@keyframes pm-dd-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* 2. locked-task "Go to task" --------------------------------------------- */
+body.page-profile .post .lock-scrim .go-task-btn{
+  margin-top:2px;padding:10px 22px;min-height:44px;border-radius:999px;
+  font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px;
+}
+body.page-profile .post .lock-scrim .go-task-btn:hover{filter:brightness(1.08)}
+body.page-profile .post.flash{animation:pm-flash 2s ease-out}
+@keyframes pm-flash{
+  0%{box-shadow:0 0 0 0 rgba(122,145,112,.55)}
+  20%{box-shadow:0 0 0 8px rgba(122,145,112,.35)}
+  100%{box-shadow:0 0 0 18px rgba(122,145,112,0)}
+}
+
+/* 3. breathing room ------------------------------------------------------- */
+body.page-profile .wrap{max-width:1200px;padding:0 24px 80px}
+body.page-profile .stats{gap:18px;margin:26px 0}
+body.page-profile .cols{gap:26px;padding:24px 0 72px}
+body.page-profile .feed{gap:20px}
+body.page-profile .task-item{margin:0 0 24px}
+body.page-profile .phd{padding:20px 22px 8px;gap:14px}
+body.page-profile .pbody{padding:10px 22px 20px;gap:14px}
+body.page-profile .reacts{padding:4px 22px 10px}
+body.page-profile .thread{padding:4px 22px 20px;gap:12px}
+body.page-profile .abar{margin:0 18px;padding:8px 0}
+body.page-profile .pst{margin:0 18px 18px}
+body.page-profile .lockbox{padding:14px 16px}
+
+@media (max-width:1199px){body.page-profile .cols{gap:22px}}
+@media (max-width:719px){
+  body.page-profile .wrap{padding:0 14px}
+  body.page-profile .cols{gap:18px}
+  body.page-profile .task-item{margin:0 0 22px}
+  body.page-profile .phd{padding:18px 16px 6px}
+  body.page-profile .pbody{padding:10px 16px 18px;gap:12px}
+  body.page-profile .reacts{padding:4px 16px 10px}
+  body.page-profile .thread{padding:4px 16px 18px}
+  body.page-profile .abar{margin:0 12px}
+}
+
+/* 2b. locked card: a readable task card with a lock banner, NOT a blank
+   grey panel. The old full-card .lock-scrim (86% opaque) hid everything,
+   which read as "all tasks are closed". */
+body.page-profile .post.locked{background:var(--surface)}
+body.page-profile .post.locked .lockbox{background:var(--sage1);color:var(--text);border:1px dashed var(--line);align-items:center}
+body.page-profile .post.locked .lockbox span{font-weight:500;min-width:0}
+body.page-profile .post.locked .lockbox .tiny{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+body.page-profile .lockbox .go-task-btn{
+  margin-left:auto;padding:10px 22px;min-height:44px;border-radius:999px;
+  font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:8px;flex:none;
+}
+body.page-profile .lockbox .go-task-btn:hover{filter:brightness(1.08)}
+/* 2c. locked card: greyed-out face + crisp Go to task (2026-10-13) */
+body.page-profile .post.locked{
+  background:#F2F1EB; border-color:#E3E1D7;
+  box-shadow:0 2px 10px rgba(60,70,60,.05);
+}
+/* every piece of card content is desaturated + dimmed ... */
+body.page-profile .post.locked .phd,
+body.page-profile .post.locked .pbody > h3,
+body.page-profile .post.locked .pbody > p,
+body.page-profile .post.locked .pbody > .filters,
+body.page-profile .post.locked .pbody > .imp,
+body.page-profile .post.locked .abar,
+body.page-profile .post.locked .pst,
+body.page-profile .post.locked .reacts,
+body.page-profile .post.locked .thread{
+  filter:grayscale(1); opacity:.55;
+}
+/* ... but the lock notice and its button stay full strength */
+body.page-profile .post.locked .lockbox,
+body.page-profile .post.locked .lockbox *{
+  filter:none !important; opacity:1 !important;
+}
+body.page-profile .post.locked .lockbox{
+  background:#E9E7DD; border:1px dashed #CFCDBF; color:#5C6359;
+}
+body.page-profile .post.locked .lockbox span{color:#5C6359}
+body.page-profile .post.locked .lockbox .tiny{color:var(--text)} /* was #8A9086 (2.64:1) then --muted (4.40, 0.1 short of AA) -> --text = 6.3:1 */
+/* the little lock avatar reads as a real padlock, not a faded smudge */
+body.page-profile .post.locked .phd .nd.locked{filter:none;opacity:.9}
+body.page-profile .post.locked{cursor:default}

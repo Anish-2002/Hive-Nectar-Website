@@ -4,80 +4,129 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>My Profile | The Meadow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="tester.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Profile-page design layer. Tokens: design/DESIGN.md (lint: 0 errors). Loads LAST on purpose. -->
+    <link rel="stylesheet" href="meadow-theme.css" />
+<link rel="stylesheet" href="profile-meadow.css" />
 </head>
-<body class="page-profile" data-theme="classic">
+<body class="page-profile" data-loading data-theme="classic">
 
 <canvas id="shareCanvas" width="600" height="400" style="display:none;"></canvas>
 
-<header class="header">
-  <a href="index.html" class="logo-area">
+<header class="header topbar">
+  <a href="the-meadow.html" class="logo-area">
     <div class="brandmark"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img"></div>
     <span class="brand-title">THE MEADOW</span>
   </a>
   <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
     <i class="fas fa-bars"></i>
   </button>
-  <nav class="nav-links" id="navLinks">
-    <a href="index.html">Home</a>
-    <a href="pollenpop.html">PollenPop</a>
+  <nav class="nav-links tl" id="navLinks">
     <a href="the-meadow.html">The Meadow</a>
+    <a href="pollenpop.html">PollenPop</a>
     <a href="board.html">Communication Board</a>
     <a href="faq.html">FAQ</a>
     <a href="contact.html">Contact</a>
     <a href="login.html">Login to Pollen Pop</a>
   </nav>
+  <div class="me" id="profileAvatarDropdown" role="button" tabindex="0" aria-label="Account menu" aria-haspopup="true">
+    <span class="av" id="topbarAvatar" aria-hidden="true"></span>
+    <span id="userNameDisplayShort">Busy Bee</span>
+    <i class="fas fa-chevron-down"></i>
+    <div class="dropdown-menu" id="avatarDropdownMenu">
+      <a href="#" id="editProfileBtn"><i class="fas fa-user-edit"></i> Edit Profile</a>
+      <a href="#" id="logoutBtnHeader"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
 </header>
 
 <main class="wrap">
-  <!-- Compact Profile Header (no card background) -->
-  <div class="profile-header-row">
-    <button class="btn tiny" onclick="shareStats()"><i class="fas fa-share-nodes"></i> Share</button>
-    <button class="btn tiny" onclick="invitePartner()" style="background:var(--honey-gradient);color:#fff;"><i class="fas fa-user-plus"></i> Invite</button>
-    <div class="user-info-row">
-      <div class="avatar-dropdown" id="profileAvatarDropdown">
-        <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="User" class="avatar-large" id="profileAvatar">
-        <span class="user-name" id="userNameDisplayShort">Busy Bee</span>
-        <i class="fas fa-chevron-down"></i>
-        <div class="dropdown-menu" id="avatarDropdownMenu">
-          <a href="#" id="editProfileBtn"><i class="fas fa-user-edit"></i> Edit Profile</a>
-          <a href="#" id="logoutBtnHeader"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
-      </div>
-      <div class="rank-badge" id="rankNameDisplayCompact">Meadow Novice</div>
+  <div class="crumb">
+    <nav aria-label="Breadcrumb">
+      <a href="the-meadow.html">The Meadow</a>
+      <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      <span>Your profile</span>
+    </nav>
+    <div class="actions">
+      <button class="btn" onclick="shareStats()"><i class="fas fa-share-nodes"></i> Share</button>
+      <button class="btn pri" onclick="invitePartner()"><i class="fas fa-user-plus"></i> Invite partner</button>
     </div>
   </div>
 
-  <!-- Stats Compact Card -->
-  <div class="stats-compact-card">
-    <div class="stat-item"><span class="stat-label">Total Nectar</span><span class="stat-value" id="pointsVal">0</span></div>
-    <div class="stat-item"><span class="stat-label">Status</span><span class="stat-value">Active</span></div>
-    <div class="stat-item"><span class="stat-label">Meadow Rank</span><span class="stat-value" id="rankLevel">#--</span></div>
-    <div class="stat-item"><span class="stat-label">Tier</span><span class="stat-value" id="userTierBadgeCompact">Free</span></div>
+  <!-- ===== Hero: journey art (design) ===== -->
+  <section class="hero">
+    <div class="hl">
+      <span class="eb">Your meadow</span>
+      <div class="who">
+        <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=Felix" alt="Your avatar" class="av" id="profileAvatar">
+        <div class="nm">
+          <b id="heroName">Your meadow</b>
+          <span class="pill" id="rankNameDisplayCompact">Meadow Novice</span>
+        </div>
+      </div>
+      <h1>Keep the meadow in bloom.</h1>
+      <p>Every task you finish adds nectar to the jar. Small habits, tended daily, grow into a meadow.</p>
+      <div class="hero-actions">
+        <button class="btn pri" type="button" id="heroCta"><i class="fas fa-seedling"></i> Take your next step</button>
+      </div>
+    </div>
+    <div class="art" aria-hidden="true">
+      <svg viewBox="0 0 520 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
+        <circle cx="430" cy="70" r="34" fill="var(--sage1)"/>
+        <circle cx="430" cy="70" r="20" fill="var(--gold)"/>
+        <path d="M0 232C86 196 148 224 236 200c88-24 146-6 284-34v154H0z" fill="var(--sage1)"/>
+        <path d="M0 258c96-30 150-2 244-20 94-18 154 4 276-22v104H0z" fill="var(--sage2)"/>
+        <path d="M62 236c52-34 66-70 120-92 54-22 84-52 138-60" stroke="var(--sage3)" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>
+        <g>
+          <circle cx="62" cy="236" r="15" fill="var(--surface)" stroke="var(--green)" stroke-width="3"/>
+          <path d="M56 236l5 5 9-10" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="182" cy="144" r="15" fill="var(--surface)" stroke="var(--sage5)" stroke-width="3"/>
+          <path d="M176 144l5 5 9-10" stroke="var(--sage5)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="320" cy="84" r="17" fill="var(--green)"/>
+          <path d="M313 84l5 5 9-10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <g transform="translate(392 176)">
+          <rect x="0" y="18" width="74" height="86" rx="16" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/>
+          <path d="M0 54h74v34a16 16 0 0 1-16 16H16A16 16 0 0 1 0 88z" fill="var(--gold)"/>
+          <rect x="10" y="6" width="54" height="16" rx="8" fill="var(--sage5)"/>
+          <circle cx="24" cy="104" r="7" fill="var(--sage5)"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ===== Stats (live values: nectar / rank / tier / status) ===== -->
+  <div class="stats">
+    <div class="sc card">
+      <div><div class="eb">Nectar gathered</div><div class="v"><b id="pointsVal">0</b><small>Total nectar</small></div></div>
+      <span class="ico"><i class="fas fa-droplet"></i></span>
+    </div>
+    <div class="sc card">
+      <div><div class="eb">Meadow rank</div><div class="v"><b id="rankLevel">#--</b><small>Among members</small></div></div>
+      <span class="ico"><i class="fas fa-ranking-star"></i></span>
+    </div>
+    <div class="sc card">
+      <div><div class="eb">Membership</div><div class="v"><b id="userTierBadgeCompact">Free</b><small>Current tier</small></div></div>
+      <span class="ico"><i class="fas fa-seedling"></i></span>
+    </div>
   </div>
 
-  <!-- Progress Compact Card -->
-  <div class="progress-compact-card">
-  <div class="progress-header">
-    <span><i class="fas fa-honey-pot"></i> Nectar Progress</span>
-    <span id="expText">0/100</span>
-  </div>
-  <div class="custom-progress-wrapper">
-    <progress id="experienceBar" value="0" max="100"></progress>
-    
-  </div>
-  <div class="progress-footer">
-    <span class="tiny">Experience points</span>
-    <span class="tiny">Nectar: <span id="nectarPointsDisplay">0</span></span>
-  </div>
-</div>
+  <!-- ===== Tabs (design) — each tab drives a control the page already had ===== -->
+  <nav class="tabs card" id="profileTabs" aria-label="Sections">
+    <button type="button" class="on" data-scroll-to="tasks">Daily tasks<em id="tabTaskCount"></em></button>
+    <button type="button" data-nav="addSigmaBtnDesktop">Reflection<em id="tabReflectionCount"></em></button>
+    <button type="button" data-nav="mobileCompletedTasksBtn">Completed<em id="tabCompletedCount"></em></button>
+    <button type="button" data-nav="mobileAchievementsBtn">Achievements<em id="tabAchievementCount"></em></button>
+    <button type="button" data-nav="upgradeTierBtn">Tier</button>
+    <button type="button" data-nav="editProfileBtn">Settings</button>
+  </nav>
 
-<!-- Partner Section -->
-<div id="partnerSection" style="display:none;margin:16px 0;padding:12px;background:var(--bg-card);border-radius:12px;border:1px solid var(--border);"></div>
-
-  <!-- Mobile action buttons – each opens a bottom sheet -->
+  <!-- Mobile action buttons – each opens a bottom sheet (unchanged behaviour) -->
   <div class="mobile-actions" id="mobileActionsPanel">
     <button type="button" class="btn mobile-action-btn" id="mobileMissionsBtn">
       <span><i class="fas fa-clipboard-list"></i> Tasks Reflection</span>
@@ -88,7 +137,7 @@
       <span class="action-badge" id="mobileCompletedBadge">0</span>
     </button>
     <button type="button" class="btn mobile-action-btn" id="mobileAchievementsBtn">
-      <span><i class="fas fa-award"></i> Achievements</span>
+      <span style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-award"></i> Achievements<span class="achievements-badge" style="background: var(--honey-gradient); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; display: none;"></span></span>
       <i class="fas fa-chevron-right"></i>
     </button>
     <button type="button" class="btn mobile-action-btn" id="mobileAddSigmaBtn">
@@ -103,7 +152,7 @@
       <span><i class="fas fa-comments"></i> Meadow Buzz</span>
       <i class="fas fa-chevron-right"></i>
     </a>
-    <a href="testjar.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
+    <a href="decorator.html" class="btn mobile-action-btn mobile-link-btn mobile-accent">
       <span><i class="fas fa-paint-brush"></i> Decorate Jar</span>
       <i class="fas fa-chevron-right"></i>
     </a>
@@ -112,47 +161,71 @@
       <i class="fas fa-chevron-right"></i>
     </button>
   </div>
+  </div>
 
-  <!-- Desktop Layout Grid (tasks, filters, sidebars – identical to before) -->
-  <div class="profile-layout-grid desktop-only-grid">
-    <aside class="left-column">
-      <div class="card">
-        <nav class="sub-nav">
-          <a href="#" class="sub-link active" id="desktopMissionsBtn"><i class="fas fa-rocket"></i> Go to Missions</a>
-          <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Meadow Buzz</a>
-          <a href="#" id="desktopAchievementsBtn" class="sub-link">
-            <i class="fas fa-award"></i> Achievements
-            <span class="achievements-badge" style="margin-left: auto; background: var(--honey-gradient); color: white; border-radius: 20px; padding: 2px 8px; font-size: 0.7rem; display: none;"></span>
-          </a>
-          <a href="testjar.html" class="sub-link" style="margin-top: 12px; background: var(--honey-gradient); color: white;"><i class="fas fa-paint-brush"></i> Decorate Jar</a>
-          <div class="card" style="margin-top: 16px; padding: 16px; background: var(--secondary);">
-            <button id="addSigmaBtnDesktop" class="btn tiny" style="width: 100%;"><i class="fas fa-chart-line"></i> Add Sigma Log</button>
-          </div>
-          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="pendingSigmaSection">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-clipboard-list" style="color: var(--success);"></i> Tasks Reflection</span>
-              <span class="pending-sigma-badge" id="pendingSigmaCountBadge" style="background: var(--honey-gradient); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;">0</span>
-            </div>
-          </div>
-          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="completedTasksSection">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i> Completed Tasks</span>
-              <span class="completed-badge" id="completedCountBadge" style="background: var(--honey-gradient); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 700;">0</span>
-            </div>
-          </div>
-          <div class="card lift" style="margin-top: 12px; padding: 16px; cursor: pointer;" id="themeSelectorDesktopBtn">
-            <div style="display: flex; align-items: center; gap: 8px;"><i class="fas fa-palette"></i> Choose Focus Themes</div>
-          </div>
-          <hr style="border: 0; border-top: 1px solid var(--border); margin: 16px 0;">
-          <a href="#" id="upgradeTierBtn" class="sub-link" style="color: var(--success);"><i class="fas fa-rocket"></i> Upgrade Tier</a>
-        </nav>
+  <div class="cols">
+    <!-- ===== Left: nectar progress + meadow menu ===== -->
+    <aside class="left">
+      <div class="card box">
+        <span class="eb">Nectar progress</span>
+        <div class="xp"><b id="expText">0/100</b><span>to next rank</span></div>
+        <div class="custom-progress-wrapper">
+          <progress id="experienceBar" value="0" max="100"></progress>
+        </div>
+        <div class="bn">Experience points <i class="fas fa-circle" aria-hidden="true"></i> Nectar: <span id="nectarPointsDisplay">0</span></div>
+      </div>
+
+      <div class="card sl">
+        <a href="#" class="sub-link active" id="desktopMissionsBtn"><i class="fas fa-rocket"></i> Go to Missions</a>
+        <a href="board.html" class="sub-link"><i class="fas fa-comments"></i> Meadow Buzz</a>
+        <a href="#" id="desktopAchievementsBtn" class="sub-link">
+          <i class="fas fa-award"></i> Achievements
+          <span class="achievements-badge" style="display: none;"></span>
+        </a>
+        <div id="pendingSigmaSection">
+          <i class="fas fa-clipboard-list"></i> Tasks Reflection
+          <span id="pendingSigmaCountBadge">0</span>
+        </div>
+        <div id="completedTasksSection">
+          <i class="fas fa-check-circle"></i> Completed Tasks
+          <span id="completedCountBadge">0</span>
+        </div>
+        <div id="themeSelectorDesktopBtn"><i class="fas fa-palette"></i> Choose Focus Themes</div>
+        <a href="decorator.html" class="sub-link"><i class="fas fa-paint-brush"></i> Decorate Jar</a>
+        <hr>
+        <a href="#" id="upgradeTierBtn" class="sub-link"><i class="fas fa-rocket"></i> Upgrade Tier</a>
       </div>
     </aside>
 
-    <section class="middle-column">
-      <div class="card">
-        <h3 style="margin-bottom: 24px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-list-check" style="color: var(--primary);"></i> Daily Tasks</h3>
-        <div class="filter-row">
+    <!-- ===== Feed: composer + daily tasks ===== -->
+    <section class="feed">
+      <div class="card composer">
+        <span class="av" id="composerAvatar" aria-hidden="true"></span>
+        <button id="addSigmaBtnDesktop" class="pillb"><i class="fas fa-plus"></i> Add Sigma Log</button>
+      </div>
+
+      <!-- ===== Stories rail (design) — quick filters, built by JS ===== -->
+      <div class="card stories" id="storiesRail" role="tablist" aria-label="Quick filters"></div>
+
+      <div class="card fbar">
+        <div class="fh">
+          <div>
+            <span class="eb">Today in the meadow</span>
+            <h2>Daily Tasks</h2>
+          </div>
+          <div class="cnt">
+            <b id="progressPct">0%</b>
+            <span>complete</span>
+          </div>
+        </div>
+        <div class="progressWrap">
+          <progress id="progressBar" value="0" max="100" style="width: 100%;"></progress>
+        </div>
+        <div class="frow">
+          <button type="button" class="ftg pillb" id="filterToggle" aria-expanded="true"><i class="fas fa-sliders ic"></i> Filters <span class="bd" id="filterBadge">0</span></button>
+          <button type="button" class="lnk" id="filterReset">Reset</button>
+        </div>
+        <div class="frow" id="filterPanel">
           <div class="dropdown-container" id="coreFilterDropdown">
             <span style="font-size: 0.75rem; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.5px;">Core Theme:</span>
             <div class="dropdown-header"><span id="coreFilterSummary">Themes</span> <i class="fas fa-chevron-down"></i></div>
@@ -169,28 +242,56 @@
             <div class="dropdown-list" id="tagFilterList"></div>
           </div>
         </div>
-        <div class="progressWrap" style="margin: 24px 0;">
-          <progress id="progressBar" value="0" max="100" style="width: 100%; height: 14px;"></progress>
-          <div style="text-align: right; margin-top: 8px;"><span id="progressPct" class="tiny bold">0%</span></div>
-        </div>
-        <div id="tasks" class="tasks">
-          <p class="tiny muted" style="padding: 24px; text-align: center;"><i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Fetching missions...</p>
-        </div>
+      </div>
+
+      <div id="tasks" class="tasks">
+        <div class="card sk"><i style="width:38%"></i><i style="width:78%"></i><i style="width:55%"></i></div>
+        <div class="card sk"><i style="width:30%"></i><i style="width:70%"></i><i style="width:48%"></i></div>
       </div>
     </section>
 
+    <!-- ===== Right: partner + circles ===== -->
+    <aside class="right">
+      <div class="card box">
+        <span class="eb">Your partner</span>
+        <div id="partnerSection" style="display:none;"></div>
+        <p class="empty" id="partnerEmpty">No partner yet. Invite someone to grow together.</p>
+        <div class="cmp" id="partnerCmp"></div>
+      </div>
+      <div class="card box">
+        <span class="eb">Meadow circles</span>
+        <div class="rl">
+          <a href="board.html"><i class="fas fa-comments"></i> Communication board</a>
+          <a href="decorator.html"><i class="fas fa-paint-brush"></i> Decorate your jar</a>
+        </div>
+      </div>
+    </aside>
   </div>
+  <!-- ===== Mobile tab bar (design) ===== -->
+  <nav class="tab" aria-label="Quick actions">
+    <button type="button" data-scroll-to="tasks"><i class="fas fa-list-check"></i>Tasks</button>
+    <button type="button" data-nav="mobileCompletedTasksBtn"><i class="fas fa-circle-check"></i>Done</button>
+    <button type="button" class="fab" data-nav="addSigmaBtnDesktop" aria-label="Add sigma log"><i class="fas fa-plus"></i></button>
+    <button type="button" data-href="board.html"><i class="fas fa-comments"></i>Buzz</button>
+    <button type="button" data-href="decorator.html"><i class="fas fa-paint-brush"></i>Jar</button>
+  </nav>
 </main>
 
 <footer class="footer">
   <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a></div>
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
-
 <script type="module" src="js/app.js"></script>
-
+<script>
+  // Failsafe: never leave the page stuck on the loader if a module fails
+  setTimeout(() => {
+    document.body.classList.remove('data-loading');
+    const l = document.getElementById('global-loader');
+    if (l) l.style.display = 'none';
+  }, 10000);
+</script>
 <!-- ========== ALL MODALS (must be before script that references them) ========== -->
-<div id="achieveModal" class="modal-overlay" style="display:none;">
+<div id="achieveModal" class="modal-overlay" style="display:none; z-index:10002;">
   <div class="modal-content" style="max-width: 440px; padding: 32px;">
     <button onclick="closeAchieve()" class="close-modal-btn" style="position: absolute; top: 16px; right: 16px; background: var(--secondary); width: 44px; height: 44px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; color: var(--fg); z-index: 2001; display: flex; align-items: center; justify-content: center;">&times;</button>
     <div style="perspective: 1000px; padding: 16px 0;">
@@ -265,7 +366,6 @@
     </div>
   </div>
 </div>
-
 <script>
 
     // Check for successful checkout redirect
@@ -514,27 +614,13 @@ window.closeEditProfileSheet = () => {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 
 <!-- Decorator Jar Bottom Sheet -->
-<div id="decoratorSheet" class="bottom-sheet-overlay jar-deco-sheet" style="display: none; visibility: hidden; opacity: 0;">
-  <div class="bottom-sheet">
-    <div class="bottom-sheet-header">
-      <h3><i class="fas fa-paint-brush"></i> Decorate Your Jar</h3>
-      <button class="bottom-sheet-close" onclick="closeDecoratorSheet()">&times;</button>
-    </div>
-    <div class="bottom-sheet-content">
-      <div class="jar-deco-body">
-        <div id="jarContainer"></div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <script type="module">
-import { initDecorator } from './js/decorator.js';
 import { initCollab, checkInviteOnLoad } from './js/collaboration.js';
 import './js/share-card.js';
 
 // Expose functions globally
-window.initDecorator = initDecorator;
 window.invitePartner = invitePartner;
 
 // Init collaboration on load
@@ -542,7 +628,4 @@ initCollab();
 checkInviteOnLoad();
 
 // Re-use the existing supabase client from profile.js context
-// The decorator will be initialized when first opened
 </script>
-</body>
-</html>

@@ -5,11 +5,11 @@ import { showToast, Loader } from './app.js';
 // BOTTOM SHEET HELPER
 // --------------------------------------------------------------
 function showBottomSheet(title, contentHtml, onClose) {
-\n  const existing = document.querySelector('.bottom-sheet-overlay:not([data-static])');
-\n  if (existing) existing.remove();
-\n
-\n  const overlay = document.createElement('div');
-\n  overlay.className = 'bottom-sheet-overlay';
+  const existing = document.querySelector('.bottom-sheet-overlay:not([data-static])');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'bottom-sheet-overlay';
   overlay.innerHTML = `
     <div class="bottom-sheet">
       <div class="bottom-sheet-header">
@@ -171,8 +171,15 @@ async function checkAuth() {
     currentUser = user;
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    await loadUserProfile();
-    await loadSidebarAndSetActive();
+    try {
+      Loader.show("Loading your journey...");
+      await loadUserProfile();
+      await loadSidebarAndSetActive();
+    } catch (err) {
+      console.error('checkAuth error:', err);
+    } finally {
+      Loader.hide();
+    }
   } else {
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
@@ -288,7 +295,7 @@ async function loadBriefs() {
 
 function renderBriefsTable(briefs) {
   if (!briefs.length) return '<p class="tiny muted">No policy briefs yet.</p>';
-  let html = `<table class="briefs-table"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+  let html = `<div style="overflow-x:auto;"><table class="briefs-table"><thead><tr><th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
   for (const b of briefs) {
     const statusClass = b.status === 'published' ? 'status-published' : 'status-draft';
     html += `
@@ -303,7 +310,7 @@ function renderBriefsTable(briefs) {
       </tr>
     `;
   }
-  html += `</tbody></table>`;
+  html += `</tbody></table></div>`;
   return html;
 }
 

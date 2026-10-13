@@ -113,7 +113,7 @@ window.invitePartner = async function () {
 
   const modal = document.createElement('div');
   modal.id = 'inviteModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;box-sizing:border-box;';
   modal.innerHTML = `
     <div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">
       <h3 style="margin:0 0 8px;font-size:1.3rem;">🤝 Invite a Partner</h3>
@@ -166,30 +166,44 @@ window.acceptInvite = async function (code) {
 };
 
 // ── Update UI with partner info ───────────────────────
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
 function updatePartnerUI(partners) {
   const container = document.getElementById('partnerSection');
   if (!container) return;
 
+  const emptyNote = document.getElementById('partnerEmpty');
   if (!partners || partners.length === 0) {
     container.style.display = 'none';
+    if (emptyNote) emptyNote.style.display = '';
     return;
   }
 
   container.style.display = 'block';
-  container.innerHTML = `<h4 style="margin:0 0 8px;font-size:.85rem;color:var(--primary);">🤝 Collaborators</h4>
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      ${partners.map(p => {
-        const initial = (p.username || '?')[0].toUpperCase();
-        const avatarHtml = p.avatar_url
-          ? `<img src="${p.avatar_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
-          : `<span style="width:28px;height:28px;border-radius:50%;background:var(--honey-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;">${initial}</span>`;
-        return `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-card);border-radius:8px;font-size:.8rem;">
-          ${avatarHtml}
-          <span style="flex:1;font-weight:600;">${p.username}</span>
-          <span style="color:var(--fg-muted);font-size:.7rem;">since ${new Date(p.since).toLocaleDateString()}</span>
-        </div>`;
-      }).join('')}
-    </div>`;
+  if (emptyNote) emptyNote.style.display = 'none';
+  container.innerHTML = document.body.classList.contains('page-profile')
+    ? `<div style="display:flex;flex-direction:column;gap:4px;">${partners.map(p => {
+         const initial = esc((p.username || '?')[0].toUpperCase());
+         const face = p.avatar_url
+           ? `<img class="av dot" src="${p.avatar_url}" alt="">`
+           : `<span class="av sg dot">${initial}</span>`;
+         return `<div class="co">${face}
+           <div><b>${esc(p.username || 'Partner')}</b><small>Growing together since ${new Date(p.since).toLocaleDateString()}</small></div>
+         </div>`;
+       }).join('')}</div>`
+    : `<h4 style="margin:0 0 8px;font-size:.85rem;color:var(--primary);">🤝 Collaborators</h4>
+      <div style="display:flex;flex-direction:column;gap:6px;">${partners.map(p => {
+         const initial = esc((p.username || '?')[0].toUpperCase());
+         const face = p.avatar_url
+           ? `<img src="${p.avatar_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+           : `<span style="width:28px;height:28px;border-radius:50%;background:var(--honey-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">${initial}</span>`;
+         return `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-card);border-radius:8px;font-size:.8rem;">
+           ${face}
+           <span style="flex:1;font-weight:600;">${esc(p.username)}</span>
+           <span style="color:var(--fg-muted);font-size:.7rem;">since ${new Date(p.since).toLocaleDateString()}</span>
+         </div>`;
+       }).join('')}</div>`;
+  if (typeof window.updatePartnerCompare === 'function') window.updatePartnerCompare();
 }
 
 // ── Show/hide invite button based on tier ────────────
@@ -229,7 +243,7 @@ function showAcceptDialog(code) {
 
   const modal = document.createElement('div');
   modal.id = 'acceptModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;box-sizing:border-box;';
   modal.innerHTML = `
     <div style="background:#fff;border-radius:16px;padding:24px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">
       <div style="font-size:3rem;margin-bottom:8px;">🤝</div>
