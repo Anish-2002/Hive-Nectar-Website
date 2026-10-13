@@ -1,0 +1,247 @@
+/* ---------------------------------------------------------------------------
+   Phase A styles for sections-phase-a.jsx.
+
+   Same visual language as admin.css (white/ivory surfaces, charcoal text,
+   light grey dividers, restrained gold accent #C8A96E, forest green for
+   success). Every class here is prefixed .admpa- so nothing can collide with
+   .adm- in admin.css. Shared chrome (buttons, pills, tables, drawer, filter
+   row, notes, empty/error states) is reused straight from admin.css; only the
+   pieces admin.css has no equivalent for are defined below. Colours are read
+   from the --adm-* custom properties admin.css publishes on .adm-shell, with
+   literal fallbacks so the components still render if those ever move.
+   --------------------------------------------------------------------------- */
+
+/* ── labelled filter control (admin.css only styles .adm-field inside a form) ─ */
+.admpa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 160px;
+}
+.admpa-field > span {
+  font-size: 0.72rem;
+  color: var(--adm-muted, #7A6B5D);
+  text-transform: capitalize;
+}
+.admpa-field > select,
+.admpa-field > input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── status pipeline strip (gift fulfilment) ────────────────────────────── */
+.admpa-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.admpa-pipeline-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adm-muted, #7A6B5D);
+  margin-right: 2px;
+}
+.admpa-pipeline-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--adm-border, #E7DFD1);
+  margin: 0 4px;
+}
+.admpa-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  background: var(--adm-card, #FFFFFF);
+  color: var(--adm-fg, #2E2A24);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.77rem;
+  cursor: pointer;
+}
+.admpa-stage:hover { border-color: var(--adm-accent, #C8A96E); }
+.admpa-stage.is-active {
+  background: var(--adm-accent, #C8A96E);
+  border-color: var(--adm-accent, #C8A96E);
+  color: #2E2A24;
+  font-weight: 600;
+}
+.admpa-stage--terminal { border-style: dashed; }
+.admpa-stage-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 1.1em;
+  text-align: right;
+}
+
+/* ── tabs (member 360) ──────────────────────────────────────────────────── */
+.admpa-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  border-bottom: 1px solid var(--adm-border, #E7DFD1);
+  margin: 12px 0 14px;
+}
+.admpa-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 9px 9px 0 0;
+  background: transparent;
+  color: var(--adm-muted, #7A6B5D);
+  font: inherit;
+  font-size: 0.79rem;
+  cursor: pointer;
+}
+.admpa-tab:hover { color: var(--adm-fg, #2E2A24); background: rgba(200, 169, 110, 0.12); }
+.admpa-tab.is-active {
+  color: var(--adm-fg, #2E2A24);
+  background: var(--adm-card, #FFFFFF);
+  border-color: var(--adm-border, #E7DFD1);
+  font-weight: 600;
+}
+.admpa-tab-count {
+  font-size: 0.66rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(200, 169, 110, 0.18);
+  color: var(--adm-fg, #2E2A24);
+  font-variant-numeric: tabular-nums;
+}
+.admpa-tab-count--alert {
+  background: rgba(180, 69, 58, 0.14);
+  color: var(--adm-danger, #B4453A);
+}
+.admpa-tab-body { padding-bottom: 8px; }
+
+/* ── outstanding badge (member 360 header) ──────────────────────────────── */
+.admpa-outstanding {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+  background: rgba(200, 169, 110, 0.18);
+  border: 1px solid rgba(200, 169, 110, 0.45);
+  color: #6B5324;
+}
+.admpa-outstanding--zero {
+  background: rgba(63, 125, 82, 0.12);
+  border-color: rgba(63, 125, 82, 0.35);
+  color: var(--adm-ok, #3F7D52);
+}
+
+/* ── extra pill tones (base .adm-pill comes from admin.css) ─────────────── */
+.admpa-pill--warn {
+  background: rgba(200, 169, 110, 0.22);
+  border-color: rgba(200, 169, 110, 0.5);
+  color: #6B5324;
+}
+.admpa-pill--danger {
+  background: rgba(180, 69, 58, 0.12);
+  border-color: rgba(180, 69, 58, 0.4);
+  color: var(--adm-danger, #B4453A);
+}
+
+/* ── member identity block ──────────────────────────────────────────────── */
+.admpa-identity {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.admpa-identity h2 { margin: 0; font-size: 1.1rem; }
+.admpa-identity p { margin: 3px 0 0; font-size: 0.8rem; color: var(--adm-muted, #7A6B5D); }
+.admpa-identity-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; align-items: center; }
+.admpa-avatar {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  background: var(--adm-card, #FFFFFF);
+}
+.admpa-avatar--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  color: var(--adm-muted, #7A6B5D);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ── key/value grid for detail views ────────────────────────────────────── */
+.admpa-kv {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+.admpa-kv > div { min-width: 0; }
+.admpa-kv-k {
+  font-size: 0.69rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--adm-muted, #7A6B5D);
+}
+.admpa-kv-v {
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
+/* ── DMAIC content blocks ───────────────────────────────────────────────── */
+.admpa-dmaic { display: grid; gap: 10px; }
+.admpa-dmaic-item {
+  border-left: 3px solid var(--adm-accent, #C8A96E);
+  padding: 2px 0 2px 11px;
+}
+.admpa-dmaic-label {
+  font-size: 0.69rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--adm-muted, #7A6B5D);
+  margin-bottom: 2px;
+}
+.admpa-dmaic-body {
+  margin: 0;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── chips row ──────────────────────────────────────────────────────────── */
+.admpa-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+/* ── stacked panels inside a tab / drawer ───────────────────────────────── */
+.admpa-stack > * + * { margin-top: 14px; }
+
+/* ── table helper: keep long ids readable ───────────────────────────────── */
+.admpa-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+
+@media (max-width: 760px) {
+  .admpa-tab { font-size: 0.73rem; padding: 7px 9px; }
+  .admpa-kv { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .admpa-field { min-width: 130px; }
+}

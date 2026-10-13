@@ -1,0 +1,793 @@
+{
+  "add_admin": {
+    "args": "p_email text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "boolean",
+    "security": "definer"
+  },
+  "admin_accept_invitation": {
+    "args": "p_token text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_actor_email": {
+    "args": "p_user_id uuid",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "text",
+    "security": "definer"
+  },
+  "admin_adjust_gift_stock": {
+    "args": "p_gift_id uuid, p_delta integer, p_kind text, p_note text",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_adjust_nectar": {
+    "args": "p_user_id uuid, p_delta integer, p_reason text, p_category text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_advance_recognition": {
+    "args": "p_id uuid, p_status text, p_payload jsonb",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_assign_review": {
+    "args": "p_id uuid, p_assignee uuid, p_reason text",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_can": {
+    "args": "p_perm text, p_user_id uuid",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "boolean",
+    "security": "definer"
+  },
+  "admin_create_ticket": {
+    "args": "p_ticket jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_decide_recognition": {
+    "args": "p_id uuid, p_decision text, p_reason text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_collab_invite": {
+    "args": "p_invite_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_collaboration": {
+    "args": "p_collab_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_communication": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_config": {
+    "args": "p_key text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_inquiry": {
+    "args": "p_inquiry_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_milestone": {
+    "args": "p_milestone_id integer",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_setting": {
+    "args": "p_key text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_sigma": {
+    "args": "p_sigma_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_site_item": {
+    "args": "p_kind text, p_id text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_support_template": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_task": {
+    "args": "p_task_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_theme": {
+    "args": "p_theme_id text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_theme_progress": {
+    "args": "p_user_id uuid, p_theme_id text, p_stage text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_token": {
+    "args": "p_token_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_user": {
+    "args": "p_user_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_user_milestone": {
+    "args": "p_user_id uuid, p_milestone_id integer",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_user_task": {
+    "args": "p_user_id uuid, p_task_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_delete_user_token": {
+    "args": "p_user_id uuid, p_token_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_action_logs": {
+    "args": "p_limit integer, p_action text, p_actor_id uuid, p_target_type text, p_target_id text, p_search text",
+    "n_defaults": 6,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_activity_feed": {
+    "args": "p_limit integer, p_from timestamp with time zone, p_to timestamp with time zone, p_kind text",
+    "n_defaults": 4,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_admins": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_analytics": {
+    "args": "p_days integer",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_audit_actions": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_collab_invites": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_collaborations": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_communications": {
+    "args": "p_limit integer, p_offset integer",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_config": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_dashboard_metrics": {
+    "args": "p_from timestamp with time zone, p_to timestamp with time zone",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_fulfilment_queue": {
+    "args": "p_status text, p_limit integer",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_gift_stock_movements": {
+    "args": "p_gift_id uuid, p_limit integer",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_gifts": {
+    "args": "p_search text, p_include_inactive boolean",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_inquiries": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_integration_health": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_member_360": {
+    "args": "p_user_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_member_subscription": {
+    "args": "p_user_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_milestones": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_my_context": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_my_pending_invitations": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_nectar_ledger": {
+    "args": "p_user_id uuid, p_limit integer, p_offset integer",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_notifications": {
+    "args": "p_user_id uuid, p_limit integer",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_recognition": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_recognition_candidates": {
+    "args": "p_limit integer",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_recognition_dashboard": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_recognitions": {
+    "args": "p_status text, p_search text, p_limit integer, p_offset integer",
+    "n_defaults": 4,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_reflections": {
+    "args": "p_status text, p_limit integer, p_offset integer",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_review_item": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_review_queue": {
+    "args": "p_status text, p_source text, p_search text, p_assignee uuid, p_limit integer, p_offset integer",
+    "n_defaults": 6,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_settings": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_sigma_inbox": {
+    "args": "p_status text, p_limit integer, p_offset integer",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_sigma_logs": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_site_content": {
+    "args": "p_kind text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_sla_stats": {
+    "args": "p_from timestamp with time zone, p_to timestamp with time zone",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_stats": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_subscriptions": {
+    "args": "p_limit integer, p_offset integer",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_support_templates": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_tasks": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_team_overview": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_themes": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_ticket": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_ticket_history": {
+    "args": "p_status text, p_priority text, p_limit integer, p_offset integer, p_overdue boolean",
+    "n_defaults": 5,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_tickets": {
+    "args": "p_status text, p_priority text, p_assignee uuid, p_search text, p_limit integer, p_offset integer",
+    "n_defaults": 6,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_tokens": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_user": {
+    "args": "p_user_id uuid",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_get_users": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_import_inquiries": {
+    "args": "p_limit integer",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_invite_admin": {
+    "args": "p_email text, p_role_key text, p_note text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_list_jar_decorations": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_list_theme_progress": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_list_user_milestones": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_list_user_tasks": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_list_user_tokens": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_log_action": {
+    "args": "p_action text, p_target_type text, p_target_id text, p_reason text",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_merge_ticket": {
+    "args": "p_target uuid, p_source uuid, p_reason text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_nominate_recognition": {
+    "args": "p_user_id uuid, p_gift_id uuid, p_reason text, p_evidence jsonb, p_review_id uuid",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_ok": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "boolean",
+    "security": "definer"
+  },
+  "admin_reply_ticket": {
+    "args": "p_ticket_id uuid, p_body text, p_internal boolean, p_template_id uuid",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_reply_to_member": {
+    "args": "p_id uuid, p_body text, p_channel text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_revoke_invitation": {
+    "args": "p_id uuid, p_reason text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_role_of": {
+    "args": "p_user_id uuid",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "text",
+    "security": "definer"
+  },
+  "admin_save_communication": {
+    "args": "p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_config": {
+    "args": "p_key text, p_value text, p_description text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_gift": {
+    "args": "p_gift jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_milestone": {
+    "args": "p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_setting": {
+    "args": "p_key text, p_value text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_site_item": {
+    "args": "p_kind text, p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_support_template": {
+    "args": "p_template jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_task": {
+    "args": "p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_theme": {
+    "args": "p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_save_token": {
+    "args": "p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_send_member_notification": {
+    "args": "p_user_id uuid, p_title text, p_body text, p_link text, p_kind text",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_gift_active": {
+    "args": "p_id uuid, p_is_active boolean",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_member_tier": {
+    "args": "p_user_id uuid, p_member_tier integer, p_tier text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_message_delivery": {
+    "args": "p_message_id uuid, p_status text, p_provider_message_id text, p_error text",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_points": {
+    "args": "p_user_id uuid, p_nectar integer, p_co2e numeric",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_review_status": {
+    "args": "p_id uuid, p_status text, p_note text, p_reason text",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_team_role": {
+    "args": "p_user_id uuid, p_role_key text, p_reason text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_set_team_status": {
+    "args": "p_user_id uuid, p_status text, p_reason text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_sync_review_queue": {
+    "args": "",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_update_inquiry": {
+    "args": "p_inquiry_id uuid, p_status text, p_notes text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_update_subscription": {
+    "args": "p_id text, p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_update_ticket": {
+    "args": "p_ticket jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_update_user": {
+    "args": "p_user_id uuid, p_data jsonb",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "remove_admin": {
+    "args": "p_email text",
+    "n_defaults": 0,
+    "public_execute": false,
+    "returns": "boolean",
+    "security": "definer"
+  }
+}

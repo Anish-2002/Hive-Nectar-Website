@@ -1,0 +1,365 @@
+/* ---------------------------------------------------------------------------
+   Dashboard styles.
+
+   Scope: every rule is prefixed .admd- so nothing here can collide with the
+   .adm- rules in admin.css or the .apa- rules in phase-a.css. Colours come from
+   the same custom properties the rest of the admin surface uses (declared on
+   .adm-shell in admin.css), with literal fallbacks so the dashboard still
+   renders on its own.
+   --------------------------------------------------------------------------- */
+
+.admd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Accessibility: text for screen readers only (the loading announcement). */
+.admd-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── date-range control ────────────────────────────────────────────────── */
+
+.admd-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admd-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+.admd-date input[type='date'] {
+  padding: 7px 10px;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  border-radius: 9px;
+  background: var(--adm-card, #FFFFFF);
+  color: var(--adm-fg, #2E2A24);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.admd-date input[type='date']:focus-visible {
+  outline: 2px solid var(--adm-accent, #C8A96E);
+  outline-offset: 2px;
+}
+
+.admd-custom-error {
+  margin: 2px 0 6px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: rgba(180, 69, 58, 0.1);
+  color: var(--adm-danger, #B4453A);
+  font-size: 0.82rem;
+}
+
+.admd-window {
+  margin: 6px 0 12px;
+  font-size: 0.8rem;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+/* ── metric blocks ─────────────────────────────────────────────────────── */
+
+.admd-block {
+  margin-bottom: 16px;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  border-radius: 14px;
+  background: var(--adm-card, #FFFFFF);
+}
+
+.admd-block--gated {
+  background: transparent;
+  border-style: dashed;
+}
+
+.admd-block-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.admd-block-head--sub {
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+.admd-block-title {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+.admd-block-subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+.admd-block-link {
+  border: 0;
+  background: transparent;
+  padding: 2px 4px;
+  color: var(--adm-accent, #C8A96E);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.admd-block-link:hover {
+  text-decoration: underline;
+}
+
+.admd-block-link:focus-visible,
+.admd-card--link:focus-visible {
+  outline: 2px solid var(--adm-accent, #C8A96E);
+  outline-offset: 2px;
+}
+
+.admd-block-note {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+.admd-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 10px;
+}
+
+.admd-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  border-radius: 12px;
+  background: var(--adm-bg, #FBF7F0);
+  text-align: left;
+}
+
+.admd-card--link {
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+.admd-card--link:hover {
+  border-color: var(--adm-accent, #C8A96E);
+  background: rgba(200, 169, 110, 0.12);
+}
+
+.admd-card-v {
+  font-size: 1.32rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--adm-fg, #2E2A24);
+}
+
+.admd-card-k {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+/* ── charts ────────────────────────────────────────────────────────────── */
+
+.admd-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.admd-grid {
+  stroke: var(--adm-border, #E7DFD1);
+  stroke-width: 1;
+}
+
+.admd-tick {
+  fill: var(--adm-muted, #7A6B5D);
+  font-size: 10px;
+}
+
+.admd-line {
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.admd-line--signups {
+  stroke: var(--adm-accent, #C8A96E);
+}
+
+.admd-line--tasks {
+  stroke: var(--adm-ok, #3F7D52);
+}
+
+.admd-dot--signups {
+  fill: var(--adm-accent, #C8A96E);
+}
+
+.admd-dot--tasks {
+  fill: var(--adm-ok, #3F7D52);
+}
+
+.admd-bar {
+  fill: var(--adm-accent, #C8A96E);
+  opacity: 0.85;
+}
+
+.admd-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.76rem;
+  color: var(--adm-muted, #7A6B5D);
+}
+
+.admd-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admd-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.admd-swatch--signups {
+  background: var(--adm-accent, #C8A96E);
+}
+
+.admd-swatch--tasks {
+  background: var(--adm-ok, #3F7D52);
+}
+
+/* ── honest states: skeleton, error, empty ─────────────────────────────── */
+
+.admd-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admd-skel-block,
+.admd-skel-chart {
+  padding: 14px 16px;
+  border: 1px solid var(--adm-border, #E7DFD1);
+  border-radius: 14px;
+  background: var(--adm-card, #FFFFFF);
+}
+
+.admd-skel-title {
+  width: 140px;
+  height: 14px;
+  border-radius: 6px;
+  background: var(--adm-border, #E7DFD1);
+  margin-bottom: 12px;
+}
+
+.admd-skel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 10px;
+}
+
+.admd-skel-card {
+  height: 62px;
+  border-radius: 12px;
+  background: var(--adm-bg, #FBF7F0);
+  border: 1px solid var(--adm-border, #E7DFD1);
+}
+
+.admd-skel-chart {
+  height: 200px;
+}
+
+.admd-skel-title,
+.admd-skel-card,
+.admd-skel-chart {
+  animation: admd-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes admd-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.admd-error-card {
+  padding: 16px 18px;
+  border: 1px solid var(--adm-danger, #B4453A);
+  border-radius: 14px;
+  background: rgba(180, 69, 58, 0.08);
+}
+
+.admd-error-title {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  color: var(--adm-danger, #B4453A);
+}
+
+.admd-error-msg {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--adm-card, #FFFFFF);
+  border: 1px solid var(--adm-border, #E7DFD1);
+  color: var(--adm-fg, #2E2A24);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.admd-empty {
+  padding: 20px 18px;
+  border: 1px dashed var(--adm-border, #E7DFD1);
+  border-radius: 14px;
+  color: var(--adm-muted, #7A6B5D);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .admd-controls {
+    gap: 6px;
+  }
+
+  .admd-date span {
+    display: none;
+  }
+
+  .admd-cards,
+  .admd-skel-cards {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}

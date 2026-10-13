@@ -1,0 +1,375 @@
+/* ---------------------------------------------------------------------------
+   Admin CRM styles.
+
+   Scope: every rule is prefixed .adm- so nothing here can leak into the member
+   pages. Colours come from the site's own custom properties where they exist,
+   with literal fallbacks so the admin surface still renders if the main
+   stylesheet ever changes.
+   --------------------------------------------------------------------------- */
+
+.adm-shell {
+  --adm-bg: var(--bg, #FBF7F0);
+  --adm-card: var(--card, #FFFFFF);
+  --adm-fg: var(--fg, #2E2A24);
+  --adm-muted: var(--fg-muted, #7A6B5D);
+  --adm-border: var(--border, #E7DFD1);
+  --adm-accent: var(--cta, #C8A96E);
+  --adm-danger: #B4453A;
+  --adm-ok: #3F7D52;
+  background: var(--adm-bg);
+  color: var(--adm-fg);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  font-family: inherit;
+}
+
+/* Sidebar. The buttons are real <button> elements because changing section is a
+   client-side navigation, not a link fetch. */
+.adm-side {
+  width: 224px;
+  flex: 0 0 224px;
+  padding: 16px 10px;
+  border-right: 1px solid var(--adm-border);
+  background: var(--adm-card);
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-brand { padding: 4px 12px 14px; }
+.adm-brand strong { display: block; font-size: 1.02rem; letter-spacing: 0.02em; }
+.adm-brand span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--adm-muted);
+}
+
+.adm-side nav { display: block; }
+.adm-side nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  margin-bottom: 3px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--adm-fg);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.adm-side nav button:hover { background: rgba(200, 169, 110, 0.14); }
+.adm-side nav button.is-active { background: var(--adm-accent); color: #2E2A24; font-weight: 600; }
+
+/* Collapsible nav groups. Each header is a real <button> carrying
+   aria-expanded/aria-controls, so it is operable from the keyboard (Enter or
+   Space) and announces its state; the group's open/closed choice is persisted
+   per group under hive.admin.nav.<id> (see AdminApp). Items keep the .is-active
+   treatment above, so the whole sidebar still works at narrow widths. */
+.adm-nav-group { margin-bottom: 6px; }
+.adm-side nav .adm-nav-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px 6px;
+  margin: 0 0 2px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--adm-muted);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.adm-side nav .adm-nav-toggle:hover { color: var(--adm-fg); background: rgba(200, 169, 110, 0.12); }
+.adm-side nav .adm-nav-toggle::before {
+  content: '';
+  width: 0;
+  height: 0;
+  flex: none;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.15s ease;
+}
+.adm-side nav .adm-nav-toggle[aria-expanded='true']::before { transform: rotate(90deg); }
+.adm-side nav .adm-nav-toggle:focus-visible,
+.adm-side nav .adm-nav-panel button:focus-visible {
+  outline: 2px solid var(--adm-accent);
+  outline-offset: 2px;
+}
+.adm-side nav .adm-nav-panel { display: block; padding-left: 4px; }
+.adm-side nav .adm-nav-panel[hidden] { display: none; }
+
+/* Date inputs in a section header (the analytics window control). */
+.adm-input-date {
+  padding: 7px 10px;
+  border: 1px solid var(--adm-border);
+  border-radius: 9px;
+  background: var(--adm-card);
+  color: var(--adm-fg);
+  font: inherit;
+  font-size: 0.82rem;
+}
+.adm-input-date:focus-visible { outline: 2px solid var(--adm-accent); outline-offset: 2px; }
+
+.adm-side-foot {
+  margin-top: auto;
+  padding: 12px;
+  border-top: 1px solid var(--adm-border);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--adm-muted);
+  word-break: break-word;
+}
+.adm-side-foot a { color: var(--adm-muted); }
+.adm-side-foot button {
+  border: 1px solid var(--adm-border);
+  background: var(--adm-card);
+  color: var(--adm-fg);
+  border-radius: 9px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.adm-side-foot button:hover { border-color: var(--adm-accent); }
+
+.adm-main { flex: 1; padding: 20px 22px 60px; min-width: 0; }
+
+.adm-head { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.adm-head h2 { margin: 0; font-size: 1.25rem; }
+.adm-head p { margin: 0; font-size: 0.82rem; color: var(--adm-muted); max-width: 62ch; }
+.adm-head .adm-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.adm-btn {
+  border: 1px solid var(--adm-border);
+  background: var(--adm-card);
+  color: var(--adm-fg);
+  border-radius: 9px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.83rem;
+  cursor: pointer;
+}
+.adm-btn:hover { border-color: var(--adm-accent); }
+.adm-btn--primary { background: var(--adm-accent); border-color: var(--adm-accent); color: #2E2A24; font-weight: 600; }
+.adm-btn--danger { color: var(--adm-danger); border-color: rgba(180, 69, 58, 0.4); }
+.adm-btn--small { padding: 4px 9px; font-size: 0.75rem; }
+.adm-btn:disabled { opacity: 0.5; cursor: default; }
+
+.adm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.adm-card {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+.adm-card .k { font-size: 0.72rem; color: var(--adm-muted); text-transform: capitalize; }
+.adm-card .v { font-size: 1.4rem; font-weight: 600; margin-top: 2px; }
+
+.adm-panel {
+  background: var(--adm-card);
+  border: 1px solid var(--adm-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.adm-panel-title { margin: 0 0 10px; font-size: 0.92rem; }
+.adm-panel h4.adm-panel-title { margin-top: 14px; font-size: 0.8rem; color: var(--adm-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.adm-panel > .adm-note { margin: 0 0 10px; }
+
+.adm-table-wrap { overflow-x: auto; background: var(--adm-card); border: 1px solid var(--adm-border); border-radius: 12px; }
+table.adm-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+table.adm-table th, table.adm-table td { padding: 8px 11px; text-align: left; border-bottom: 1px solid var(--adm-border); vertical-align: top; }
+table.adm-table th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--adm-muted); background: rgba(200, 169, 110, 0.07); position: sticky; top: 0; }
+table.adm-table tbody tr:hover { background: rgba(200, 169, 110, 0.06); }
+table.adm-table td.wrap { max-width: 320px; white-space: normal; word-break: break-word; }
+table.adm-table tr.is-clickable { cursor: pointer; }
+
+.adm-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  border: 1px solid var(--adm-border);
+  background: rgba(200, 169, 110, 0.12);
+}
+.adm-pill--ok { background: rgba(63, 125, 82, 0.14); border-color: rgba(63, 125, 82, 0.4); color: var(--adm-ok); }
+.adm-pill--off { background: #F1EDE6; color: var(--adm-muted); }
+
+.adm-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.adm-filters input, .adm-filters select {
+  padding: 8px 11px;
+  border: 1px solid var(--adm-border);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.83rem;
+  background: var(--adm-card);
+  color: var(--adm-fg);
+  min-width: 160px;
+}
+
+.adm-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(680px, 94vw);
+  background: var(--adm-bg);
+  border-left: 1px solid var(--adm-border);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.16);
+  padding: 18px 20px 40px;
+  overflow-y: auto;
+  z-index: 9000;
+}
+.adm-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  z-index: 9100;
+}
+.adm-modal > div {
+  background: var(--adm-bg);
+  border-radius: 14px;
+  padding: 18px 20px;
+  width: min(760px, 100%);
+  border: 1px solid var(--adm-border);
+}
+
+.adm-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px 14px; }
+.adm-form .adm-field { display: flex; flex-direction: column; gap: 3px; }
+.adm-form .adm-field--wide { grid-column: 1 / -1; }
+.adm-form label { font-size: 0.72rem; color: var(--adm-muted); text-transform: capitalize; }
+.adm-form input, .adm-form select, .adm-form textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--adm-border);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.85rem;
+  background: var(--adm-card);
+  color: var(--adm-fg);
+  width: 100%;
+  box-sizing: border-box;
+}
+.adm-form textarea { min-height: 74px; resize: vertical; }
+.adm-form .adm-check { flex-direction: row; align-items: center; gap: 7px; }
+.adm-form .adm-check input { width: auto; }
+
+.adm-note { font-size: 0.78rem; color: var(--adm-muted); line-height: 1.5; }
+.adm-ok { background: rgba(63, 125, 82, 0.1); border: 1px solid rgba(63, 125, 82, 0.35); color: var(--adm-ok); padding: 9px 12px; border-radius: 9px; font-size: 0.83rem; }
+.adm-error { background: rgba(180, 69, 58, 0.1); border: 1px solid rgba(180, 69, 58, 0.35); color: var(--adm-danger); padding: 9px 12px; border-radius: 9px; font-size: 0.83rem; }
+.adm-empty { padding: 26px; text-align: center; color: var(--adm-muted); font-size: 0.85rem; }
+
+.adm-toast {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2E2A24;
+  color: #FBF7F0;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  z-index: 9500;
+  max-width: 90vw;
+}
+.adm-toast--error { background: var(--adm-danger); }
+.adm-toast--ok { background: var(--adm-ok); }
+
+.adm-gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px; background: #FBF7F0; color: #2E2A24; }
+.adm-gate .adm-panel { max-width: 460px; text-align: center; }
+.adm-gate .adm-gate-card {
+  background: #FFFFFF;
+  border: 1px solid #E7DFD1;
+  border-radius: 14px;
+  padding: 24px 26px;
+  max-width: 460px;
+  text-align: center;
+}
+.adm-gate .adm-gate-card h1 { margin: 0 0 10px; font-size: 1.3rem; }
+.adm-gate .adm-gate-card p { margin: 0 0 12px; font-size: 0.9rem; }
+.adm-gate h2 { margin: 0 0 8px; }
+
+.adm-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+
+/* Horizontal meters, used where a number needs to be read against a maximum
+   (day counts, distribution across the four tiers). No charting library. */
+.adm-meters { display: grid; gap: 6px; }
+.adm-meter { display: grid; grid-template-columns: 108px 1fr 54px; align-items: center; gap: 9px; font-size: 0.79rem; }
+.adm-meter .adm-meter-label { color: var(--adm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-meter .adm-meter-track { height: 9px; border-radius: 999px; background: #EFE9DE; overflow: hidden; }
+.adm-meter .adm-meter-track i { display: block; height: 100%; background: var(--adm-accent); }
+.adm-meter .adm-meter-value { text-align: right; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 760px) {
+  .adm-shell { flex-direction: column; }
+  .adm-side {
+    width: 100%;
+    flex: none;
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--adm-border);
+  }
+  .adm-main { padding: 16px 14px 50px; }
+  .adm-meter { grid-template-columns: 84px 1fr 46px; }
+}
+
+/* ── file upload control (token / milestone / content artwork) ─────────────
+   Uploads go straight to Supabase Storage and the returned public URL is
+   written into the same text column the member site already reads, so there is
+   no second asset registry to keep in sync. */
+.adm-file-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.adm-file-thumb {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  object-fit: contain;
+  padding: 4px;
+  border: 1px solid var(--adm-border);
+  border-radius: 8px;
+  background: var(--adm-bg);
+}
+
+.adm-file-thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--adm-muted);
+  font-size: 11px;
+}
+
+.adm-file-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.adm-file-controls input[type='file'] {
+  font-size: 12px;
+  color: var(--adm-muted);
+}

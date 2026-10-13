@@ -1,0 +1,50 @@
+[
+  {
+    "icon": "fa-seedling",
+    "title": "What Exists Here",
+    "hint": "PollenPop, Nectar, Honey, Themes",
+    "html": "<h2><i class=\"fas fa-seedling\"></i> What Exists Here</h2>\n        <p>The Meadow is designed around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>\n        <ul>\n          <li><strong>PollenPop</strong> — Small, tangible tasks that seed new behaviours and anchor them into your daily routine as habits.</li>\n          <li><strong>Nectar</strong> — The energy unit inside The Meadow. It records your presence and marks your contribution.</li>\n          <li><strong>Honey Unit</strong> — Effort-earned wealth built from accumulated Nectar. It is yours alone, unexchangeable, and a living record of your impact.</li>\n          <li><strong>Themes & Growth Stages</strong> — Four core themes to choose from based on your interest and curiosity. Each theme has growth stages, and there are no instructions for how to move through them. Over time, repetition happens naturally; without force, without conscious decision. You are both witness and participant.</li>\n        </ul>\n        <p><em>Everything here is optional and adjustable. The system does not tell you who to be. It shows you what you are capable of doing, repeatedly.</em></p>\n        <p>We are part of nature. And like nature, we are resilient. We can heal and regenerate when there is space. The Meadow creates that space — tasks fit quietly into your day. There is no commitment required, no reminders sent. But there is real, visible evidence that you showed up, participated, and earned something: a small, honest nudge that you are still here. We hope that nudge helps you feel like yourself again.</p>"
+  },
+  {
+    "icon": "fa-question-circle",
+    "title": "Why This Exists",
+    "hint": "The space between corporate & everyday",
+    "html": "<h2><i class=\"fas fa-question-circle\"></i> Why This Exists</h2>\n        <p>Most sustainability efforts operate at corporate or government scale and rely on information and innovation from the top down. Few address the architecture of everyday behaviour. The Meadow was built for that space.</p>\n        <p>It exists to prove that small, consistent actions can quietly rebuild lost habits and discipline into a stable, resilient lifestyle without moral pressure.</p>\n        <p>To test that at scale, it was first embedded in the founder's own daily life. She is a scientist by training. A systems designer driven by both instinct and situation. A mother watching how habits and discipline shape the next generation, without anyone meaning for it to happen.</p>"
+  },
+  {
+    "icon": "fa-ban",
+    "title": "How This Is Different",
+    "hint": "The design rules are simple",
+    "html": "<h2><i class=\"fa-ban\"></i> How This Is Different</h2>\n        <h4 style=\"margin:16px 0 8px;\"><i class=\"fas fa-ban\" style=\"color:var(--primary);\"></i> What we don't do</h4>\n        <ul>\n          <li>No moral statements</li>\n          <li>No competitive language</li>\n          <li>No urgency framing</li>\n          <li>No 'hero' narratives</li>\n        </ul>\n        <h4 style=\"margin:16px 0 8px;\"><i class=\"fas fa-seedling\" style=\"color:var(--primary);\"></i> Built on three observations</h4>\n        <ul>\n          <li>Humans are part of nature</li>\n          <li>When too much is extracted from a system's capacity to regenerate, fractures appear</li>\n          <li>Nature corrects imbalance over time, and so can we</li>\n        </ul>\n        <p><em>The Meadow is built as a micro-regenerative loop: repair instead of replace, cook instead of order, talk before you shout.</em></p>"
+  },
+  {
+    "icon": "fa-user-check",
+    "title": "Founder Snapshot",
+    "hint": "The story that started it all",
+    "html": "<h2><i class=\"fas fa-user-check\"></i> Founder Snapshot</h2>\n        <p>Before The Meadow existed, the founder experienced career stagnation after parental leave due to a newborn, a young child, and self-esteem that had quietly eroded. The fear of what came next was real, and what pulled her back was family.</p>\n        <p>The work happened in the margins — training courses squeezed into lunch breaks and late nights, dinner planned on the same kitchen bench as everything else. That is where The Meadow began.</p>\n        <p>Patterns emerged between lab work and school pick-ups, between spreadsheets and garden beds, between noticing the slow drift of norms and trusting the resilience of structure.</p>\n        <p>Behaviour compounds over time, but so does neglect, and faster. The system was first tested in her own daily loops, then refined into themes, stages, gates, and units. It is still being refined now.</p>\n        <p style=\"font-weight:600;color:var(--primary-dark);\">— The Meadow Team</p>"
+  },
+  {
+    "icon": "fa-shield-alt",
+    "title": "Credibility & Norm Shift",
+    "hint": "Why behaviour quietly resets",
+    "html": "<h2><i class=\"fas fa-shield-alt\"></i> Credibility & Norm Shift</h2>\n        <p>The Meadow was designed with the weight of human burden in mind: daily pressure, mental load, the quiet imbalance that builds over time.</p>\n        <p>When that pressure accumulates, we stop recognising ourselves. We don't know who the person shouting at their kids is. We don't know how we got here.</p>\n        <p>This experience led to understanding the mechanism behind <strong>'Norm Shift'</strong>, the way behaviour quietly resets without us noticing. Raising your voice once becomes a pattern. Forgetting an anniversary once becomes annual. Norm Shift can move in either direction, depending on how it shapes your habits and character over time.</p>\n        <p style=\"font-weight:500;\">The Meadow exists to help you notice the shift, and, if you choose, find your way back.</p>"
+  },
+  {
+    "icon": "fa-dice-d6",
+    "title": "Design Values",
+    "hint": "Coherence over performance",
+    "html": "<h2><i class=\"fas fa-dice-d6\"></i> Design Values</h2>\n        <p class=\"muted\">Coherence over performance, regeneration over intensity.</p>\n        <ul>\n          <li><strong>Humans are part of nature</strong> — We are not separate from the natural world; our habits and rhythms echo its cycles.</li>\n          <li><strong>Regeneration over intensity</strong> — Repair instead of replace, cook instead of order, talk before you shout.</li>\n          <li><strong>Structure over motivation</strong> — Systems outlast willpower. We provide the architecture; you bring the presence.</li>\n          <li><strong>Optional visibility</strong> — You choose how visible you want to be. Comparison and competition are optional.</li>\n          <li><strong>Earned progression</strong> — Progression comes from behaviour, not instruction. You earn what you repeat.</li>\n          <li><strong>Physical evidence of impact</strong> — The jar, tokens, and cue card exist for you to interpret and assign meaning.</li>\n          <li><strong>Behavioural gates, not checkpoints</strong> — No forced milestones; you move forward when your actions naturally unlock the next stage.</li>\n          <li><strong>Coherence over performance</strong> — The system works because it is internally consistent, not because it is optimised for metrics.</li>\n        </ul>"
+  },
+  {
+    "icon": "fa-flask",
+    "title": "PollenPop — First Product",
+    "hint": "The first product from The Meadow",
+    "html": "<h2><i class=\"fas fa-flask\"></i> PollenPop — First Product</h2>\n        <p>PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>\n        <p>It provides access to daily sustainability tasks, Nectar points for real rewards, growth tracking, and a community of changemakers.</p>\n        <p><a href=\"pollenpop.html\" class=\"btn\" style=\"margin-top:8px;\">Learn more <i class=\"fas fa-arrow-right\"></i></a></p>"
+  },
+  {
+    "icon": "fa-gift",
+    "title": "Member Benefits",
+    "hint": "What you get when you join",
+    "html": "<h2><i class=\"fas fa-gift\"></i> PollenPop Member Benefits</h2>\n        <ul>\n          <li>Access to daily sustainability tasks</li>\n          <li>Earn Nectar points for real rewards</li>\n          <li>Track your growth & achievements</li>\n          <li>Join a community of changemakers</li>\n        </ul>\n        <p style=\"font-style:italic;\">Everything here is optional and adjustable. The system does not tell you who to be. It shows you what you are capable of doing, repeatedly.</p>"
+  }
+]

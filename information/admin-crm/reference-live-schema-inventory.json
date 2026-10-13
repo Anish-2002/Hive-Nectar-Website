@@ -1,0 +1,4693 @@
+{
+ "project_ref": "gxboojbfmpejbjolfmjq",
+ "source": "live management API, SELECT-only",
+ "tables": [
+  {
+   "table_name": "achievements",
+   "rows": 0,
+   "bytes": 16384,
+   "rls_enabled": false,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "admin_users",
+   "rows": 1,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "app_config",
+   "rows": 3,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "badge_stages",
+   "rows": 20,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "badges",
+   "rows": 5,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "challenges",
+   "rows": 0,
+   "bytes": 16384,
+   "rls_enabled": false,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "collaboration_invites",
+   "rows": 12,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 3,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "collaborations",
+   "rows": 1,
+   "bytes": 40960,
+   "rls_enabled": true,
+   "policy_count": 2,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "communications",
+   "rows": 6,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 2,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "contact_inquiries",
+   "rows": 6,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 4,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "customers",
+   "rows": 5,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "founders",
+   "rows": 1,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "hub_content",
+   "rows": 7,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "impact_conversion",
+   "rows": 11,
+   "bytes": 32768,
+   "rls_enabled": false,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "milestones",
+   "rows": 32,
+   "bytes": 65536,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "navigation_menu",
+   "rows": 5,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "policy_briefs",
+   "rows": 3,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "prices",
+   "rows": 3,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "products",
+   "rows": 3,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "profiles",
+   "rows": 20,
+   "bytes": 139264,
+   "rls_enabled": true,
+   "policy_count": 5,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "sigma_logs",
+   "rows": 8,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 3,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "social_links",
+   "rows": 4,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "stripe_events",
+   "rows": 44,
+   "bytes": 180224,
+   "rls_enabled": true,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "subscriptions",
+   "rows": 0,
+   "bytes": 24576,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "task_comments",
+   "rows": 1,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "task_feedback",
+   "rows": 12,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "rows": 3,
+   "bytes": 32768,
+   "rls_enabled": false,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "tasks",
+   "rows": 150,
+   "bytes": 262144,
+   "rls_enabled": true,
+   "policy_count": 2,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "theme_guardrails",
+   "rows": 10,
+   "bytes": 49152,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "theme_settings",
+   "rows": 1,
+   "bytes": 24576,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "theme_stats",
+   "rows": 0,
+   "bytes": 32768,
+   "rls_enabled": false,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "themes",
+   "rows": 5,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "tokens",
+   "rows": 70,
+   "bytes": 81920,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_badge_progress",
+   "rows": 0,
+   "bytes": 16384,
+   "rls_enabled": true,
+   "policy_count": 3,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "rows": 0,
+   "bytes": 24576,
+   "rls_enabled": true,
+   "policy_count": 1,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "rows": 6,
+   "bytes": 57344,
+   "rls_enabled": true,
+   "policy_count": 3,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_milestones",
+   "rows": 40,
+   "bytes": 57344,
+   "rls_enabled": true,
+   "policy_count": 4,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "rows": 0,
+   "bytes": 57344,
+   "rls_enabled": true,
+   "policy_count": 2,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_tasks",
+   "rows": 170,
+   "bytes": 147456,
+   "rls_enabled": true,
+   "policy_count": 6,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_theme_progress",
+   "rows": 35,
+   "bytes": 81920,
+   "rls_enabled": true,
+   "policy_count": 4,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "user_tokens",
+   "rows": 51,
+   "bytes": 24576,
+   "rls_enabled": true,
+   "policy_count": 5,
+   "rows_source": "explicit count(*)"
+  },
+  {
+   "table_name": "webhook_debug",
+   "rows": 1,
+   "bytes": 32768,
+   "rls_enabled": true,
+   "policy_count": 0,
+   "rows_source": "explicit count(*)"
+  }
+ ],
+ "columns": [
+  {
+   "table_name": "achievements",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "achievement_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "badge_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "badge_tier",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "is_legacy",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "achievements",
+   "column_name": "unlocked_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "admin_users",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "admin_users",
+   "column_name": "email",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "admin_users",
+   "column_name": "added_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "app_config",
+   "column_name": "key",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "app_config",
+   "column_name": "value",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "app_config",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "app_config",
+   "column_name": "updated_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "badge_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "stage_order",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "stage_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "requirement_description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "co2e_target",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "reach_target",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "required_task_ids",
+   "data_type": "ARRAY",
+   "udt_name": "_uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "required_token_ids",
+   "data_type": "ARRAY",
+   "udt_name": "_uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "required_milestone_ids",
+   "data_type": "ARRAY",
+   "udt_name": "_int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "icon_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "palette",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "badges",
+   "column_name": "total_stages",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "themes",
+   "data_type": "ARRAY",
+   "udt_name": "_text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "mission",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "stages",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "visual",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "challenges",
+   "column_name": "legacy_addon",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "inviter_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "invite_code",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "expires_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "invitee_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "invitee_email",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "user_a_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "user_b_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "message",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "post_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "icon",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "author_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "author_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "author_email",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "title",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "communications",
+   "column_name": "content",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "user_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "user_email",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "category",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "message",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "contact_inquiries",
+   "column_name": "admin_notes",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "customers",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "customers",
+   "column_name": "stripe_customer_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "customers",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "position",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "bio",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "avatar_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "order_index",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "founders",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "title",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "category_slug",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "media_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "source_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "thumbnail_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "hub_content",
+   "column_name": "order_index",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "impact_type_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "impact_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "co2e_per_unit",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "unit_label",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "notes",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "typical_actions",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "conversion_logic",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "impact_conversion",
+   "column_name": "co2e_explained",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "id",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "category",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "requirement_value",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "reward_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "reward_value",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "icon_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "milestones",
+   "column_name": "active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "label",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "icon",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "path",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "order_index",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "is_active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "navigation_menu",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "doc_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "short_description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "file_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "policy_briefs",
+   "column_name": "source_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "product_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "currency",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "unit_amount",
+   "data_type": "bigint",
+   "udt_name": "int8",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "interval",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "interval_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "trial_period_days",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "metadata",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "prices",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "image",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "metadata",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "products",
+   "column_name": "tier_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "first_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "last_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "username",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "email",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "nectar_points",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "total_tasks_completed",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "current_stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "avatar_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "address",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "phone_number",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "updated_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "tier",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "join_date",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "referral_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "total_co2e_saved",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "member_status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "stripe_customer_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "stripe_subscription_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "experience",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "user_level",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "engagement_level",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "referral_code",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "referred_by",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "member_tier",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "prefers_experienced",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "selected_themes",
+   "data_type": "ARRAY",
+   "udt_name": "_text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "subscription_status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "subscription_tier",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "subscription_current_period_end",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "subscription_cancel_at_period_end",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "is_public",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "alias",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "define",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "measure",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "analysis",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "improve",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "control",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "icon",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "order_index",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "is_active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "social_links",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "stripe_events",
+   "column_name": "id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "stripe_events",
+   "column_name": "type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "stripe_events",
+   "column_name": "raw",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "stripe_events",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "customer_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "price_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "current_period_start",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "current_period_end",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "cancel_at_period_end",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "trial_start",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "trial_end",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "metadata",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "tier",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "stripe_subscription_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "stripe_customer_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "updated_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "task_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "comment_text",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "task_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "reaction",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "task_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "define",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "measure",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "analysis",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "improve",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "control",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "task_title",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "task_description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "core_theme",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "category",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "nectar_reward",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_unit_value",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "audience",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "required_level",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "task_group",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "core_task",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "novice_description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "experienced_description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_unit",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_base_value",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "source_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "event_tag",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "examples",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_value",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "task_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "task_order",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "available_from",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "available_to",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "min_days",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "min_task_types",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "min_spread_days",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_guardrails",
+   "column_name": "min_nectar",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "id",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "bg",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "card_bg",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "primary_color",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "secondary_color",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "fg",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "fg_muted",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "border_color",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "primary_gradient",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 200
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "deep_meadow",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "terra",
+   "data_type": "character varying",
+   "udt_name": "varchar",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": 20
+  },
+  {
+   "table_name": "theme_settings",
+   "column_name": "updated_at",
+   "data_type": "timestamp without time zone",
+   "udt_name": "timestamp",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "current_stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "nectar_earned",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "distinct_days_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "unique_task_types_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "first_action_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "last_action_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "theme_name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "token_series_family",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "includes",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "symbolism",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "essence",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "emotional_tone",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "visual_symbol_icon_idea",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "primary_color",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "secondary_color",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "colour_symbolism",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "purpose",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "sub_topics",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "example_focus",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "themes",
+   "column_name": "min_tier",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "name",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "icon_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "description",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "tasks_required",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "active",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "badge_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "current_stage",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "evidence",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "metrics",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "submitted_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "approved_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "challenge_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "current_stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "evidence_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "approved",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "milestone_id",
+   "data_type": "bigint",
+   "udt_name": "int8",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "token_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "x_pos",
+   "data_type": "real",
+   "udt_name": "float4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "y_pos",
+   "data_type": "real",
+   "udt_name": "float4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "scale",
+   "data_type": "real",
+   "udt_name": "float4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "created_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "rotation",
+   "data_type": "real",
+   "udt_name": "float4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "milestone_id",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "achieved_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "is_legacy",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "viewed",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "task_group",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "total_completions",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "first_completion",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "last_completion",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "nectar_earned",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "task_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "applied_multiplier",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "calculated_nectar",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "co2_saved_kg",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "status",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "evidence_url",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "completed_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "completion_day",
+   "data_type": "date",
+   "udt_name": "date",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "calculated_co2e_saved",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "multiplier_applied",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "experience_level",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "completion_date",
+   "data_type": "date",
+   "udt_name": "date",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "version",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "points_awarded",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "theme_id",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "stage",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "variety_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "first_action_date",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "last_action_date",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "nectar_earned",
+   "data_type": "numeric",
+   "udt_name": "numeric",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "unlocked_task_index",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "novice_days_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "experienced_days_count",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "user_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "token_id",
+   "data_type": "uuid",
+   "udt_name": "uuid",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "acquired_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "awarded_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "viewed",
+   "data_type": "boolean",
+   "udt_name": "bool",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "webhook_debug",
+   "column_name": "id",
+   "data_type": "integer",
+   "udt_name": "int4",
+   "is_nullable": "NO",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "webhook_debug",
+   "column_name": "received_at",
+   "data_type": "timestamp with time zone",
+   "udt_name": "timestamptz",
+   "is_nullable": "YES",
+   "has_default": true,
+   "max_len": null
+  },
+  {
+   "table_name": "webhook_debug",
+   "column_name": "event_type",
+   "data_type": "text",
+   "udt_name": "text",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "webhook_debug",
+   "column_name": "metadata",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  },
+  {
+   "table_name": "webhook_debug",
+   "column_name": "raw",
+   "data_type": "jsonb",
+   "udt_name": "jsonb",
+   "is_nullable": "YES",
+   "has_default": false,
+   "max_len": null
+  }
+ ],
+ "foreign_keys": [
+  {
+   "table_name": "achievements",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "achievements_user_id_fkey"
+  },
+  {
+   "table_name": "badge_stages",
+   "column_name": "badge_id",
+   "ref_table": "badges",
+   "ref_column": "id",
+   "constraint_name": "badge_stages_badge_id_fkey"
+  },
+  {
+   "table_name": "badges",
+   "column_name": "theme_id",
+   "ref_table": "themes",
+   "ref_column": "theme_id",
+   "constraint_name": "badges_theme_id_fkey"
+  },
+  {
+   "table_name": "collaboration_invites",
+   "column_name": "inviter_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "collaboration_invites_inviter_id_fkey"
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "user_a_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "collaborations_user_a_id_fkey"
+  },
+  {
+   "table_name": "collaborations",
+   "column_name": "user_b_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "collaborations_user_b_id_fkey"
+  },
+  {
+   "table_name": "communications",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "communications_user_id_fkey"
+  },
+  {
+   "table_name": "prices",
+   "column_name": "product_id",
+   "ref_table": "products",
+   "ref_column": "id",
+   "constraint_name": "prices_product_id_fkey"
+  },
+  {
+   "table_name": "profiles",
+   "column_name": "referred_by",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "profiles_referred_by_fkey"
+  },
+  {
+   "table_name": "sigma_logs",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "sigma_logs_user_id_fkey"
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "customer_id",
+   "ref_table": "customers",
+   "ref_column": "id",
+   "constraint_name": "subscriptions_customer_id_fkey"
+  },
+  {
+   "table_name": "subscriptions",
+   "column_name": "price_id",
+   "ref_table": "prices",
+   "ref_column": "id",
+   "constraint_name": "subscriptions_price_id_fkey"
+  },
+  {
+   "table_name": "task_comments",
+   "column_name": "task_id",
+   "ref_table": "tasks",
+   "ref_column": "id",
+   "constraint_name": "task_comments_task_id_fkey"
+  },
+  {
+   "table_name": "task_feedback",
+   "column_name": "task_id",
+   "ref_table": "tasks",
+   "ref_column": "id",
+   "constraint_name": "task_feedback_task_id_fkey"
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "task_id",
+   "ref_table": "tasks",
+   "ref_column": "id",
+   "constraint_name": "task_sigma_logs_task_id_fkey"
+  },
+  {
+   "table_name": "task_sigma_logs",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "task_sigma_logs_user_id_fkey"
+  },
+  {
+   "table_name": "tasks",
+   "column_name": "impact_type",
+   "ref_table": "impact_conversion",
+   "ref_column": "impact_type_id",
+   "constraint_name": "fk_tasks_impact_conversion"
+  },
+  {
+   "table_name": "theme_stats",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "theme_stats_user_id_fkey"
+  },
+  {
+   "table_name": "tokens",
+   "column_name": "theme_id",
+   "ref_table": "themes",
+   "ref_column": "theme_id",
+   "constraint_name": "tokens_theme_id_fkey"
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "badge_id",
+   "ref_table": "badges",
+   "ref_column": "id",
+   "constraint_name": "user_badge_progress_badge_id_fkey"
+  },
+  {
+   "table_name": "user_badge_progress",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_badge_progress_user_id_fkey"
+  },
+  {
+   "table_name": "user_challenge_progress",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_challenge_progress_user_id_fkey"
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "milestone_id",
+   "ref_table": "milestones",
+   "ref_column": "id",
+   "constraint_name": "user_jar_decorations_milestone_id_fkey"
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "token_id",
+   "ref_table": "tokens",
+   "ref_column": "id",
+   "constraint_name": "user_jar_decorations_token_id_fkey"
+  },
+  {
+   "table_name": "user_jar_decorations",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_jar_decorations_user_id_fkey"
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "milestone_id",
+   "ref_table": "milestones",
+   "ref_column": "id",
+   "constraint_name": "user_milestones_milestone_id_fkey"
+  },
+  {
+   "table_name": "user_milestones",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_milestones_user_id_fkey"
+  },
+  {
+   "table_name": "user_task_group_stats",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_task_group_stats_user_id_fkey"
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "task_id",
+   "ref_table": "tasks",
+   "ref_column": "id",
+   "constraint_name": "user_tasks_task_id_fkey"
+  },
+  {
+   "table_name": "user_tasks",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_tasks_user_id_fkey"
+  },
+  {
+   "table_name": "user_theme_progress",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_theme_progress_user_id_fkey"
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "token_id",
+   "ref_table": "tokens",
+   "ref_column": "id",
+   "constraint_name": "user_tokens_token_id_fkey"
+  },
+  {
+   "table_name": "user_tokens",
+   "column_name": "user_id",
+   "ref_table": "profiles",
+   "ref_column": "id",
+   "constraint_name": "user_tokens_user_id_fkey"
+  }
+ ],
+ "check_constraints": [
+  {
+   "tbl": "badge_stages",
+   "conname": "badge_stages_stage_name_check",
+   "def": "CHECK ((stage_name = ANY (ARRAY['Sprout'::text, 'Bloom'::text, 'Grow'::text, 'Harvest'::text])))"
+  },
+  {
+   "tbl": "collaboration_invites",
+   "conname": "collaboration_invites_status_check",
+   "def": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text, 'expired'::text])))"
+  },
+  {
+   "tbl": "collaborations",
+   "conname": "different_users",
+   "def": "CHECK ((user_a_id <> user_b_id))"
+  },
+  {
+   "tbl": "hub_content",
+   "conname": "hub_content_media_type_check",
+   "def": "CHECK ((media_type = ANY (ARRAY['tiktok_url'::text, 'youtube'::text, 'etsy_link'::text, 'drive_pdf'::text, 'supabase_pdf'::text, 'image'::text])))"
+  },
+  {
+   "tbl": "task_feedback",
+   "conname": "task_feedback_reaction_check",
+   "def": "CHECK ((reaction = ANY (ARRAY['like'::text, 'dislike'::text])))"
+  },
+  {
+   "tbl": "theme_guardrails",
+   "conname": "theme_guardrails_stage_check",
+   "def": "CHECK ((stage = ANY (ARRAY['Sprout'::text, 'Bloom'::text])))"
+  },
+  {
+   "tbl": "user_badge_progress",
+   "conname": "user_badge_progress_status_check",
+   "def": "CHECK ((status = ANY (ARRAY['in_progress'::text, 'pending_approval'::text, 'approved'::text])))"
+  },
+  {
+   "tbl": "user_tasks",
+   "conname": "user_tasks_version_check",
+   "def": "CHECK ((version = ANY (ARRAY['novice'::text, 'experienced'::text])))"
+  },
+  {
+   "tbl": "user_theme_progress",
+   "conname": "stage_check",
+   "def": "CHECK ((stage = ANY (ARRAY['\ud83c\udf30 Seeds'::text, '\ud83c\udf31 Sprout'::text, '\ud83c\udf38 Bloom'::text, '\ud83c\udf3e Harvest'::text])))"
+  }
+ ],
+ "functions": [
+  {
+   "name": "accept_collab_invite",
+   "args": "p_code text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "add_admin",
+   "args": "p_email text",
+   "returns": "boolean",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "admin_delete_collab_invite",
+   "args": "p_invite_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_collaboration",
+   "args": "p_collab_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_config",
+   "args": "p_key text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_inquiry",
+   "args": "p_inquiry_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_milestone",
+   "args": "p_milestone_id integer",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_sigma",
+   "args": "p_sigma_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_task",
+   "args": "p_task_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_theme",
+   "args": "p_theme_id text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_theme_progress",
+   "args": "p_user_id uuid, p_theme_id text, p_stage text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_token",
+   "args": "p_token_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_user",
+   "args": "p_user_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_user_milestone",
+   "args": "p_user_id uuid, p_milestone_id integer",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_user_task",
+   "args": "p_user_id uuid, p_task_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_delete_user_token",
+   "args": "p_user_id uuid, p_token_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_admins",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_collab_invites",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_collaborations",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_config",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_inquiries",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_milestones",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_sigma_logs",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_stats",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_tasks",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_themes",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_tokens",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_user",
+   "args": "p_user_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_get_users",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_list_jar_decorations",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_list_theme_progress",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_list_user_milestones",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_list_user_tasks",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_list_user_tokens",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_ok",
+   "args": "",
+   "returns": "boolean",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_save_config",
+   "args": "p_key text, p_value text, p_description text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_save_milestone",
+   "args": "p_data jsonb",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_save_task",
+   "args": "p_data jsonb",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_save_theme",
+   "args": "p_data jsonb",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_save_token",
+   "args": "p_data jsonb",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_set_points",
+   "args": "p_user_id uuid, p_nectar integer, p_co2e numeric",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_update_inquiry",
+   "args": "p_inquiry_id uuid, p_status text, p_notes text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "admin_update_user",
+   "args": "p_user_id uuid, p_data jsonb",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": true
+  },
+  {
+   "name": "approve_badge_stage",
+   "args": "p_submission_id uuid",
+   "returns": "boolean",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "award_milestone",
+   "args": "p_user_id uuid, p_milestone_id integer",
+   "returns": "void",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "award_stage_bonus",
+   "args": "p_user_id uuid, p_badge_id uuid, p_stage_order integer",
+   "returns": "void",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "award_theme_tokens",
+   "args": "p_user_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "calculate_points",
+   "args": "impact_value numeric, task_stage text, user_level text, engagement_level text",
+   "returns": "numeric",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "calculate_points",
+   "args": "impact_text text, task_stage text, user_level text, engagement_level text",
+   "returns": "numeric",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "check_and_award_milestones",
+   "args": "p_user_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "check_and_award_theme_tokens",
+   "args": "p_user_id uuid, p_theme_id text",
+   "returns": "TABLE(token_name text, stage text)",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "check_badge_stage_auto_approval",
+   "args": "p_user_id uuid, p_badge_id uuid, p_stage_order integer",
+   "returns": "boolean",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "check_upcoming_renewals",
+   "args": "p_days_ahead integer",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "complete_task",
+   "args": "p_user_id uuid, p_task_id uuid, p_version text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "create_collab_invite",
+   "args": "",
+   "returns": "text",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "create_directed_collab_invite",
+   "args": "p_email text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "downgrade_expired_subscriptions",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "ensure_profile_alias",
+   "args": "",
+   "returns": "trigger",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "extract_numeric",
+   "args": "text_value text",
+   "returns": "numeric",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_admin_stats",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_collab_partners",
+   "args": "",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_leaderboard",
+   "args": "p_limit integer",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_my_task_progress",
+   "args": "",
+   "returns": "TABLE(task_id bigint, completed boolean, completed_at timestamp with time zone)",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_partner_profiles",
+   "args": "p_ids uuid[]",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_partner_progress",
+   "args": "p_partner_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_public_profile",
+   "args": "p_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_site_stats",
+   "args": "",
+   "returns": "json",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_user_revealed_tokens",
+   "args": "p_user_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_user_tasks",
+   "args": "p_user_id uuid",
+   "returns": "TABLE(id uuid, task_title text, task_description text, core_theme text, category text, stage text, nectar_reward integer, impact_type text, impact_unit_value numeric, audience text, required_level integer, created_at timestamp with time zone, task_group text, core_task text, novice_description text, experienced_description text, impact_unit text, impact_base_value numeric, source_url text, event_tag text, examples text, impact_value text, theme_id text, task_id text, task_order integer, available_from timestamp with time zone, available_to timestamp with time zone, primary_color text, is_unlocked boolean)",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "get_user_tasks_v2",
+   "args": "p_user_id uuid",
+   "returns": "TABLE(id uuid, task_title text, task_description text, core_theme text, category text, stage text, nectar_reward integer, impact_type text, impact_unit_value numeric, audience text, required_level integer, created_at timestamp with time zone, task_group text, core_task text, novice_description text, experienced_description text, impact_unit text, impact_base_value numeric, source_url text, event_tag text, examples text, impact_value text, theme_id text, task_id text, task_order integer, available_from timestamp with time zone, available_to timestamp with time zone, primary_color text, is_unlocked boolean)",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "handle_new_user",
+   "args": "",
+   "returns": "trigger",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "handle_subscription_event",
+   "args": "p_event_type text, p_stripe_sub_id text, p_customer_id text, p_period_end bigint, p_product_id text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "increment_theme_stage_progress",
+   "args": "p_user_id uuid, p_theme_id text, p_stage text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "increment_theme_stage_progress",
+   "args": "p_user_id uuid, p_theme_id text, p_stage text, p_increment integer",
+   "returns": "text",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "is_admin",
+   "args": "p_user_id uuid",
+   "returns": "boolean",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "lookup_member_for_invite",
+   "args": "p_email text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "mark_milestone_viewed",
+   "args": "p_user_id uuid, p_milestone_id integer",
+   "returns": "void",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "mark_milestone_viewed",
+   "args": "p_user_id uuid, p_milestone_id bigint",
+   "returns": "void",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "mark_token_viewed",
+   "args": "p_user_id uuid, p_token_id uuid",
+   "returns": "void",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "profile_display_name",
+   "args": "p_is_public boolean, p_first text, p_last text, p_alias text",
+   "returns": "text",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "remove_admin",
+   "args": "p_email text",
+   "returns": "boolean",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "reset_experienced_progress",
+   "args": "p_user_id uuid",
+   "returns": "text",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "reset_user_progress_by_id",
+   "args": "uid uuid",
+   "returns": "text",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "reveal_token",
+   "args": "p_user_id uuid, p_token_id uuid",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "save_jar_decorations",
+   "args": "p_user_id uuid, p_decorations jsonb",
+   "returns": "void",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "search_public_profiles",
+   "args": "p_query text, p_limit integer",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "set_profile_visibility",
+   "args": "p_public boolean, p_alias text",
+   "returns": "jsonb",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "storage_admin",
+   "args": "",
+   "returns": "boolean",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "submit_badge_stage",
+   "args": "p_user_id uuid, p_badge_id uuid, p_stage_order integer, p_evidence text, p_metrics jsonb",
+   "returns": "uuid",
+   "security_definer": false,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "unlock_all_tasks_for_user",
+   "args": "p_user_id uuid",
+   "returns": "text",
+   "security_definer": true,
+   "is_admin_rpc": false
+  },
+  {
+   "name": "update_user_levels",
+   "args": "p_user_id uuid",
+   "returns": "TABLE(new_user_level text, new_engagement_level text)",
+   "security_definer": false,
+   "is_admin_rpc": false
+  }
+ ],
+ "enums": [],
+ "triggers": [
+  {
+   "tbl": "profiles",
+   "tgname": "trg_ensure_profile_alias",
+   "fn": "ensure_profile_alias",
+   "events": "INSERTUPDATE"
+  }
+ ],
+ "views": []
+}

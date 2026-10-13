@@ -1,0 +1,43 @@
+-- 2026-10-13 — SUPERSEDED. DO NOT APPLY. This file is a record of a decision, not a migration.
+--
+-- WHAT THIS FILE USED TO DO
+-- It stripped pictographs from every displayed text column (tasks, tokens,
+-- user_theme_progress, milestones) so the stored strings matched the cleaned copy.
+--
+-- WHY IT MUST NOT BE APPLIED
+-- The emoji stage labels are CANONICAL SCHEMA KEYS, not decoration. Three SECURITY DEFINER
+-- functions and one CHECK constraint depend on the exact bytes:
+--
+--   user_theme_progress.stage_check   → only accepts '<U+1F330> Seeds' / '<U+1F331> Sprout' / '<U+1F338> Bloom' / '<U+1F33E> Harvest'
+--   calculate_points()                → CASE task_stage WHEN '<U+1F330> Seeds' THEN 1 WHEN '<U+1F331> Sprout' THEN 2 ...
+--                                       a cleaned 'Seeds' falls through to ELSE 1  ⇒ WRONG nectar math
+--   get_user_tasks()                  → allowed_stages := CASE member_tier WHEN 0 THEN ARRAY['<U+1F330> Seeds'] ...
+--                                       a cleaned 'Seeds' task is INVISIBLE to every tier
+--   get_user_tasks_v2()               → same tier gating on the emoji literals
+--
+-- Applying this rewrite therefore: (a) fails its own CHECK constraint on user_theme_progress,
+-- and (b) if forced past it, silently corrupts every user's nectar total and hides their tasks.
+--
+-- WHAT WAS DONE INSTEAD (final design, three layers)
+--   1. DISPLAY   — js/emoji.js is a render-time net over text nodes + title/alt/placeholder/
+--                  aria-label, wired into 24/24 pages. The DB keeps its canonical bytes; the
+--                  rendered page never shows a pictograph. meadowCleanText() repairs the
+--                  spacing left behind by stripping (collapse runs, drop space before
+--                  punctuation, drop empty parens).
+--   2. SOURCE    — every served HTML/JS/CSS/JSON file is pictograph-free (0 across 77 files).
+--   3. WRITE PATH— forms still SEND the canonical values the RPCs expect, but express them
+--                  without a pictograph in source: HTML entities in admin-crm.html
+--                  (&#127792; Seeds = <U+1F330> Seeds ...) and \u{1F330} escapes in js/admin-crm.js / js/profile.js.
+--                  Verified: the submitted value is byte-identical to the DB literal, so
+--                  calculate_points and get_user_tasks keep working.
+--
+-- NOT touched, by design: public.tasks.task_id — an identifier like 'GEN-T03-<stage>-1'.
+-- Nothing depends on its emoji-bearing text (FKs reference tasks.id, a uuid) and its rendered
+-- form is cleaned by the net, so it stays byte-exact.
+--
+-- If you want the DB itself to be pictograph-free in future, the correct order is:
+--   1. rewrite the CHECK constraint and all three RPC bodies to the clean literals in one
+--      transaction, 2. backfill every table, 3. verify nectar math on a known account.
+--   4. Never in the reverse order — step 2 before step 1 is what corrupts the data.
+
+-- No statements. Intentionally.

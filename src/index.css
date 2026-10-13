@@ -1,0 +1,21 @@
+/* ---------------------------------------------------------------------------
+   React shell only.
+
+   The vanilla stylesheet is NOT imported here. It is declared as a plain
+   <link rel="stylesheet" href="/style.css"> in index.html instead, because a
+   CSS `@import` cannot be switched off at runtime — and src/lib/legacy.js has
+   to be able to disable it for the one page (preview.html) that does not link
+   it. Loading it through a <link> keeps the original cascade order (site
+   stylesheet first, page-specific styles after) and lets the engine restore
+   exact per-page fidelity.
+
+   The legacy pages are injected into <body> as direct children, so the React
+   root must not create a layout box of its own. `display: contents` removes
+   the box while keeping the element in the DOM, which lets the original
+   `body { display: flex; flex-direction: column }` layout and the
+   `body > header` / `body > main` / `body > footer` selectors keep working
+   byte-for-byte as authored.
+   --------------------------------------------------------------------------- */
+#root {
+  display: contents;
+}

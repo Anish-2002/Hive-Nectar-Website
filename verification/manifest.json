@@ -1,0 +1,698 @@
+[
+  {
+    "file": "public/BloomGuardian50.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/BloomGuardian50.png",
+    "identical": true,
+    "shippedBytes": 1655772,
+    "sourceBytes": 1655772,
+    "sha256": "a8c7646bf1ea45eeb62929caa8fa84e5ab3545d4d18149fdb4ff7d343b517f8c"
+  },
+  {
+    "file": "public/admin_comms.json",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/admin_comms.json",
+    "identical": true,
+    "shippedBytes": 387,
+    "sourceBytes": 387,
+    "sha256": "49c081a3fd160df5c1692c0f43145c19b714e3e9c3c5f36b69906730dde5acd6"
+  },
+  {
+    "file": "public/assets/avatar-fallback.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/avatar-fallback.svg",
+    "identical": true,
+    "shippedBytes": 465,
+    "sourceBytes": 465,
+    "sha256": "e03de8ff51fd3242aa06e3b81f59cae4a1e303d825fd44e11fa4d9383919669e"
+  },
+  {
+    "file": "public/assets/theme-icons/acting.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/acting.png",
+    "identical": true,
+    "shippedBytes": 66920,
+    "sourceBytes": 66920,
+    "sha256": "d7568996661407a936abfcbcc32ad554440191c74595f65ccf652ed220d9e0e7"
+  },
+  {
+    "file": "public/assets/theme-icons/acting.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/acting.webp",
+    "identical": true,
+    "shippedBytes": 14668,
+    "sourceBytes": 14668,
+    "sha256": "e17a6cf4537f8b4cb49291e2f7f03d614b5e34b9c7a3b6fad337f22e8ec0650f"
+  },
+  {
+    "file": "public/assets/theme-icons/connecting.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/connecting.png",
+    "identical": true,
+    "shippedBytes": 86607,
+    "sourceBytes": 86607,
+    "sha256": "f16e097384d5c71a98ab6e4ff55f9d734a73f72d1c433e0404adcf5c6a2b4bb3"
+  },
+  {
+    "file": "public/assets/theme-icons/connecting.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/connecting.webp",
+    "identical": true,
+    "shippedBytes": 18236,
+    "sourceBytes": 18236,
+    "sha256": "5bafcd44cad32665083afe16f80a78e13fc912a66d412ed227c11f8b8592221a"
+  },
+  {
+    "file": "public/assets/theme-icons/creating.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/creating.png",
+    "identical": true,
+    "shippedBytes": 61106,
+    "sourceBytes": 61106,
+    "sha256": "8be91fb78124414f06dcf88d8fad7ef51c113268e98c32faaa2388d8b1b29321"
+  },
+  {
+    "file": "public/assets/theme-icons/creating.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/creating.webp",
+    "identical": true,
+    "shippedBytes": 13822,
+    "sourceBytes": 13822,
+    "sha256": "b885cc0c584acf7af59ce91f71f138c97750c0575b3bb2caac4f1e7a0a78ba6c"
+  },
+  {
+    "file": "public/assets/theme-icons/innovating.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/innovating.png",
+    "identical": true,
+    "shippedBytes": 63365,
+    "sourceBytes": 63365,
+    "sha256": "08f355329d65b660b745e60fda037a5696e09353f6ad897d773cc59059f69db6"
+  },
+  {
+    "file": "public/assets/theme-icons/innovating.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/innovating.webp",
+    "identical": true,
+    "shippedBytes": 12278,
+    "sourceBytes": 12278,
+    "sha256": "0ae1e66b515f89f35ec3cf0670e83c3f1f1c2859110d0d675a107e0f3900768e"
+  },
+  {
+    "file": "public/assets/theme-icons/reflecting.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/reflecting.png",
+    "identical": true,
+    "shippedBytes": 51272,
+    "sourceBytes": 51272,
+    "sha256": "35c916637aca997b521fde73e37816e98f2d76636678489c7753ad2f8e464c47"
+  },
+  {
+    "file": "public/assets/theme-icons/reflecting.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/theme-icons/reflecting.webp",
+    "identical": true,
+    "shippedBytes": 10206,
+    "sourceBytes": 10206,
+    "sha256": "e493d75968cfe1fdd27ca8c1012852c0b0f15a3fe3ef9648b985832b08c56016"
+  },
+  {
+    "file": "public/assets/tokens/Action-Motivating/TE-005_RhythmBeat.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Action-Motivating/TE-005_RhythmBeat.svg",
+    "identical": true,
+    "shippedBytes": 14111,
+    "sourceBytes": 14111,
+    "sha256": "59c53beee3f3475606dc10730e78e9c08b4a35eca8a0a6f4909c356e22fb6dc8"
+  },
+  {
+    "file": "public/assets/tokens/Action-Motivating/TE-010_RhythmGroove.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Action-Motivating/TE-010_RhythmGroove.svg",
+    "identical": true,
+    "shippedBytes": 17164,
+    "sourceBytes": 17164,
+    "sha256": "fa227d024665e1505b6cbc1d06251002c295dff5e418be02741959e9b2163993"
+  },
+  {
+    "file": "public/assets/tokens/Action-Motivating/TE-015_RhythmEnsemble.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Action-Motivating/TE-015_RhythmEnsemble.svg",
+    "identical": true,
+    "shippedBytes": 19168,
+    "sourceBytes": 19168,
+    "sha256": "a692b57d555a3ed5d62fe6ebf086ec1539ceeb6bf3ca6e20d67a03210f0625a8"
+  },
+  {
+    "file": "public/assets/tokens/Connecting-Belonging/TE-001_RootsSeed.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Connecting-Belonging/TE-001_RootsSeed.svg",
+    "identical": true,
+    "shippedBytes": 19634,
+    "sourceBytes": 19634,
+    "sha256": "4022d83be5f6266aa789055d21267182071fa0da9db5c27ed0083f4ab3494bc8"
+  },
+  {
+    "file": "public/assets/tokens/Connecting-Belonging/TE-006_RootsSprout.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Connecting-Belonging/TE-006_RootsSprout.svg",
+    "identical": true,
+    "shippedBytes": 45468,
+    "sourceBytes": 45468,
+    "sha256": "b07699c578c7ec6d9c381387638a155524c821c330f35d8fbb6eddb569d6659e"
+  },
+  {
+    "file": "public/assets/tokens/Connecting-Belonging/TE-011_RootsBloom.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Connecting-Belonging/TE-011_RootsBloom.svg",
+    "identical": true,
+    "shippedBytes": 50728,
+    "sourceBytes": 50728,
+    "sha256": "56b72ea34ae16a0b0bf49e6a2d07037fc21e96be081e1bd0f42568459467c8d4"
+  },
+  {
+    "file": "public/assets/tokens/Creative/TE-002_ForgeHands.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Creative/TE-002_ForgeHands.svg",
+    "identical": true,
+    "shippedBytes": 13381,
+    "sourceBytes": 13381,
+    "sha256": "8b67c843954aa851d997c1a7858520c18530faced9a3978ace0dc23bee080e18"
+  },
+  {
+    "file": "public/assets/tokens/Creative/TE-007_ForgeShape.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Creative/TE-007_ForgeShape.svg",
+    "identical": true,
+    "shippedBytes": 14552,
+    "sourceBytes": 14552,
+    "sha256": "b569a4e7634c8dd893cfb918aa4eb60ddfa44758fdd230bbfac4e2a8d3fc5516"
+  },
+  {
+    "file": "public/assets/tokens/Creative/TE-012_ForgeCraft.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Creative/TE-012_ForgeCraft.svg",
+    "identical": true,
+    "shippedBytes": 29538,
+    "sourceBytes": 29538,
+    "sha256": "e776c43fce4eed1ef94d42c950ddd8c0ebcb5ec8e0df7e05e1e355cf9e606d18"
+  },
+  {
+    "file": "public/assets/tokens/Innovation/TE-003_ShiftNudge.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Innovation/TE-003_ShiftNudge.svg",
+    "identical": true,
+    "shippedBytes": 16978,
+    "sourceBytes": 16978,
+    "sha256": "1fa42be9a3a7abbb4ef43579c07c2c27028e7147bf2d3827eb0f2e4c4773c7be"
+  },
+  {
+    "file": "public/assets/tokens/Innovation/TE-008_ShiftAngle.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Innovation/TE-008_ShiftAngle.svg",
+    "identical": true,
+    "shippedBytes": 26464,
+    "sourceBytes": 26464,
+    "sha256": "71221860d5843e6c85f49ef870560eafe5cbcd913df1ac9d0fc42b24cf54f604"
+  },
+  {
+    "file": "public/assets/tokens/Innovation/TE-013_ShiftCurrent.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Innovation/TE-013_ShiftCurrent.svg",
+    "identical": true,
+    "shippedBytes": 44103,
+    "sourceBytes": 44103,
+    "sha256": "7f29f626fd6fa2df94a5e4c1ad2d9ec3e21d4b9dfd7274e4d58b7bcce584b712"
+  },
+  {
+    "file": "public/assets/tokens/Reflective/TE-004_EchoSignal.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Reflective/TE-004_EchoSignal.svg",
+    "identical": true,
+    "shippedBytes": 22572,
+    "sourceBytes": 22572,
+    "sha256": "51894f6fc9375229a2a775ba3a260ae4fd9994495b718d092e3077b894801adc"
+  },
+  {
+    "file": "public/assets/tokens/Reflective/TE-009_EchoResonance.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Reflective/TE-009_EchoResonance.svg",
+    "identical": true,
+    "shippedBytes": 26633,
+    "sourceBytes": 26633,
+    "sha256": "d0c5557a215ae059b57b2c818773f86d3d0493a0a9d88bc0215b8308b3234df1"
+  },
+  {
+    "file": "public/assets/tokens/Reflective/TE-014_EchoStill.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/assets/tokens/Reflective/TE-014_EchoStill.svg",
+    "identical": true,
+    "shippedBytes": 52162,
+    "sourceBytes": 52162,
+    "sha256": "6d9303a7ef7562797b51f9488bfa55fdce88bd5803c9b7638930d34e382004b1"
+  },
+  {
+    "file": "public/honey_jar.glb",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/honey_jar.glb",
+    "identical": true,
+    "shippedBytes": 46692,
+    "sourceBytes": 46692,
+    "sha256": "78aea8e4cf5da17f9822681a91d108711e52d3df956d4ad442b06ffd7c7f33a9"
+  },
+  {
+    "file": "public/js/admin-achievements.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/admin-achievements.js",
+    "identical": true,
+    "shippedBytes": 5020,
+    "sourceBytes": 5020,
+    "sha256": "ea70d3ec83e911e8bb781fe53904bbbe5e2427d380bd002fa2169656d8a94bb1"
+  },
+  {
+    "file": "public/js/admin-crm.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/admin-crm.js",
+    "identical": true,
+    "shippedBytes": 26219,
+    "sourceBytes": 26219,
+    "sha256": "23026101b486a7a6faf91015eade27cc94217b28ac3d10c0eb78f175677a2c94"
+  },
+  {
+    "file": "public/js/admin.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/admin.js",
+    "identical": true,
+    "shippedBytes": 524,
+    "sourceBytes": 524,
+    "sha256": "66707c7df31610704f4461b1ff77cea7be875d6076ec362e1458e5323c8e1929"
+  },
+  {
+    "file": "public/js/app.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/app.js",
+    "identical": true,
+    "shippedBytes": 9666,
+    "sourceBytes": 9666,
+    "sha256": "899ced8236540fab858304eeb81abb58d813bdc97ebb77ac801e02aaaa17d75c"
+  },
+  {
+    "file": "public/js/collaboration.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/collaboration.js",
+    "identical": true,
+    "shippedBytes": 16032,
+    "sourceBytes": 16032,
+    "sha256": "a58fc38ab4835d85214c9675f4a89eb59d8a2ea8bf538d593f5bc8dde6931b71"
+  },
+  {
+    "file": "public/js/comms.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/comms.js",
+    "identical": true,
+    "shippedBytes": 16749,
+    "sourceBytes": 16749,
+    "sha256": "615f7b37fc01cca5315f93b6615309fe9aa0e12edec9fc177b4d9f4bd0543ee8"
+  },
+  {
+    "file": "public/js/config.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/config.js",
+    "identical": true,
+    "shippedBytes": 2274,
+    "sourceBytes": 2274,
+    "sha256": "879259f762b2939c187312140af98de64b55cc6ca6d9dfddae8569097095c90f"
+  },
+  {
+    "file": "public/js/contact.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/contact.js",
+    "identical": true,
+    "shippedBytes": 3246,
+    "sourceBytes": 3246,
+    "sha256": "9783a22780efca3891dc83611b2868485b08be9f309550f7fd0ec4389dfe0968"
+  },
+  {
+    "file": "public/js/decorator.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/decorator.js",
+    "identical": true,
+    "shippedBytes": 18524,
+    "sourceBytes": 18524,
+    "sha256": "622c81ba95f0c9f63d6843e226d7ef2b185bb5259eba89c7c25a209c72b57a4e"
+  },
+  {
+    "file": "public/js/email.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/email.js",
+    "identical": true,
+    "shippedBytes": 971,
+    "sourceBytes": 971,
+    "sha256": "a90915432df17c85734d1b1137491bdb6a1f0ad1ef7de1858d1408ce16eaeca5"
+  },
+  {
+    "file": "public/js/emoji.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/emoji.js",
+    "identical": true,
+    "shippedBytes": 5568,
+    "sourceBytes": 5568,
+    "sha256": "484890d3bd5abef6eff5e9630f7ee2573fe1080a9e7747e76804e361527a433e"
+  },
+  {
+    "file": "public/js/forgot-password.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/forgot-password.js",
+    "identical": true,
+    "shippedBytes": 1278,
+    "sourceBytes": 1278,
+    "sha256": "c8acb43cf58bef8abf90e62d857fa64f2e1e764f8d1fd1443460077e67c37790"
+  },
+  {
+    "file": "public/js/login.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/login.js",
+    "identical": true,
+    "shippedBytes": 1537,
+    "sourceBytes": 1537,
+    "sha256": "b2b0e0dd03d0d3557333f2eb6aa6bd0866c6a3b888fc5d61f80eee595a48a79b"
+  },
+  {
+    "file": "public/js/nav-auth.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/nav-auth.js",
+    "identical": true,
+    "shippedBytes": 2591,
+    "sourceBytes": 2591,
+    "sha256": "47376cc471c014327ba126051a903c44f8ac8b36f03745b087d45bf3705eb558"
+  },
+  {
+    "file": "public/js/notification.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/notification.js",
+    "identical": true,
+    "shippedBytes": 2453,
+    "sourceBytes": 2453,
+    "sha256": "e4c84334dbc3a15008827b131d2d19a5eaffacd9e645a2d42bd2df3a4184e11a"
+  },
+  {
+    "file": "public/js/profile.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/profile.js",
+    "identical": true,
+    "shippedBytes": 166414,
+    "sourceBytes": 166414,
+    "sha256": "ed992b01cf0a4ebf89cc112a453c5582ff3bdb2b28e92f12a26a35def9936556"
+  },
+  {
+    "file": "public/js/share-card.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/share-card.js",
+    "identical": true,
+    "shippedBytes": 8514,
+    "sourceBytes": 8514,
+    "sha256": "e279ef6e60f49925af123a419ae5777c725e93b9f5c3a79efb4d42fe9ee8e37f"
+  },
+  {
+    "file": "public/js/signup.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/signup.js",
+    "identical": true,
+    "shippedBytes": 3909,
+    "sourceBytes": 3909,
+    "sha256": "1a792c7469170b48c1eb4e04ee0d51ae7af467923620e4ef7158f946be3ee233"
+  },
+  {
+    "file": "public/js/social.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/social.js",
+    "identical": true,
+    "shippedBytes": 23580,
+    "sourceBytes": 23580,
+    "sha256": "3dcfc4ea4ed83d9c130fd08480497fd6ee6eb7bb07c2fbae777b7fa74dc2518c"
+  },
+  {
+    "file": "public/js/supabase-config.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/supabase-config.js",
+    "identical": true,
+    "shippedBytes": 498,
+    "sourceBytes": 498,
+    "sha256": "f10726a56d65e2bbc8b42d337266feb7433eab80c2bf0d8565cbf64082ab61ed"
+  },
+  {
+    "file": "public/js/theme-tokens.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/theme-tokens.js",
+    "identical": true,
+    "shippedBytes": 3970,
+    "sourceBytes": 3970,
+    "sha256": "ac34c9d673e8172f5e3d762685cac130a3f5b533487a84ca46f8ef55419a6d31"
+  },
+  {
+    "file": "public/js/trial.js",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/js/trial.js",
+    "identical": true,
+    "shippedBytes": 19374,
+    "sourceBytes": 19374,
+    "sha256": "14de31d302cdd79c46755815d8b26332210ce5af7729fa163d0e5534e2451785"
+  },
+  {
+    "file": "public/logo.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/logo.svg",
+    "identical": true,
+    "shippedBytes": 38923,
+    "sourceBytes": 38923,
+    "sha256": "04907c9f6b5d5f945e3b8051d048fa8959525fb33bf27823e37ef8c649ab59cb"
+  },
+  {
+    "file": "public/logoHa.svg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/logoHa.svg",
+    "identical": true,
+    "shippedBytes": 151878,
+    "sourceBytes": 151878,
+    "sha256": "1c893458021ba428f15498d30e6bb53f9416f5f2ee45df9da3341c1bfd3d38f8"
+  },
+  {
+    "file": "public/meadow-theme.css",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/meadow-theme.css",
+    "identical": true,
+    "shippedBytes": 11647,
+    "sourceBytes": 11647,
+    "sha256": "c2aa94c96d0b6011f128cf5284a5f167372ee2f538543c6ee0c47225826f0318"
+  },
+  {
+    "file": "public/newlogo.jpg",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/newlogo.jpg",
+    "identical": true,
+    "shippedBytes": 41634,
+    "sourceBytes": 41634,
+    "sha256": "8d9f0158ccd008563cf86940cfd5db3adf8960d4e04b1d5ac85480e05afcbc5e"
+  },
+  {
+    "file": "public/newlogo.png",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/newlogo.png",
+    "identical": true,
+    "shippedBytes": 99621,
+    "sourceBytes": 99621,
+    "sha256": "a148495cebea9cc271c9f054784974b66226a9d7bab61daad02ffd624428b2b9"
+  },
+  {
+    "file": "public/newlogo.webp",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/newlogo.webp",
+    "identical": true,
+    "shippedBytes": 75856,
+    "sourceBytes": 75856,
+    "sha256": "dbe52ece9ba1e970cdb56fa7254645dc91311deba2be460d0af801ea501ed507"
+  },
+  {
+    "file": "public/profile-meadow.css",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/profile-meadow.css",
+    "identical": true,
+    "shippedBytes": 59305,
+    "sourceBytes": 59305,
+    "sha256": "3fc30fa78b438fc2a170123ab688d030c5bcd7f3c5938cdbb1556c2ee2be6922"
+  },
+  {
+    "file": "public/style.css",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/style.css",
+    "identical": true,
+    "shippedBytes": 96592,
+    "sourceBytes": 96592,
+    "sha256": "80ec34edb6be9c4c62c62abb30656daaac3319274b93a93bfac621cb0a4f6c25"
+  },
+  {
+    "file": "public/tasks_master.json",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/tasks_master.json",
+    "identical": true,
+    "shippedBytes": 6272,
+    "sourceBytes": 6272,
+    "sha256": "e9dbed6f9298a93b161bbaac69fff726efa85d2d19de005adb9013afd654ce44"
+  },
+  {
+    "file": "public/tester.css",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/tester.css",
+    "identical": true,
+    "shippedBytes": 8485,
+    "sourceBytes": 8485,
+    "sha256": "241acdf7b7111e8acb1e326af5e050541a3b669929a222b9df9bdbc867c0e5b9"
+  },
+  {
+    "file": "public/tie.glb",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/tie.glb",
+    "identical": true,
+    "shippedBytes": 1507604,
+    "sourceBytes": 1507604,
+    "sha256": "5a947bee049276267182d3173b8d290ad5d92f5df1d9b9b4bf5b091e799c3a1f"
+  },
+  {
+    "file": "public/users.json",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/users.json",
+    "identical": true,
+    "shippedBytes": 206,
+    "sourceBytes": 206,
+    "sha256": "073e825be8235c6e9eb30a7c8b949917e56345a5e87d1328b4afcb19cf7ca592"
+  },
+  {
+    "file": "src/legacy/CRM.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/CRM.html",
+    "identical": true,
+    "shippedBytes": 7926,
+    "sourceBytes": 7926,
+    "sha256": "ab7c6cef34c0568023a88bcede2c99a27a2b56761849b284a71d3640002a1c21"
+  },
+  {
+    "file": "src/legacy/about.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/about.html",
+    "identical": true,
+    "shippedBytes": 9840,
+    "sourceBytes": 9840,
+    "sha256": "68bace4290557e0664f28ca2d1d41c8f380b9877dbf7c6b7790ff75ef2780f88"
+  },
+  {
+    "file": "src/legacy/admin-achievements.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/admin-achievements.html",
+    "identical": true,
+    "shippedBytes": 3906,
+    "sourceBytes": 3906,
+    "sha256": "bbfb85d9b88487181398fbfb77d125e1b9347e45bd65bace7ea3db88c9a4f0d3"
+  },
+  {
+    "file": "src/legacy/admin-crm.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/admin-crm.html",
+    "identical": true,
+    "shippedBytes": 15758,
+    "sourceBytes": 15758,
+    "sha256": "d1f545fa258ddcb8d184c662477670e91a8ee2fb9d336da9c0ed42f9e3328d03"
+  },
+  {
+    "file": "src/legacy/admin_comms.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/admin_comms.html",
+    "identical": true,
+    "shippedBytes": 4807,
+    "sourceBytes": 4807,
+    "sha256": "475c70e6fc286e112800cc5b4c31c1f9aa4f0b535a0dbacc18e3996b62c2eb05"
+  },
+  {
+    "file": "src/legacy/admin_inbox.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/admin_inbox.html",
+    "identical": true,
+    "shippedBytes": 3904,
+    "sourceBytes": 3904,
+    "sha256": "376460b450f6c56b33a264e778b1c3abfb3c77609febe6c4e14a44c5938d6247"
+  },
+  {
+    "file": "src/legacy/board.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/board.html",
+    "identical": true,
+    "shippedBytes": 6502,
+    "sourceBytes": 6502,
+    "sha256": "84331746df465eb7595db15141976abfa9b81da78810fb6ec1e57a9a203dcbf8"
+  },
+  {
+    "file": "src/legacy/collaborate.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/collaborate.html",
+    "identical": true,
+    "shippedBytes": 4257,
+    "sourceBytes": 4257,
+    "sha256": "1a5043aacd69240ab6ddc71d73012127ae733001542105248f36d67eff24639b"
+  },
+  {
+    "file": "src/legacy/contact.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/contact.html",
+    "identical": true,
+    "shippedBytes": 5892,
+    "sourceBytes": 5892,
+    "sha256": "80fbbf1dbbc296d4adbad12da18d57672b7777f0a9dec8279c78980022aeff07"
+  },
+  {
+    "file": "src/legacy/decorator.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/decorator.html",
+    "identical": true,
+    "shippedBytes": 80991,
+    "sourceBytes": 80991,
+    "sha256": "c76f5d5231e182e0de7ef5e83e838db8845eb229bbedf745c1019cf00b91e20d"
+  },
+  {
+    "file": "src/legacy/faq.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/faq.html",
+    "identical": true,
+    "shippedBytes": 10188,
+    "sourceBytes": 10188,
+    "sha256": "34ae463e1989cd06fd41f50e57a88e4db0b5c737ddefeebd9c5fdf17a149a1fd"
+  },
+  {
+    "file": "src/legacy/forgot-password.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/forgot-password.html",
+    "identical": true,
+    "shippedBytes": 2985,
+    "sourceBytes": 2985,
+    "sha256": "36ce35bfd5011f3f9bd278a244386aa48e39854be2bad2bb09464418cc84c184"
+  },
+  {
+    "file": "src/legacy/founders.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/founders.html",
+    "identical": true,
+    "shippedBytes": 5567,
+    "sourceBytes": 5567,
+    "sha256": "ee0d0a3df2dd28b0b93eb55695da23ee6f943c961e82d10b36a169a77d61ea7c"
+  },
+  {
+    "file": "src/legacy/index.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/index.html",
+    "identical": true,
+    "shippedBytes": 1040,
+    "sourceBytes": 1040,
+    "sha256": "9df9169f58c8944bde2b6b9d410e612c28868a105b74f344597e3b7c4b617abb"
+  },
+  {
+    "file": "src/legacy/information-and-links.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/information-and-links.html",
+    "identical": true,
+    "shippedBytes": 9852,
+    "sourceBytes": 9852,
+    "sha256": "406be5d91cfe507bbf0392c496f116a0a119a9e8ec80b36e6f6c3c223d3e16fe"
+  },
+  {
+    "file": "src/legacy/join.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/join.html",
+    "identical": true,
+    "shippedBytes": 5135,
+    "sourceBytes": 5135,
+    "sha256": "f14d9802e2e2a772025f0b5f3c8018c4942c152e7152adc84ea474bc00daa0f1"
+  },
+  {
+    "file": "src/legacy/login.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/login.html",
+    "identical": true,
+    "shippedBytes": 3656,
+    "sourceBytes": 3656,
+    "sha256": "abc1445ef6e0b01bbf5c70dae1d84ea231b7587c70c39bb66b45fd454e0894f1"
+  },
+  {
+    "file": "src/legacy/pollenpop.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/pollenpop.html",
+    "identical": true,
+    "shippedBytes": 7303,
+    "sourceBytes": 7303,
+    "sha256": "dfbba517472db1f6943e589b95c75ddc5da1f5ff9b6f58b8da75d723d060c878"
+  },
+  {
+    "file": "src/legacy/preview.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/preview.html",
+    "identical": true,
+    "shippedBytes": 10762,
+    "sourceBytes": 10762,
+    "sha256": "d2d43a635669f64b9c1e6071a10a6e9f7b024c6a9ed81a3842ee60b04c9edacc"
+  },
+  {
+    "file": "src/legacy/profile.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/profile.html",
+    "identical": true,
+    "shippedBytes": 31504,
+    "sourceBytes": 31504,
+    "sha256": "aa58432bca4bd57b490f31ccdc6b119e42c7414d9d76a5f3fc8a17d31e6c2383"
+  },
+  {
+    "file": "src/legacy/reset-password.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/reset-password.html",
+    "identical": true,
+    "shippedBytes": 7043,
+    "sourceBytes": 7043,
+    "sha256": "9cd3afb19dd7b006a16fa91f577830462380ac83a39f51a211d6fe867722c4b9"
+  },
+  {
+    "file": "src/legacy/testjar.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/testjar.html",
+    "identical": true,
+    "shippedBytes": 47386,
+    "sourceBytes": 47386,
+    "sha256": "b29de4ca8ca3c545a2dca7aa79f6275de089f82880c939ba138cd220336b06c0"
+  },
+  {
+    "file": "src/legacy/the-meadow.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/the-meadow.html",
+    "identical": true,
+    "shippedBytes": 27724,
+    "sourceBytes": 27724,
+    "sha256": "e394c9698166962481f62c874bb589ab41309aa0fe3d99c5d98e05bfb2f9fb1e"
+  },
+  {
+    "file": "src/legacy/trail.html",
+    "source": "/home/it-guy/Documents/hive nectar/Hive-Nectar-Website-02-aug2026/trail.html",
+    "identical": true,
+    "shippedBytes": 3452,
+    "sourceBytes": 3452,
+    "sha256": "938c728ce624b289b3f2c3dabff8e57b8c1d6dd4130e3793178b580689fdec56"
+  }
+]

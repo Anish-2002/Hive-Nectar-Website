@@ -1,21 +1,30 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>The Meadow | Belonging</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <meta http-equiv="refresh" content="0; url=the-meadow.html" />
-  <script>window.location.replace('the-meadow.html');</script>
-</head>
-<body class="page-index" data-theme="classic">
-  <main class="wrap" style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
-    <div style="text-align:center;">
-      <div class="brandmark" style="margin-bottom:16px;"><img src="newlogo.webp" alt="The Meadow Logo" class="logo-img" style="width:72px;"></div>
-      <p style="color:var(--fg-muted);">Taking you to The Meadow…</p>
-      <a href="the-meadow.html" class="btn" style="margin-top:12px;">Go to The Meadow</a>
-    </div>
-  </main>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 8c14 22 30 38 30 52a30 30 0 0 1-60 0C20 46 36 30 50 8z' fill='%23D9A441'/><circle cx='41' cy='58' r='6' fill='%23FFF3D6' opacity='.75'/></svg>"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      These two are the *only* sheets every original page shares (23 of 24 link
+      style.css; 18 of 24 link Font Awesome). They are declared on the shell so
+      the very first paint is never unstyled, and tagged `data-shell-css` so
+      src/lib/legacy.js can switch them OFF for the pages that do not declare
+      them — preview.html is a Tailwind-only document that links neither, and
+      must not inherit the site theme.
+    -->
+    <link rel="stylesheet" href="/style.css" data-shell-css="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      data-shell-css="font-awesome"
+    />
+    <title>The Meadow</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
