@@ -2,6 +2,7 @@
 """Reflection data path under RLS. Rolled back: no production data changes."""
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -23,7 +24,7 @@ TOKEN = (os.environ.get("SUPABASE_ACCESS_TOKEN") or creds.get("SUPABASE_ACCESS_T
 BASE = f"https://api.supabase.com/v1/projects/{REF}/database/query"
 
 
-def sql(q):
+def sql_once(q, timeout=90):
     req = urllib.request.Request(
         BASE,
         data=json.dumps({"query": q}).encode(),
@@ -31,7 +32,7 @@ def sql(q):
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=90) as r:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode() or "[]")
     except urllib.error.HTTPError as e:
         body = e.read().decode()
@@ -39,6 +40,26 @@ def sql(q):
             return {"__error__": json.loads(body).get("message", body)}
         except Exception:
             return {"__error__": body}
+
+
+def sql(q, attempts=6):
+    """Retry while the management API is rate-limiting.
+
+    A `429 ThrottlerException` is a transport limit. Reporting it as
+    `cannot read fixtures` would blame the data for a rate limit.
+    """
+    last = {}
+    for i in range(attempts):
+        res = sql_once(q)
+        if not (isinstance(res, dict) and "__error__" in res):
+            return res
+        msg = str(res.get("__error__"))
+        if "Too Many Requests" not in msg and "429" not in msg:
+            return res
+        last = {"__error__": f"{msg} (after {i + 1} attempt(s))"}
+        if i < attempts - 1:
+            time.sleep(10 * (i + 1))
+    return last
 
 
 results = []
@@ -63,10 +84,15 @@ def err(res):
     return isinstance(res, dict) and "__error__" in res
 
 
-member = first_row(sql("select id::text from profiles order by updated_at limit 1"))
-task = first_row(sql("select id::text from tasks limit 1"))
+member_rows = sql("select id::text from profiles order by updated_at limit 1")
+member = first_row(member_rows)
+task_rows = sql("select id::text from tasks limit 1")
+task = first_row(task_rows)
 if not member or not task:
-    raise SystemExit(f"cannot read fixtures: member={member} task={task}")
+    raise SystemExit(
+        f"cannot read fixtures: member={member} task={task} "
+        f"member_response={str(member_rows)[:300]} task_response={str(task_rows)[:300]}"
+    )
 uid, tid = member["id"], task["id"]
 orow = first_row(sql(f"select id::text from profiles where id::text <> '{uid}' limit 1"))
 oid = orow["id"] if orow else uid

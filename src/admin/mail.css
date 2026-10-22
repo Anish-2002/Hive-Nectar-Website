@@ -1,0 +1,63 @@
+/* ---------------------------------------------------------------------------
+   Mail queue styles.
+
+   Only the handful of pieces the mail screen needs that admin.css does not
+   already provide. Everything else (panels, cards, tables, buttons, ok/error
+   banners) is reused from admin.css, and every rule stays prefixed .adm- so
+   nothing leaks into the member pages.
+   --------------------------------------------------------------------------- */
+
+.adm-warn {
+  background: rgba(200, 169, 110, 0.16);
+  border: 1px solid rgba(200, 169, 110, 0.5);
+  color: var(--adm-fg);
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.adm-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.adm-inline input[type='text'] {
+  flex: 1 1 260px;
+  min-width: 220px;
+  padding: 8px 10px;
+  border: 1px solid var(--adm-border);
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.83rem;
+  background: var(--adm-card);
+  color: var(--adm-fg);
+}
+
+.adm-pill--wait {
+  background: rgba(200, 169, 110, 0.2);
+  border-color: rgba(200, 169, 110, 0.55);
+}
+
+.adm-pill--bad {
+  background: rgba(180, 69, 58, 0.12);
+  border-color: rgba(180, 69, 58, 0.45);
+  color: var(--adm-danger);
+}
+
+.adm-pre {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--adm-bg);
+  border: 1px solid var(--adm-border);
+  border-radius: 9px;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 240px;
+  overflow: auto;
+}

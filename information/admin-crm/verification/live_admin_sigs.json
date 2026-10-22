@@ -300,6 +300,13 @@
     "returns": "jsonb",
     "security": "definer"
   },
+  "admin_get_mail_outbox": {
+    "args": "p_status text, p_limit integer, p_offset integer",
+    "n_defaults": 3,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
   "admin_get_member_360": {
     "args": "p_user_id uuid",
     "n_defaults": 0,
@@ -573,6 +580,13 @@
     "returns": "jsonb",
     "security": "definer"
   },
+  "admin_mail_flush_claim": {
+    "args": "p_ids uuid[], p_limit integer",
+    "n_defaults": 2,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
   "admin_merge_ticket": {
     "args": "p_target uuid, p_source uuid, p_reason text",
     "n_defaults": 1,
@@ -594,6 +608,13 @@
     "returns": "boolean",
     "security": "definer"
   },
+  "admin_queue_test_email": {
+    "args": "p_to text",
+    "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
   "admin_reply_ticket": {
     "args": "p_ticket_id uuid, p_body text, p_internal boolean, p_template_id uuid",
     "n_defaults": 2,
@@ -604,6 +625,13 @@
   "admin_reply_to_member": {
     "args": "p_id uuid, p_body text, p_channel text",
     "n_defaults": 1,
+    "public_execute": false,
+    "returns": "jsonb",
+    "security": "definer"
+  },
+  "admin_retry_mail": {
+    "args": "p_id uuid",
+    "n_defaults": 0,
     "public_execute": false,
     "returns": "jsonb",
     "security": "definer"

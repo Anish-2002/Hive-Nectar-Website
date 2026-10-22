@@ -303,6 +303,9 @@ INTENTIONAL = {
     "admin_delete_inquiry": "superseded by admin_delete_ticket",
     "admin_set_message_delivery": "records the mail provider's delivery callback; written "
                                   "by the transport/webhook, never from the browser",
+    "admin_mail_flush_claim": "claims outbox rows for transmission; called by the send-mail "
+                              "edge function, which holds the provider credential, never "
+                              "from the browser",
 }
 unused = sorted(set(sigs) - referenced - set(INTENTIONAL))
 if unused:
@@ -315,6 +318,21 @@ else:
 for name, why in sorted(INTENTIONAL.items()):
     if name in sigs:
         ok(f"{name}: intentionally unwired -- {why}")
+
+# The claim above has to be earned, not asserted: a function marked "called by the
+# edge function" must actually appear in that edge function's source.
+EDGE = ROOT / "supabase" / "functions" / "send-mail" / "index.ts"
+if EDGE.exists():
+    edge_src = EDGE.read_text(encoding="utf-8")
+    for name in ("admin_mail_flush_claim",):
+        if name in sigs:
+            if name in edge_src:
+                ok(f"{name}: referenced by the send-mail edge function (server-side caller)")
+            else:
+                bad(f"{name}: claimed to be called by the send-mail edge function, "
+                    f"but {EDGE} never mentions it")
+else:
+    warn(f"send-mail edge function not found at {EDGE}; skipped the server-caller check")
 
 # ------------------------------------------------- nav entries resolve to a component
 # A NAV entry whose `component:` identifier is neither imported nor declared locally
@@ -335,23 +353,29 @@ else:
     else:
         ok(f"all {len(comps)} NAV entries resolve to an imported or local component")
 
-# ------------------------------------------------- every adm-* class exists in admin.css
+# ------------------------------------------------- every adm-* class exists in the admin CSS
 # An invented class name renders unstyled, which reads as "broken screen" rather than
 # "missing feature" -- and no other check would notice.
-css_path = ADMIN_DIR / "admin.css"
-if css_path.exists():
-    defined = set(re.findall(r"\.(adm-[A-Za-z0-9_-]+)", css_path.read_text(encoding="utf-8")))
+# Every stylesheet of the admin surface is scanned, not just admin.css: a section added
+# with its own stylesheet (mail.css) defines real classes that a single-file scan would
+# report as missing.
+css_files = sorted(ADMIN_DIR.glob("*.css"))
+if css_files:
+    defined = set()
+    for css_file in css_files:
+        defined |= set(re.findall(r"\.(adm-[A-Za-z0-9_-]+)", css_file.read_text(encoding="utf-8")))
     used = set()
     for text in src.values():
         used |= set(re.findall(r'[\s"\'`]((?:adm-)[A-Za-z0-9_-]+)', text))
     # A name ending in "-" is a template prefix (`adm-toast--${kind}`), not a class.
     unstyled = sorted(u for u in used - defined if not u.endswith("-"))
     if unstyled:
-        warn(f"{len(unstyled)} class(es) used but not defined in admin.css: {unstyled[:8]}")
+        warn(f"{len(unstyled)} class(es) used but not defined in the admin CSS: {unstyled[:8]}")
     else:
-        ok(f"all {len(used)} adm-* classes used by the admin UI exist in admin.css")
+        ok(f"all {len(used)} adm-* classes used by the admin UI exist in the admin CSS "
+           f"({len(css_files)} stylesheets)")
 else:
-    warn("admin.css not found; skipped the class-existence check")
+    warn("no admin stylesheet found; skipped the class-existence check")
 
 # --------------------------------------------------------------- emoji audit
 emoji_re = re.compile(

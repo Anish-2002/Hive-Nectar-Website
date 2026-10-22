@@ -485,8 +485,20 @@ if out:
     check("setting deleted", g("settings_delete").get("success") is True, g("settings_delete"))
     check("deleting a missing setting refused", g("settings_delete_missing").get("success") is False, g("settings_delete_missing"))
     h = g("health").get("health") or {}
-    check("integration health reports the mail transport truthfully",
-          isinstance(h.get("email_transport"), dict) and h["email_transport"].get("ready") is False, str(h.get("email_transport"))[:200])
+    # Migration 11's own property: the health read answers with a structured
+    # dependency block. Assert THAT shape, not a shape some later migration
+    # invented - this script's stage 0 REPLAYS the migration-11 file, which
+    # redefines admin_get_integration_health and therefore restores the
+    # migration-11 body. Asserting the migration 14/16 transport here would test
+    # a state this script has just undone; verify_mail_live_state.py owns that
+    # assertion and runs after 14/15/16 are re-applied (see run_admin_gate.sh).
+    deps = ("billing", "realtime")
+    check("integration health returns a structured block",
+          isinstance(h, dict) and set(deps) <= set(h)
+          and all(isinstance((h.get(k) or {}).get("ready"), bool) for k in deps)
+          and all(bool(str((h.get(k) or {}).get("detail") or "").strip()) for k in deps)
+          and isinstance(h.get("tables"), dict) and len(h.get("tables")) >= 5,
+          str(h)[:300])
     cfg = (g("public_config").get("cfg") or {})
     check("get_all_config returns usable keys and no secrets",
           "site_url" in cfg and not any(k for k in cfg if any(s in k.lower() for s in ("secret", "token", "passw", "smtp"))),
@@ -710,4 +722,12 @@ check("no probe member left behind", run("select count(*) as c from public.admin
       in ([{"c": 0}], [[{"c": 0}]]), "")
 
 print(f"\nRESULT  {PASS} PASS / {FAIL} FAIL")
+print("\nNOTICE  stage 0 replayed migration 11, which redefines four functions the")
+print("        mail work replaced. The live mail paths and the integration-health")
+print("        block are therefore back to the migration-11 bodies. Re-apply the")
+print("        mail migrations before using the CRM:")
+print("          /usr/bin/python3 information/admin-crm/verification/reapply_mail_migrations.py")
+print("        The gate (run_admin_gate.sh) does this automatically and then runs")
+print("        probe_mail_paths.py + verify_mail_live_state.py, which fail loudly")
+print("        if the reset is left in place.")
 sys.exit(1 if FAIL else 0)

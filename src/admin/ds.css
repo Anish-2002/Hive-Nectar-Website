@@ -1,0 +1,1842 @@
+/* =====================================================================
+   Hive Nectar — CRM design system (ds)
+   ---------------------------------------------------------------------
+   One stylesheet that owns the administration surface: tokens, type scale,
+   the application shell (sidebar / top bar / content container) and the
+   component vocabulary every module is built from.
+
+   Rules this file exists to enforce:
+     * The CRM does not inherit the member theme. Body text is Inter, and the
+       member site's display face (Fredoka) is never used here.
+     * Nothing is smaller than the type scale. Table data is 13.5px, labels
+       12.5px, body 15px, section headings 20px, page titles 28px.
+     * Content lives in a bounded container, so a 2560px display does not
+       stretch a table across the whole screen.
+     * Every selector is scoped to `.ds-shell` (which sits on the same element
+       as `.adm-shell`), so the member experience cannot be affected.
+
+   Loaded after the legacy sheets in `AdminApp.jsx`; the companion
+   `ds-legacy.css` (generated) re-points the old `.adm-*` rules at these tokens.
+   ===================================================================== */
+
+/* ---------- 1. Inter, self-hosted (no third-party request, no FOUT) ----- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ---------- 2. Tokens --------------------------------------------------- */
+/* The shell and the pre-shell gate both carry the tokens: the gate renders
+   before .adm-shell exists, and an unresolvable var() would drop the padding. */
+.adm-shell.ds-shell,
+.adm-gate.ds-gate {
+  /* surfaces */
+  --ds-bg: #FAF9F6;
+  --ds-bg-sunken: #F4F2EC;
+  --ds-surface: #FFFFFF;
+  --ds-surface-alt: #FCFBF8;
+  --ds-border: #E5E7EB;
+  --ds-border-soft: #EFEDE7;
+  --ds-border-strong: #D6D9DF;
+
+  /* text */
+  --ds-text: #1F2937;
+  --ds-muted: #64748B;
+  --ds-faint: #94A3B8;
+
+  /* brand + status */
+  --ds-accent: #D9A441;
+  --ds-accent-ink: #7A5A16;
+  --ds-accent-soft: #FBF3E2;
+  --ds-green: #2F6B4F;
+  --ds-ok: #2F6B4F;
+  --ds-ok-soft: #EAF3EE;
+  --ds-warn: #9A6B00;
+  --ds-warn-soft: #FBF1DC;
+  --ds-danger: #B42318;
+  --ds-danger-soft: #FBEAE8;
+  --ds-info: #1E5B8A;
+  --ds-info-soft: #E9F1F8;
+
+  /* type */
+  --ds-font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --ds-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --ds-t-page: 28px;
+  --ds-t-section: 20px;
+  --ds-t-card: 15px;
+  --ds-t-body: 15px;
+  --ds-t-table: 13.5px;
+  --ds-t-label: 12.5px;
+  --ds-t-meta: 12px;
+  --ds-t-stat: 26px;
+
+  /* space + shape */
+  --ds-1: 4px;
+  --ds-2: 8px;
+  --ds-3: 12px;
+  --ds-4: 16px;
+  --ds-5: 20px;
+  --ds-6: 24px;
+  --ds-7: 32px;
+  --ds-8: 40px;
+  --ds-r-sm: 6px;
+  --ds-r: 8px;
+  --ds-r-lg: 12px;
+  --ds-r-pill: 999px;
+  --ds-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --ds-shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.12), 0 2px 6px rgba(16, 24, 40, 0.06);
+  --ds-side-w: 248px;
+  --ds-side-rail: 68px;
+  --ds-top-h: 60px;
+  --ds-page-max: 1520px;
+  --ds-ring: 0 0 0 3px rgba(217, 164, 65, 0.28);
+
+  /* Re-point the member-theme variables the legacy CRM sheets read, so their
+     own var()-based rules resolve to the design tokens instead of the meadow
+     palette. Compound selector: beats the legacy `.adm-shell` block. */
+  --bg: var(--ds-bg);
+  --fg: var(--ds-text);
+  --border: var(--ds-border);
+  --cta: var(--ds-accent);
+  --muted: var(--ds-muted);
+  --surface: var(--ds-surface);
+  --adm-bg: var(--ds-bg);
+  --adm-surface: var(--ds-surface);
+  --adm-fg: var(--ds-text);
+  --adm-muted: var(--ds-muted);
+  --adm-border: var(--ds-border);
+  --adm-accent: var(--ds-accent);
+
+  /* the shell itself */
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font-family: var(--ds-font);
+  font-size: var(--ds-t-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The member site paints a honeycomb gradient on the body; the CRM must sit on
+   a flat surface. Guarded by :has() so member pages are untouched. */
+body:has(.ds-shell) {
+  background: var(--ds-bg, #FAF9F6);
+  background-image: none;
+}
+
+.ds-shell h1,
+.ds-shell h2,
+.ds-shell h3,
+.ds-shell h4,
+.ds-shell h5,
+.ds-shell h6 {
+  font-family: var(--ds-font);
+  color: var(--ds-text);
+  letter-spacing: -0.011em;
+  line-height: 1.28;
+  margin: 0;
+}
+.ds-shell h1 { font-size: var(--ds-t-page); font-weight: 650; }
+.ds-shell h2 { font-size: var(--ds-t-section); font-weight: 620; }
+.ds-shell h3 { font-size: 18px; font-weight: 600; }
+.ds-shell p { margin: 0 0 var(--ds-3); }
+
+.ds-shell a { color: var(--ds-accent-ink); text-decoration: none; }
+.ds-shell a:hover { text-decoration: underline; }
+
+.ds-shell :focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- 3. Sidebar -------------------------------------------------- */
+.ds-side {
+  flex: 0 0 var(--ds-side-w);
+  width: var(--ds-side-w);
+  display: flex;
+  flex-direction: column;
+  background: var(--ds-surface);
+  border-right: 1px solid var(--ds-border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 20;
+  transition: width 160ms ease, flex-basis 160ms ease;
+}
+
+.ds-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  padding: var(--ds-4) var(--ds-4) var(--ds-3);
+  border-bottom: 1px solid var(--ds-border-soft);
+  min-height: var(--ds-top-h);
+  flex: 0 0 auto;
+}
+.ds-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ds-r);
+  background: var(--ds-accent);
+  color: #3A2A08;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+}
+.ds-brand-text { display: flex; flex-direction: column; min-width: 0; }
+.ds-brand-name {
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--ds-text);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.ds-brand-sub {
+  font-size: var(--ds-t-meta);
+  color: var(--ds-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* The menu scrolls on its own, so a long navigation never pushes the footer
+   off-screen and never leaves a bare column below the item list. */
+.ds-nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--ds-3) var(--ds-2) var(--ds-5);
+  scrollbar-width: thin;
+}
+.ds-nav-group + .ds-nav-group { margin-top: var(--ds-1); }
+.ds-nav-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-2);
+  padding: var(--ds-2) var(--ds-2);
+  margin-top: var(--ds-3);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ds-faint);
+  border-radius: var(--ds-r-sm);
+  text-align: left;
+}
+.ds-nav-toggle:hover { color: var(--ds-muted); background: var(--ds-bg-sunken); }
+.ds-nav-toggle-label { flex: 1 1 auto; min-width: 0; }
+.ds-nav-toggle svg { flex: 0 0 auto; transition: transform 140ms ease; }
+.ds-nav-toggle[aria-expanded='true'] svg { transform: rotate(90deg); }
+
+.ds-nav-panel { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 0; }
+.ds-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  width: 100%;
+  padding: 7px var(--ds-2);
+  border: 0;
+  border-radius: var(--ds-r);
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-muted);
+  text-align: left;
+  position: relative;
+  white-space: nowrap;
+}
+.ds-nav-item svg { flex: 0 0 auto; color: var(--ds-faint); }
+.ds-nav-item span:not(.ds-nav-count) { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.ds-nav-item:hover { background: var(--ds-bg-sunken); color: var(--ds-text); }
+.ds-nav-item:hover svg { color: var(--ds-muted); }
+.ds-nav-item.is-active {
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent-ink);
+  font-weight: 600;
+}
+.ds-nav-item.is-active svg { color: var(--ds-accent-ink); }
+.ds-nav-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--ds-accent);
+}
+.ds-nav-count {
+  flex: 0 0 auto;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: var(--ds-r-pill);
+  background: var(--ds-danger-soft);
+  color: var(--ds-danger);
+  font-size: 11.5px;
+  font-weight: 650;
+  text-align: center;
+  line-height: 18px;
+}
+
+.ds-side-foot {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--ds-border-soft);
+  padding: var(--ds-3);
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+}
+.ds-side-foot-text { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
+.ds-side-foot-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ds-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-side-foot-role { font-size: var(--ds-t-meta); color: var(--ds-muted); }
+
+/* Collapsed rail: icons only, with the label kept in the title attribute. */
+.adm-shell.ds-shell:is(.is-collapsed, .is-rail) .ds-side {
+  width: var(--ds-side-rail);
+  flex-basis: var(--ds-side-rail);
+}
+.ds-shell:is(.is-collapsed, .is-rail) .ds-brand-text,
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-toggle-label,
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-item span,
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-count,
+.ds-shell:is(.is-collapsed, .is-rail) .ds-side-foot-text { display: none; }
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-toggle,
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
+.ds-shell:is(.is-collapsed, .is-rail) .ds-nav-toggle svg { display: none; }
+.ds-shell:is(.is-collapsed, .is-rail) .ds-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+
+/* ---------- 4. Top bar + content --------------------------------------- */
+.ds-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.ds-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--ds-4);
+  height: var(--ds-top-h);
+  padding: 0 var(--ds-6);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(8px);
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.ds-crumbs { display: flex; align-items: center; gap: var(--ds-2); min-width: 0; }
+.ds-crumbs-group {
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ds-faint);
+  white-space: nowrap;
+}
+.ds-crumbs-sep { color: var(--ds-border-strong); }
+.ds-crumbs-current {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ds-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-topbar-spacer { flex: 1 1 auto; }
+
+.ds-search { position: relative; flex: 0 1 380px; min-width: 180px; }
+.ds-search svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ds-faint);
+  pointer-events: none;
+}
+.ds-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--ds-3) 0 34px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface-alt);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+.ds-search input::placeholder { color: var(--ds-faint); }
+.ds-search input:focus {
+  outline: none;
+  border-color: var(--ds-accent);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-ring);
+}
+.ds-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  box-shadow: var(--ds-shadow-lg);
+  padding: var(--ds-2);
+}
+.ds-search-hit {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  width: 100%;
+  padding: var(--ds-2) var(--ds-3);
+  border: 0;
+  border-radius: var(--ds-r);
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ds-text);
+  cursor: pointer;
+  text-align: left;
+}
+.ds-search-hit:hover,
+.ds-search-hit.is-active { background: var(--ds-bg-sunken); }
+.ds-search-hit small { color: var(--ds-muted); font-size: var(--ds-t-meta); margin-left: auto; }
+.ds-search-none { padding: var(--ds-3); color: var(--ds-muted); font-size: 13px; }
+
+.ds-actions { display: flex; align-items: center; gap: var(--ds-2); }
+
+.ds-icon-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--ds-r);
+  background: none;
+  color: var(--ds-muted);
+  cursor: pointer;
+}
+.ds-icon-btn:hover { background: var(--ds-bg-sunken); color: var(--ds-text); }
+.ds-icon-btn[aria-expanded='true'] { background: var(--ds-bg-sunken); color: var(--ds-text); }
+
+.ds-bell-count {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: var(--ds-r-pill);
+  background: var(--ds-danger);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  border: 2px solid var(--ds-surface);
+  box-sizing: content-box;
+}
+.ds-bell-count[hidden] { display: none; }
+
+.ds-avatar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-2);
+  height: 36px;
+  padding: 0 var(--ds-2) 0 var(--ds-1);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-pill);
+  background: var(--ds-surface);
+  cursor: pointer;
+  font: inherit;
+  color: var(--ds-text);
+}
+.ds-avatar:hover { border-color: var(--ds-border-strong); }
+.ds-avatar-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ds-accent-soft);
+  color: var(--ds-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.ds-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  min-width: 280px;
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  box-shadow: var(--ds-shadow-lg);
+  padding: var(--ds-2);
+}
+.ds-menu-wrap { position: relative; }
+.ds-menu-head {
+  padding: var(--ds-3);
+  border-bottom: 1px solid var(--ds-border-soft);
+  margin-bottom: var(--ds-2);
+}
+.ds-menu-title {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-faint);
+}
+.ds-menu-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  width: 100%;
+  padding: var(--ds-2) var(--ds-3);
+  border: 0;
+  border-radius: var(--ds-r);
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ds-text);
+  cursor: pointer;
+  text-align: left;
+}
+.ds-menu-row:hover { background: var(--ds-bg-sunken); }
+.ds-menu-row-name { flex: 1 1 auto; min-width: 0; }
+.ds-menu-row-count {
+  flex: 0 0 auto;
+  font-size: var(--ds-t-label);
+  font-weight: 650;
+  color: var(--ds-danger);
+}
+.ds-menu-row-count.is-zero { color: var(--ds-faint); }
+.ds-menu-empty { padding: var(--ds-3); color: var(--ds-muted); font-size: 13px; }
+.ds-menu-sep { height: 1px; background: var(--ds-border-soft); margin: var(--ds-2) 0; }
+.ds-menu-row--danger { color: var(--ds-danger); }
+
+.ds-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--ds-6);
+  padding-bottom: var(--ds-8);
+}
+.ds-page {
+  width: 100%;
+  max-width: var(--ds-page-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-5);
+}
+/* The legacy main element carries 20px/22px/60px padding of its own. The shell
+   renders ONE element that carries both classes, so zeroing `.adm-main` also
+   zeroed `.ds-main` (higher specificity, same element) and the page lost its
+   gutter — every screen sat flush against the viewport edge. Only the legacy
+   element that is NOT the new main gets zeroed. */
+.ds-shell .adm-main:not(.ds-main) { padding: 0; }
+
+.ds-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-4);
+  flex-wrap: wrap;
+  margin: 0;
+}
+.ds-page-head-text { min-width: 0; }
+.ds-page-title {
+  font-size: var(--ds-t-page);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--ds-text);
+  margin: 0;
+}
+.ds-page-sub {
+  margin: var(--ds-1) 0 0;
+  font-size: 13.5px;
+  color: var(--ds-muted);
+  max-width: 78ch;
+}
+.ds-page-actions { display: flex; align-items: center; gap: var(--ds-2); flex-wrap: wrap; }
+
+/* ---------- 5. Components ---------------------------------------------- */
+.ds-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  box-shadow: var(--ds-shadow);
+  padding: var(--ds-5);
+}
+.ds-card--flush { padding: 0; overflow: hidden; }
+.ds-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-3);
+  padding: 0 0 var(--ds-3);
+  border-bottom: 1px solid var(--ds-border-soft);
+  margin-bottom: var(--ds-4);
+}
+.ds-card-title { font-size: 18px; font-weight: 620; color: var(--ds-text); }
+.ds-card-note { font-size: var(--ds-t-label); color: var(--ds-muted); }
+
+.ds-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: var(--ds-3);
+}
+.ds-stat {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  box-shadow: none;
+  font: inherit;
+}
+button.ds-stat { cursor: pointer; }
+button.ds-stat:hover { border-color: var(--ds-border-strong); }
+.ds-stat-label {
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+.ds-stat-value {
+  font-size: var(--ds-t-stat);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--ds-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.ds-stat-foot { font-size: var(--ds-t-meta); color: var(--ds-muted); }
+
+.ds-table-wrap { overflow-x: auto; border-radius: var(--ds-r-lg); }
+.ds-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-t-table);
+}
+.ds-table th {
+  text-align: left;
+  font-size: var(--ds-t-label);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+  background: var(--ds-surface-alt);
+  border-bottom: 1px solid var(--ds-border);
+  padding: 10px var(--ds-4);
+  white-space: nowrap;
+}
+.ds-table td {
+  padding: 11px var(--ds-4);
+  border-bottom: 1px solid var(--ds-border-soft);
+  color: var(--ds-text);
+  vertical-align: middle;
+}
+.ds-table tbody tr:hover td { background: var(--ds-surface-alt); }
+.ds-table tbody tr:last-child td { border-bottom: 0; }
+.ds-table .ds-num { font-variant-numeric: tabular-nums; text-align: right; width: 1%; white-space: nowrap; }
+.ds-table .ds-strong { font-weight: 600; }
+.ds-table .ds-sub { color: var(--ds-muted); font-size: var(--ds-t-meta); }
+
+.ds-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ds-3);
+  flex-wrap: wrap;
+}
+.ds-toolbar .ds-field { flex: 1 1 200px; max-width: 320px; }
+.ds-toolbar-spacer { flex: 1 1 auto; }
+
+.ds-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.ds-field > label,
+.ds-label {
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ds-muted);
+}
+.ds-input,
+.ds-select,
+.ds-textarea,
+.ds-shell input[type='text'].ds-input {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.ds-textarea { min-height: 96px; resize: vertical; }
+.ds-input:focus,
+.ds-select:focus,
+.ds-textarea:focus {
+  outline: none;
+  border-color: var(--ds-accent);
+  box-shadow: var(--ds-ring);
+}
+.ds-input::placeholder,
+.ds-textarea::placeholder { color: var(--ds-faint); }
+.ds-hint { font-size: var(--ds-t-meta); color: var(--ds-muted); }
+
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-2);
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ds-btn:hover { border-color: var(--ds-border-strong); background: var(--ds-surface-alt); }
+.ds-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.ds-btn--primary {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: #3A2A08;
+  font-weight: 650;
+}
+.ds-btn--primary:hover { background: #CE9A34; border-color: #CE9A34; }
+.ds-btn--ghost { background: none; border-color: transparent; color: var(--ds-muted); }
+.ds-btn--ghost:hover { background: var(--ds-bg-sunken); color: var(--ds-text); }
+.ds-btn--danger { color: var(--ds-danger); border-color: #F0C9C4; background: var(--ds-danger-soft); }
+.ds-btn--danger:hover { background: #F7DEDB; border-color: #E2ACA4; }
+.ds-btn--sm { height: 30px; padding: 0 10px; font-size: 13px; }
+.ds-btn--block { width: 100%; }
+
+.ds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: var(--ds-r-pill);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-alt);
+  color: var(--ds-muted);
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ds-pill--ok { background: var(--ds-ok-soft); border-color: #CFE3D7; color: var(--ds-ok); }
+.ds-pill--warn { background: var(--ds-warn-soft); border-color: #EFDDB4; color: var(--ds-warn); }
+.ds-pill--danger { background: var(--ds-danger-soft); border-color: #F0C9C4; color: var(--ds-danger); }
+.ds-pill--info { background: var(--ds-info-soft); border-color: #C9DCEB; color: var(--ds-info); }
+.ds-pill--accent { background: var(--ds-accent-soft); border-color: #EFDCB4; color: var(--ds-accent-ink); }
+
+.ds-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--ds-bg-sunken);
+  border-radius: var(--ds-r);
+  border: 1px solid var(--ds-border-soft);
+  flex-wrap: wrap;
+}
+.ds-tab {
+  border: 0;
+  background: none;
+  border-radius: var(--ds-r-sm);
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 550;
+  color: var(--ds-muted);
+  cursor: pointer;
+}
+.ds-tab:hover { color: var(--ds-text); }
+.ds-tab.is-active {
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font-weight: 620;
+  box-shadow: var(--ds-shadow);
+}
+
+.ds-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  padding: var(--ds-3) var(--ds-4);
+  border-top: 1px solid var(--ds-border-soft);
+  font-size: var(--ds-t-label);
+  color: var(--ds-muted);
+}
+.ds-pager-spacer { flex: 1 1 auto; }
+
+.ds-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 26, 32, 0.42);
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+}
+.ds-drawer {
+  width: min(720px, 100%);
+  height: 100%;
+  background: var(--ds-surface);
+  border-left: 1px solid var(--ds-border);
+  box-shadow: var(--ds-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  animation: ds-slide-in 180ms ease-out;
+}
+.ds-drawer-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-4);
+  padding: var(--ds-4) var(--ds-5);
+  border-bottom: 1px solid var(--ds-border);
+}
+.ds-drawer-title { font-size: 17px; font-weight: 640; }
+.ds-drawer-body { flex: 1 1 auto; overflow-y: auto; padding: var(--ds-5); }
+.ds-drawer-foot {
+  flex: 0 0 auto;
+  padding: var(--ds-4) var(--ds-5);
+  border-top: 1px solid var(--ds-border);
+  display: flex;
+  gap: var(--ds-2);
+  justify-content: flex-end;
+  background: var(--ds-surface-alt);
+}
+@keyframes ds-slide-in { from { transform: translateX(24px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+
+.ds-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 26, 32, 0.42);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-5);
+}
+.ds-modal {
+  width: min(560px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--ds-surface);
+  border-radius: var(--ds-r-lg);
+  border: 1px solid var(--ds-border);
+  box-shadow: var(--ds-shadow-lg);
+  padding: var(--ds-5);
+}
+
+.ds-timeline { display: flex; flex-direction: column; gap: 0; }
+.ds-tl-item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: var(--ds-3);
+  padding-bottom: var(--ds-4);
+  position: relative;
+}
+.ds-tl-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 0;
+  width: 1px;
+  background: var(--ds-border);
+}
+.ds-tl-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-muted);
+  z-index: 1;
+}
+.ds-tl-body { min-width: 0; }
+.ds-tl-title { font-size: 13.5px; font-weight: 600; color: var(--ds-text); }
+.ds-tl-meta { font-size: var(--ds-t-meta); color: var(--ds-muted); }
+
+.ds-member-panel { display: flex; flex-direction: column; gap: var(--ds-3); }
+.ds-member-head { display: flex; align-items: center; gap: var(--ds-3); }
+.ds-member-name { font-size: 15px; font-weight: 640; }
+.ds-member-sub { font-size: var(--ds-t-meta); color: var(--ds-muted); }
+.ds-kv { display: grid; grid-template-columns: minmax(96px, 34%) 1fr; gap: 6px var(--ds-3); }
+.ds-kv dt { font-size: var(--ds-t-label); color: var(--ds-muted); font-weight: 550; }
+.ds-kv dd { margin: 0; font-size: 13.5px; color: var(--ds-text); }
+
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+  color: var(--ds-muted);
+}
+.ds-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ds-faint); flex: 0 0 auto; }
+.ds-dot--ok { background: var(--ds-ok); }
+.ds-dot--warn { background: var(--ds-warn); }
+.ds-dot--danger { background: var(--ds-danger); }
+
+.ds-empty,
+.ds-loading,
+.ds-error {
+  border: 1px dashed var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  background: var(--ds-surface-alt);
+  padding: var(--ds-7) var(--ds-5);
+  text-align: center;
+  color: var(--ds-muted);
+  font-size: 14px;
+}
+.ds-error { border-style: solid; border-color: #F0C9C4; background: var(--ds-danger-soft); color: var(--ds-danger); }
+.ds-empty-title { display: block; font-size: 15px; font-weight: 620; color: var(--ds-text); margin-bottom: var(--ds-1); }
+.ds-skeleton {
+  border-radius: var(--ds-r-sm);
+  background: linear-gradient(90deg, var(--ds-bg-sunken) 25%, #EDEAE3 37%, var(--ds-bg-sunken) 63%);
+  background-size: 400% 100%;
+  animation: ds-shimmer 1.4s ease infinite;
+  height: 12px;
+}
+@keyframes ds-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+.ds-toast {
+  position: fixed;
+  right: var(--ds-6);
+  bottom: var(--ds-6);
+  z-index: 80;
+  max-width: 380px;
+  padding: var(--ds-3) var(--ds-4);
+  border-radius: var(--ds-r);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-lg);
+  font-size: 14px;
+  color: var(--ds-text);
+}
+.ds-toast--ok { border-left: 3px solid var(--ds-ok); }
+.ds-toast--warn { border-left: 3px solid var(--ds-warn); }
+.ds-toast--error { border-left: 3px solid var(--ds-danger); }
+
+/* ---------- 6. Legacy surface re-pointing ------------------------------- */
+/* The section components still use the .adm-* vocabulary; these rules give
+   those names the design-system treatment so all 33 modules upgrade at once. */
+.ds-shell .adm-panel,
+.ds-shell .admd-block,
+.ds-shell .admpa-block,
+.ds-shell .adm-card,
+.ds-shell .admd-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  box-shadow: var(--ds-shadow);
+  padding: var(--ds-5);
+  margin-bottom: var(--ds-5);
+}
+.ds-shell .adm-panel h3,
+.ds-shell .admd-block h3,
+.ds-shell .admpa-block h3 { font-size: 18px; font-weight: 620; }
+
+.ds-shell .adm-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-4);
+  flex-wrap: wrap;
+  margin: 0 0 var(--ds-4);
+}
+.ds-shell .adm-head h2 {
+  font-size: var(--ds-t-page);
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.ds-shell .adm-head .adm-note,
+.ds-shell .adm-head p { margin: 2px 0 0; font-size: 13px; color: var(--ds-muted); }
+
+/* Cards and forms: stop stretching them across an ultrawide canvas. */
+.ds-shell .adm-cards,
+.ds-shell .admd-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--ds-4);
+}
+.ds-shell .adm-cards > *,
+.ds-shell .admd-cards > * { margin: 0; }
+
+.ds-shell .adm-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--ds-4);
+  max-width: 1180px;
+}
+.ds-shell .adm-form > .adm-field--wide,
+.ds-shell .adm-form > .adm-wide { grid-column: 1 / -1; }
+
+.ds-shell table.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ds-t-table);
+}
+.ds-shell table.adm-table th {
+  background: var(--ds-surface-alt);
+  border-bottom: 1px solid var(--ds-border);
+  padding: 10px var(--ds-4);
+  font-size: var(--ds-t-label);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+  white-space: nowrap;
+}
+.ds-shell table.adm-table td {
+  padding: 11px var(--ds-4);
+  border-bottom: 1px solid var(--ds-border-soft);
+  font-size: var(--ds-t-table);
+  color: var(--ds-text);
+}
+.ds-shell table.adm-table tbody tr:hover td { background: var(--ds-surface-alt); }
+
+.ds-shell .adm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ds-2);
+  min-height: 36px;
+  height: auto;
+  padding: 6px 14px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ds-shell .adm-btn:hover { background: var(--ds-surface-alt); border-color: var(--ds-border-strong); text-decoration: none; }
+.ds-shell .adm-btn--primary {
+  background: var(--ds-accent);
+  border-color: var(--ds-accent);
+  color: #3A2A08;
+  font-weight: 650;
+}
+.ds-shell .adm-btn--primary:hover { background: #CE9A34; border-color: #CE9A34; }
+
+.ds-shell .adm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: var(--ds-r-pill);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface-alt);
+  color: var(--ds-muted);
+  font-size: var(--ds-t-label);
+  font-weight: 600;
+}
+.ds-shell .adm-pill--ok,
+.ds-shell .admpa-pill--ok { background: var(--ds-ok-soft); border-color: #CFE3D7; color: var(--ds-ok); }
+.ds-shell .adm-pill--off,
+.ds-shell .adm-pill--bad,
+.ds-shell .admpa-pill--danger { background: var(--ds-danger-soft); border-color: #F0C9C4; color: var(--ds-danger); }
+.ds-shell .adm-pill--wait,
+.ds-shell .admpa-pill--warn { background: var(--ds-warn-soft); border-color: #EFDDB4; color: var(--ds-warn); }
+
+.ds-shell .adm-form label,
+.ds-shell .adm-field label { font-size: var(--ds-t-label); font-weight: 600; color: var(--ds-muted); }
+.ds-shell .adm-form input,
+.ds-shell .adm-form select,
+.ds-shell .adm-form textarea,
+.ds-shell .adm-inline input {
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+.ds-shell .adm-form input:focus,
+.ds-shell .adm-form select:focus,
+.ds-shell .adm-form textarea:focus {
+  outline: none;
+  border-color: var(--ds-accent);
+  box-shadow: var(--ds-ring);
+}
+
+.ds-shell .adm-muted,
+.ds-shell .adm-note,
+.ds-shell .adm-sub,
+.ds-shell .adm-hint,
+.ds-shell .adm-empty { color: var(--ds-muted); }
+
+.ds-shell .adm-toast {
+  position: fixed;
+  right: var(--ds-6);
+  bottom: var(--ds-6);
+  z-index: 80;
+  max-width: 400px;
+  padding: var(--ds-3) var(--ds-4);
+  border-radius: var(--ds-r);
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-lg);
+  font-size: 14px;
+  color: var(--ds-text);
+}
+.ds-shell .adm-toast--ok { border-left: 3px solid var(--ds-ok); }
+.ds-shell .adm-toast--warn { border-left: 3px solid var(--ds-warn); }
+.ds-shell .adm-toast--error { border-left: 3px solid var(--ds-danger); }
+
+/* Sign-in / denied / error gate: the one screen shown before the shell exists. */
+.adm-gate.ds-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ds-bg, #FAF9F6);
+  padding: var(--ds-6);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: #1F2937;
+}
+.adm-gate.ds-gate .adm-gate-card {
+  width: min(460px, 100%);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: var(--ds-r-lg, 12px);
+  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.1);
+  padding: var(--ds-7, 32px);
+}
+.adm-gate.ds-gate h1 {
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin: 0 0 var(--ds-3, 12px);
+}
+.adm-gate.ds-gate p { font-size: 14.5px; color: #64748B; margin: 0 0 var(--ds-3, 12px); }
+.adm-gate.ds-gate :is(.adm-btn, .ds-btn) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  color: #1F2937;
+  font-size: 14px;
+  font-weight: 550;
+  text-decoration: none;
+  cursor: pointer;
+}
+.adm-gate.ds-gate :is(.adm-btn--primary, .ds-btn--primary) {
+  background: #D9A441;
+  border-color: #D9A441;
+  color: #3A2A08;
+  font-weight: 650;
+}
+/* The member site paints a honeycomb gradient behind everything; the gate is a
+   full-screen administration surface, so it gets the flat administration
+   background while it is mounted. */
+body:has(.adm-gate.ds-gate) { background-color: #FAF9F6; background-image: none; }
+.adm-gate.ds-gate .adm-error {
+  border: 1px solid #F0C9C4;
+  background: #FBEAE8;
+  color: #B42318;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+}
+
+/* ---------- 7. Responsive ---------------------------------------------- */
+@media (max-width: 1180px) {
+  .ds-search { flex-basis: 260px; }
+  .ds-crumbs-group { display: none; }
+  .ds-crumbs-sep { display: none; }
+}
+@media (max-width: 960px) {
+  .adm-shell.ds-shell { flex-direction: column; }
+  .ds-side {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--ds-border);
+  }
+  .ds-nav { max-height: 42vh; }
+  .ds-main { padding: var(--ds-4); }
+  .ds-search { flex: 1 1 auto; }
+}
+
+/* ---------- 8. Shell wiring -------------------------------------------------
+   The popovers (bell, profile) are anchored to their own trigger, the search
+   panel hangs off the input, and the two collapse toggles live in the sidebar
+   foot and the top bar. Kept next to the shell rules so the markup contract in
+   AdminApp.jsx and the CSS never drift. */
+.ds-menu-wrap { position: relative; display: inline-flex; }
+.ds-search { position: relative; }
+.ds-icon-btn { position: relative; }
+
+/* Collapse toggle: sidebar foot (full width, labelled) + top bar (icon only). */
+.ds-rail-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-2);
+  width: 100%;
+  padding: 6px var(--ds-2);
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ds-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.ds-rail-toggle:hover { background: var(--ds-bg-sunken); color: var(--ds-text); }
+.ds-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-right: var(--ds-2);
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface);
+  color: var(--ds-muted);
+  cursor: pointer;
+}
+.ds-sidebar-toggle:hover { background: var(--ds-bg-sunken); color: var(--ds-text); }
+.ds-shell:is(.is-collapsed, .is-rail) .ds-rail-toggle { justify-content: center; }
+.ds-shell:is(.is-collapsed, .is-rail) .ds-rail-toggle .ds-nav-label { display: none; }
+
+/* Search: clear button + results panel (sections and members). */
+.ds-search-clear {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ds-bg-sunken);
+  color: var(--ds-muted);
+  cursor: pointer;
+}
+.ds-search-clear:hover { color: var(--ds-text); }
+.ds-search-panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--ds-2);
+  border: 1px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-lg);
+}
+.ds-search-group {
+  margin: 6px var(--ds-2) 2px;
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-faint);
+}
+.ds-search-hit-note { margin-left: auto; color: var(--ds-muted); font-size: var(--ds-t-meta); }
+.ds-bell-unknown {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ds-warn);
+  box-shadow: 0 0 0 2px var(--ds-surface);
+}
+
+/* Notification menu rows + profile menu. */
+.ds-menu--bell { min-width: 340px; }
+.ds-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  width: 100%;
+  padding: 7px var(--ds-2);
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.ds-menu-item:hover { background: var(--ds-bg-sunken); text-decoration: none; }
+.ds-menu-item-label { flex: 1 1 auto; min-width: 0; }
+.ds-menu-item-value { flex: 0 0 auto; font-weight: 650; color: var(--ds-faint); }
+.ds-menu-item-value.is-live { color: var(--ds-danger); }
+.ds-menu-note { margin: 0; padding: 2px var(--ds-2) 4px; font-size: 12.5px; color: var(--ds-muted); }
+.ds-menu-foot {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px;
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface-alt);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.ds-menu-foot:hover { background: var(--ds-bg-sunken); }
+.ds-menu-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-3);
+  margin: 0 calc(var(--ds-2) * -1) 6px;
+  padding: 4px var(--ds-2) 10px;
+  border-bottom: 1px solid var(--ds-border-soft);
+}
+.ds-menu-identity > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.ds-menu-identity strong {
+  overflow: hidden;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 9. Name aliases ------------------------------------------------
+   The shell markup and the older class vocabulary name the same two things
+   twice; both spellings resolve here so neither file has to be rewritten. */
+.ds-brand-text > :is(.ds-brand-name, strong) {
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--ds-text);
+}
+.ds-brand-text > :is(.ds-brand-sub, span) {
+  font-size: var(--ds-t-meta);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-muted);
+}
+:is(.ds-avatar-img, .ds-avatar-initials) {
+  font-size: 12.5px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+:is(.ds-crumbs-sep, .ds-crumb-sep) { color: var(--ds-faint); }
+:is(.ds-crumbs-current, .ds-crumb-current) {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ds-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 10. Support inbox workspace ------------------------------------
+   Three columns: the ticket queue, the conversation with its composer, and the
+   member context. The queue is its own column, so the thread keeps a readable
+   measure instead of being flattened across a 2560px display. */
+.ds-inbox {
+  display: grid;
+  grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+  gap: var(--ds-5);
+  align-items: start;
+}
+.ds-queue { display: flex; flex-direction: column; gap: var(--ds-3); min-width: 0; }
+.ds-thread { min-width: 0; }
+.ds-qitem {
+  display: block;
+  width: 100%;
+  margin-bottom: var(--ds-2);
+  padding: 10px var(--ds-3);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r);
+  background: var(--ds-surface);
+  text-align: left;
+  cursor: pointer;
+}
+.ds-qitem:hover { border-color: var(--ds-border-strong); background: var(--ds-surface-alt); }
+.ds-qitem.is-active { border-color: var(--ds-accent); box-shadow: 0 0 0 2px var(--ds-accent-soft); }
+.ds-qitem-top { display: flex; align-items: center; gap: var(--ds-2); }
+.ds-qitem-subject {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ds-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ds-qitem-no { flex: 0 0 auto; font-family: var(--ds-mono); font-size: 11.5px; color: var(--ds-faint); }
+.ds-qitem-meta { display: flex; align-items: center; gap: var(--ds-2); margin-top: 5px; font-size: var(--ds-t-meta); color: var(--ds-muted); }
+.ds-qitem-meta > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-ticket {
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r-lg);
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow);
+  overflow: hidden;
+}
+.ds-ticket-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-4);
+  padding: var(--ds-4) var(--ds-5);
+  border-bottom: 1px solid var(--ds-border-soft);
+}
+.ds-ticket-title { font-size: 18px; font-weight: 640; color: var(--ds-text); }
+.ds-ticket-sub { margin-top: 2px; font-size: var(--ds-t-meta); color: var(--ds-muted); }
+.ds-ticket-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: var(--ds-5);
+  padding: var(--ds-5);
+  align-items: start;
+}
+.ds-ticket-thread { display: flex; flex-direction: column; gap: var(--ds-4); min-width: 0; }
+.ds-ticket-context { display: flex; flex-direction: column; gap: var(--ds-4); min-width: 0; }
+.ds-msg { padding-left: var(--ds-3); border-left: 3px solid var(--ds-border); }
+.ds-msg.is-outbound { border-left-color: var(--ds-accent); }
+.ds-msg.is-note { padding: var(--ds-3); border-left-color: var(--ds-border-strong); background: var(--ds-bg-sunken); }
+.ds-msg-head { display: flex; align-items: center; gap: var(--ds-2); font-size: var(--ds-t-meta); color: var(--ds-muted); }
+.ds-msg-body { margin-top: 4px; white-space: pre-wrap; font-size: 14.5px; color: var(--ds-text); }
+
+/* Key/value rows in a narrow column wrap badly as two flex ends, so inside the
+   ticket context they stack: small label above, value below. */
+.ds-ticket-context .ds-kv {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ds-border-soft);
+}
+.ds-ticket-context .ds-kv:last-child { border-bottom: 0; }
+.ds-ticket-context .ds-kv > span { font-size: var(--ds-t-meta); }
+.ds-ticket-context .ds-kv > strong { font-size: 15px; }
+
+/* A form field that is a direct child of a card keeps a readable measure instead
+   of stretching the input across the whole panel. */
+.ds-card > .ds-field { max-width: 640px; }
+.ds-card > .ds-field > .ds-input,
+.ds-card > .ds-field > .ds-select,
+.ds-card > .ds-field > .ds-textarea { width: 100%; }
+
+@media (max-width: 1500px) {
+  .ds-inbox { grid-template-columns: minmax(260px, 300px) minmax(0, 1fr); }
+  .ds-ticket-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1100px) {
+  .ds-inbox { grid-template-columns: minmax(0, 1fr); }
+  .ds-ticket-context { order: -1; }
+}
+
+/* ---------- 11. Directory, queue + settings components -------------------- */
+
+/* Rows were 68px tall because emails wrapped to two lines; cells truncate. */
+.ds-table th { padding: 9px 14px; }
+.ds-table td { padding: 10px 14px; }
+.ds-table .ds-cell { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-table .ds-cell--wide { max-width: 420px; }
+.ds-table .ds-cell--sm { max-width: 160px; }
+.ds-table .ds-cell--mono { font-family: var(--ds-mono); font-size: 12.5px; color: var(--ds-muted); }
+.ds-table .ds-actions { width: 1%; text-align: right; white-space: nowrap; }
+.ds-table-wrap { border: 1px solid var(--ds-border); background: var(--ds-surface); }
+
+/* Directory cell: avatar + name over email. */
+.ds-member { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ds-member-text { min-width: 0; display: flex; flex-direction: column; line-height: 1.32; }
+.ds-member-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-member-mail { font-size: 12px; color: var(--ds-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ds-avatar { width: 32px; height: 32px; border-radius: 50%; flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12.5px; font-weight: 650; text-transform: uppercase;
+  background: var(--ds-accent-soft); color: var(--ds-accent-ink); border: 1px solid #EFDCB4; }
+.ds-avatar--sm { width: 26px; height: 26px; font-size: 11px; }
+.ds-avatar--lg { width: 54px; height: 54px; font-size: 19px; border-width: 2px; }
+.ds-avatar--muted { background: var(--ds-bg-sunken); color: var(--ds-muted); border-color: var(--ds-border); }
+.ds-avatar--ok { background: var(--ds-ok-soft); color: var(--ds-ok); border-color: #CFE3D7; }
+
+/* Activity indicator: dot + "when". */
+.ds-activity { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ds-muted); white-space: nowrap; }
+.ds-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ds-faint); flex: 0 0 auto; }
+.ds-dot--ok { background: #2F6B4F; }
+.ds-dot--warn { background: #D9A441; }
+.ds-dot--danger { background: #B42318; }
+.ds-dot--off { background: #CBD5E1; }
+.ds-dot--live { box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.16); }
+
+/* Filter rows: the legacy sheets let every control grow to the full width, which
+   produced 900px-wide search boxes. Controls get a fixed, readable measure. */
+.ds-shell .adm-filters { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-end; margin: 0 0 14px; }
+.ds-shell .adm-filters > label,
+.ds-shell .adm-filters > .adm-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; align-items: flex-start; }
+.ds-shell .adm-filters input,
+.ds-shell .adm-filters select { height: 34px; width: auto; min-width: 0; padding: 6px 10px;
+  font-size: 13.5px; border: 1px solid var(--ds-border); border-radius: var(--ds-r);
+  background: var(--ds-surface); color: var(--ds-text); }
+.ds-shell .adm-filters input[type='search'],
+.ds-shell .adm-filters input[type='text'],
+.ds-shell .adm-filters input:not([type]) { width: 260px; max-width: 100%; }
+.ds-shell .adm-filters select { min-width: 152px; max-width: 220px; }
+.ds-shell .adm-filters .adm-btn { height: 34px; }
+.ds-shell .adm-filters > .adm-btn { align-self: flex-end; }
+
+/* Segmented filter chips (queue scopes, status scopes). */
+.ds-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.ds-chip { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px;
+  border: 1px solid var(--ds-border); border-radius: var(--ds-r-pill); background: var(--ds-surface);
+  color: var(--ds-muted); font-size: 13px; font-weight: 550; cursor: pointer; }
+.ds-chip:hover { border-color: var(--ds-border-strong); color: var(--ds-text); }
+.ds-chip.is-on { background: var(--ds-text); border-color: var(--ds-text); color: #FFFFFF; }
+.ds-chip-count { font-size: 11.5px; font-weight: 650; padding: 1px 7px; border-radius: var(--ds-r-pill);
+  background: var(--ds-bg-sunken); color: var(--ds-muted); }
+.ds-chip.is-on .ds-chip-count { background: rgba(255, 255, 255, 0.22); color: #FFFFFF; }
+
+/* Empty states: a defined block instead of a bare line of grey text. */
+.ds-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; min-height: 132px; padding: var(--ds-5); text-align: center;
+  color: var(--ds-muted); font-size: 13.5px; }
+.ds-empty svg { color: var(--ds-faint); }
+.ds-empty strong { color: var(--ds-text); font-size: 14.5px; font-weight: 600; }
+.ds-empty-hint { font-size: 12.5px; color: var(--ds-muted); max-width: 420px; }
+
+/* Integration health cards (Settings). */
+.ds-health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: var(--ds-3); }
+.ds-health { border: 1px solid var(--ds-border); border-radius: var(--ds-r-lg); background: var(--ds-surface);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.ds-health-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ds-2); }
+.ds-health-name { font-size: 14.5px; font-weight: 600; }
+.ds-health-detail { font-size: 12.5px; color: var(--ds-muted); line-height: 1.5; }
+.ds-health-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-2);
+  border-top: 1px solid var(--ds-border-soft); padding-top: 8px; font-size: 12px; color: var(--ds-faint); }
+.ds-health.is-bad { border-color: #F2C9C4; background: #FFFCFB; }
+.ds-health.is-warn { border-color: #F0DFB8; background: #FFFDF7; }
+
+/* Key/value configuration table (Settings). */
+.ds-kv-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.ds-kv-table .ds-kv-key { width: 26%; }
+.ds-kv-table .ds-kv-actions { width: 32%; }
+.ds-kv-table th { text-align: left; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ds-muted); padding: 8px 14px; border-bottom: 1px solid var(--ds-border); }
+.ds-kv-table td { padding: 9px 14px; border-bottom: 1px solid var(--ds-border-soft); vertical-align: middle; font-size: 13.5px; }
+.ds-kv-table tr:last-child td { border-bottom: 0; }
+.ds-kv-key { font-family: var(--ds-mono); font-size: 12.5px; color: var(--ds-text); font-weight: 550; }
+.ds-kv-desc { color: var(--ds-muted); font-size: 12.5px; max-width: 420px; }
+.ds-kv-table input, .ds-kv-table textarea { width: 100%; min-width: 0; height: 34px; padding: 6px 10px;
+  font-family: var(--ds-mono); font-size: 12.5px; border: 1px solid var(--ds-border);
+  border-radius: var(--ds-r); background: var(--ds-surface); color: var(--ds-text); }
+.ds-kv-table input:focus, .ds-kv-table textarea:focus { outline: 2px solid var(--ds-accent); outline-offset: 1px; border-color: var(--ds-accent); }
+.ds-kv-actions { display: flex; gap: 6px; justify-content: flex-end; white-space: nowrap; }
+.ds-confirm { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ds-danger); }
+
+/* Integration health (Settings): one card per dependency, with an explicit
+   healthy / not-ready state instead of a table row nobody reads. */
+.ds-alert { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: var(--ds-r-lg);
+  border: 1px solid var(--ds-border); background: var(--ds-surface-alt); font-size: 13px; margin: 0 0 var(--ds-4); }
+.ds-alert > strong { font-size: 13.5px; font-weight: 650; }
+.ds-alert > span { color: var(--ds-muted); font-size: 12.5px; line-height: 1.5; }
+.ds-alert--danger { background: var(--ds-danger-soft); border-color: #F0C9C4; }
+.ds-alert--danger > strong { color: var(--ds-danger); }
+.ds-alert--ok { background: var(--ds-ok-soft); border-color: #CFE3D7; }
+.ds-alert--ok > strong { color: var(--ds-ok); }
+.ds-alert--warn { background: var(--ds-warn-soft); border-color: #EFDDB4; }
+.ds-alert--warn > strong { color: var(--ds-warn); }
+
+.ds-health-card { background: var(--ds-surface); border: 1px solid var(--ds-border); border-left: 3px solid var(--ds-border-strong);
+  border-radius: var(--ds-r-lg); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.ds-health-card.is-ok { border-left-color: var(--ds-ok); }
+.ds-health-card.is-down { border-left-color: var(--ds-danger); }
+.ds-health-card header { display: flex; align-items: center; gap: 8px; }
+.ds-health-card header strong { font-size: 14px; font-weight: 650; color: var(--ds-text); flex: 1 1 auto; }
+.ds-health-detail { margin: 0; font-size: 12.5px; color: var(--ds-muted); line-height: 1.5; }
+.ds-health-kv { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding-top: 10px; border-top: 1px solid var(--ds-border-soft); }
+.ds-health-kv > div { display: flex; flex-direction: column; gap: 1px; }
+.ds-health-kv dt { font-size: 10.5px; font-weight: 650; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ds-faint); }
+.ds-health-kv dd { margin: 0; font-size: 12.5px; color: var(--ds-text); font-family: var(--ds-mono); }
+
+.ds-card-body { padding: var(--ds-4); }
+.ds-card-body > :first-child { margin-top: 0; }
+.ds-stats--db { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.ds-row-actions { display: flex; align-items: center; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.ds-dirty { display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-radius: 50%; background: var(--ds-accent); vertical-align: 1px; }
+
+.ds-health-grid { align-items: start; }
+.ds-stats--db .ds-stat { padding: 10px 12px; }
+.ds-stats--db .ds-stat-value { font-size: 20px; }
+.ds-row-actions { flex-wrap: nowrap; }
+.ds-kv-table .ds-kv-actions { width: 34%; }
+
+/* Group labels stay put while the nav scrolls, so a half-scrolled heading never
+   sits behind the top bar looking clipped. */
+.ds-nav-group > .ds-nav-toggle { position: sticky; top: 0; z-index: 1; background: var(--ds-surface); }
+
+/* Inline feedback after a write. */
+.ds-flash { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 550; }
+
+/* ---------- 13. Queues, submissions and detail panels -------------------- */
+.ds-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.ds-tab { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+  border-radius: var(--ds-r-pill); border: 1px solid var(--ds-border); background: var(--ds-surface);
+  color: var(--ds-muted); font: inherit; font-size: 12.5px; font-weight: 550; cursor: pointer; }
+.ds-tab:hover { background: var(--ds-surface-alt); color: var(--ds-text); }
+.ds-tab.is-active { background: var(--ds-accent-soft); border-color: #EFDCB4; color: var(--ds-accent-ink); font-weight: 650; }
+.ds-tab-count { font-size: 11px; font-weight: 650; padding: 1px 6px; border-radius: var(--ds-r-pill);
+  background: var(--ds-bg-sunken); color: var(--ds-muted); }
+.ds-tab.is-active .ds-tab-count { background: #FFFFFF; color: var(--ds-accent-ink); }
+.ds-queue-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ds-3);
+  flex-wrap: wrap; margin: 0 0 var(--ds-4); }
+.ds-note { margin: 0 0 var(--ds-3); font-size: 12.5px; color: var(--ds-muted); }
+/* Metric chips (shared CountsBar): labelled counters, not "key: value" pills. */
+.ds-metrics { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 var(--ds-4); }
+.ds-metric { display: inline-flex; align-items: baseline; gap: 6px; padding: 5px 10px;
+  border: 1px solid var(--ds-border); border-radius: var(--ds-r); background: var(--ds-surface-alt); }
+.ds-metric-k { font-size: 11px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ds-muted); }
+.ds-metric-v { font-size: 13px; font-weight: 650; color: var(--ds-text); font-variant-numeric: tabular-nums; }
+.ds-metric-note { font-size: 12px; color: var(--ds-faint); }
+.ds-detail { display: flex; flex-direction: column; gap: var(--ds-4); }
+.ds-dmaic { display: flex; flex-direction: column; gap: 14px; }
+.ds-dmaic-item h4 { margin: 0 0 4px; font-size: 11.5px; font-weight: 650; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--ds-muted); }
+.ds-dmaic-item p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ds-text);
+  white-space: pre-wrap; overflow-wrap: anywhere; }
+.ds-actions-stack { display: flex; flex-direction: column; gap: 10px; margin-top: var(--ds-4);
+  padding-top: var(--ds-4); border-top: 1px solid var(--ds-border-soft); }
+.ds-actions-stack select, .ds-actions-stack input { height: 34px; padding: 6px 10px; font-size: 13.5px;
+  border: 1px solid var(--ds-border); border-radius: var(--ds-r); background: var(--ds-surface);
+  color: var(--ds-text); max-width: 420px; width: 100%; }
+.ds-row-actions--start { justify-content: flex-start; }
+.ds-empty-title { margin: 0 0 2px; font-size: 14px; font-weight: 600; color: var(--ds-text); }
+.ds-kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 18px; margin: 0; }
+.ds-kv > div { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ds-kv dt { font-size: 10.5px; font-weight: 650; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ds-faint); }
+.ds-kv dd { margin: 0; font-size: 13px; color: var(--ds-text); overflow-wrap: anywhere; }
+.ds-card-body > .ds-actions-stack { margin-top: var(--ds-4); }
+
+/* Legacy stat cards (`.adm-card` with .k/.v) are used by most older modules —
+   Recognition, Nectar, Memberships, Collaborations. Compacting them here lifts
+   every one of those screens at once instead of rewriting each grid. */
+.ds-shell .adm-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--ds-3); }
+.ds-shell .adm-card { padding: 12px 14px; border-radius: var(--ds-r-lg); box-shadow: none;
+  border: 1px solid var(--ds-border); background: var(--ds-surface); }
+.ds-shell .adm-card .k { font-size: 11.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ds-muted); }
+.ds-shell .adm-card .v { font-size: 22px; font-weight: 650; color: var(--ds-text); line-height: 1.2; }
+
+/* Pipeline / stage chips (gift fulfilment) and legacy tab rows. */
+.ds-shell .admpa-pipeline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 0 0 var(--ds-4); margin-bottom: var(--ds-4); border-bottom: 1px solid var(--ds-border); }
+.ds-shell .admpa-pipeline-label, .ds-shell .admpa-pipeline-sep { font-size: 10.5px; font-weight: 650;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ds-faint); }
+.ds-shell .admpa-pipeline-sep { width: 12px; border-left: 1px solid var(--ds-border); height: 18px; }
+.ds-shell .admpa-stage { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px;
+  border-radius: var(--ds-r-pill); border: 1px solid var(--ds-border); background: var(--ds-surface);
+  color: var(--ds-muted); font-size: 12.5px; font-weight: 550; cursor: pointer; }
+.ds-shell .admpa-stage:hover { background: var(--ds-surface-alt); color: var(--ds-text); }
+.ds-shell .admpa-stage.is-active { background: var(--ds-accent-soft); border-color: #EFDCB4; color: var(--ds-accent-ink); font-weight: 650; }
+.ds-shell .admpa-stage--terminal.is-active { background: var(--ds-bg-sunken); border-color: var(--ds-border-strong); color: var(--ds-text); }
+.ds-shell .admpa-stage-count { font-size: 11px; font-weight: 650; padding: 1px 6px; border-radius: var(--ds-r-pill);
+  background: var(--ds-bg-sunken); color: var(--ds-muted); }
+.ds-shell .admpa-stage.is-active .admpa-stage-count { background: #FFFFFF; color: var(--ds-accent-ink); }
+.ds-shell .admpa-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--ds-4); }
+.ds-shell .admpa-tab { height: 30px; padding: 0 12px; border-radius: var(--ds-r-pill); border: 1px solid var(--ds-border);
+  background: var(--ds-surface); color: var(--ds-muted); font-size: 12.5px; font-weight: 550; cursor: pointer; }
+.ds-shell .admpa-tab.is-active { background: var(--ds-accent-soft); border-color: #EFDCB4; color: var(--ds-accent-ink); font-weight: 650; }
+.ds-shell .adm-head + h3, .ds-shell h3 { margin-top: var(--ds-5); }
+.ds-flash--ok { color: var(--ds-ok); }
+.ds-flash--err { color: var(--ds-danger); }
+
+/* Review timeline + progression steps. */
+.ds-timeline { list-style: none; margin: 0; padding: 0 0 0 4px; display: flex; flex-direction: column; gap: 12px; }
+.ds-timeline li { position: relative; padding-left: 20px; font-size: 13px; }
+.ds-timeline li::before { content: ''; position: absolute; left: 0; top: 6px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--ds-surface); border: 2px solid var(--ds-border-strong); }
+.ds-timeline li::after { content: ''; position: absolute; left: 4px; top: 16px; bottom: -12px; width: 1px; background: var(--ds-border); }
+.ds-timeline li:last-child::after { display: none; }
+.ds-timeline li.is-done::before { border-color: var(--ds-ok); background: var(--ds-ok); }
+.ds-timeline li.is-now::before { border-color: var(--ds-accent); background: var(--ds-accent); box-shadow: 0 0 0 3px var(--ds-accent-soft); }
+.ds-timeline-when { font-size: 11.5px; color: var(--ds-faint); }
+.ds-steps { display: flex; align-items: center; gap: 4px; }
+.ds-step { height: 5px; width: 34px; border-radius: var(--ds-r-pill); background: var(--ds-bg-sunken); }
+.ds-step.is-done { background: var(--ds-ok); }
+.ds-step.is-now { background: var(--ds-accent); }
+
+/* Stock level indicator (gift catalogue / fulfilment). */
+.ds-stock { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.ds-stock-bar { width: 54px; height: 6px; border-radius: var(--ds-r-pill); background: var(--ds-bg-sunken); overflow: hidden; }
+.ds-stock-bar > i { display: block; height: 100%; background: var(--ds-ok); }
+.ds-stock.is-low .ds-stock-bar > i { background: var(--ds-accent); }
+.ds-stock.is-out .ds-stock-bar > i { background: var(--ds-danger); }
+.ds-stock-num { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ds-stat-value { font-size: 23px; }
+
+/* The table wraps its own border when it sits inside a card. */
+.ds-card > .ds-table-wrap { border: 0; border-radius: 0; }
+.ds-card--flush { padding: 0; overflow: hidden; }
+
+/* The legacy `.adm-table` is what ~20 modules still render (DataTable/RawTable),
+   so it has to carry the new system's density and type as well — otherwise the
+   CRM reads as two different products. */
+.ds-shell .adm-table-wrap { border: 1px solid var(--ds-border); border-radius: var(--ds-r-lg); background: var(--ds-surface); overflow-x: auto; }
+.ds-shell table.adm-table { width: 100%; border-collapse: collapse; }
+.ds-shell table.adm-table th { padding: 9px 14px; text-align: left; font-size: 11.5px; font-weight: 650;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ds-muted); background: var(--ds-bg-sunken);
+  border-bottom: 1px solid var(--ds-border); white-space: nowrap; }
+.ds-shell table.adm-table td { padding: 10px 14px; font-size: var(--ds-t-table); color: var(--ds-text);
+  border-bottom: 1px solid var(--ds-border-soft); vertical-align: middle; }
+.ds-shell table.adm-table tbody tr:last-child td { border-bottom: 0; }
+.ds-shell table.adm-table tbody tr.is-clickable { cursor: pointer; }
+.ds-shell table.adm-table tbody tr.is-clickable:hover { background: var(--ds-surface-alt); }
+.ds-shell table.adm-table td.wrap { max-width: 420px; white-space: normal; }
+.ds-shell .adm-empty { border: 1px dashed var(--ds-border-strong); border-radius: var(--ds-r-lg);
+  background: var(--ds-surface-alt); color: var(--ds-muted); font-size: 13.5px; padding: 26px 18px; text-align: center; }
+
+/* Directory table: fixed column roles so the row fits an 1140px content box
+   instead of overflowing to 1500px and clipping its last column. */
+.ds-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ds-field-label { font-size: 11.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ds-muted); }
+.ds-chip-note { display: inline-block; margin-left: 6px; font-size: 11.5px; color: var(--ds-muted); white-space: nowrap; }
+.ds-level { font-weight: 600; color: var(--ds-text); }
+.ds-when { color: var(--ds-muted); white-space: nowrap; }
+.ds-activity-when { font-style: normal; color: var(--ds-faint); margin-left: 2px; }
+.ds-tag { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: var(--ds-r-sm);
+  background: var(--ds-bg-sunken); border: 1px solid var(--ds-border); color: var(--ds-muted);
+  font-size: 10.5px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 1px; }
+.ds-table--dir { table-layout: fixed; }
+.ds-table--dir .col-member { width: 30%; }
+.ds-table--dir .col-tier { width: 13%; }
+.ds-table--dir .col-level { width: 17%; }
+.ds-table--dir .col-num { width: 8%; text-align: right; }
+.ds-table--dir .col-when { width: 15%; }
+.ds-table--dir th.col-num { text-align: right; }
+
+/* ---------- 12. Responsive ------------------------------------------------ */
+@media (max-width: 1180px) {
+  .ds-shell .ds-main { padding: var(--ds-5) var(--ds-4) var(--ds-8); }
+  .ds-health-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+@media (max-width: 1100px) {
+  .ds-shell { --ds-side-w: 264px; }
+  .ds-side {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--ds-side-w);
+    z-index: 60;
+    transform: translateX(-100%);
+    transition: transform 0.18s ease;
+    box-shadow: var(--ds-shadow-lg);
+  }
+  .ds-shell:not(.is-collapsed) .ds-side { transform: none; }
+  .ds-shell:not(.is-collapsed)::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 24, 40, 0.32);
+    z-index: 55;
+  }
+  .ds-shell .ds-main { padding: var(--ds-4) var(--ds-4) var(--ds-7); }
+  .ds-page-head { flex-direction: column; align-items: flex-start; gap: var(--ds-3); }
+}
+@media (max-width: 820px) {
+  .ds-search { display: none; }
+  .ds-shell .ds-main { padding: var(--ds-4) var(--ds-3) var(--ds-7); }
+  .ds-stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .ds-shell .adm-filters input[type='search'],
+  .ds-shell .adm-filters input[type='text'],
+  .ds-shell .adm-filters input:not([type]) { width: 100%; }
+  .ds-shell .adm-filters select { max-width: none; flex: 1 1 150px; }
+}

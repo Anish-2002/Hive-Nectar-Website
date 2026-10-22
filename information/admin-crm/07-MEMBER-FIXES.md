@@ -144,14 +144,15 @@ creating a new Storage bucket, deploying edge functions, and anything needing th
    return 404, so the signup welcome mail, the contact-form notification and the
    broadcast notice all fail. A real delivery path is a hard prerequisite of the
    Support Centre module.
-3. **Mobile reflection tile opens the wrong sheet.** `profile.js` binds
-   `#mobileMissionsBtn` — the button labelled *Tasks Reflection*, carrying the
-   reflection badge — to `openMissionsModal()`, while the reflection binding at
-   the adjacent line looks up `#mobilePendingSigmaBtn`, which does not exist in
-   `profile.html`. Left as-is deliberately: on mobile that button is the **only**
-   entry point to Missions, so rebinding it to reflections would remove Missions
-   from mobile. Needs a product decision (either add a Missions entry to the
-   mobile tab bar first, or accept the swap).
+3. **Mobile reflection tile opens the wrong sheet. — FIXED 2026-10-14 (see
+   §A5).** `profile.js` bound `#mobileMissionsBtn` — the button labelled *Tasks
+   Reflection*, carrying the reflection badge — to `openMissionsModal()`, while the
+   reflection binding at the adjacent line looks up `#mobilePendingSigmaBtn`, which
+   exists in no page. It is now `openPendingSigmaModal()`, matching the label. The
+   note that this button was the **only** mobile entry point to Missions was wrong:
+   only `.desktop-only-grid` is hidden on mobile, so the sidebar row
+   `#desktopMissionsBtn` ("Go to Missions") is still there, and the sidebar stacks
+   *above* the feed (`body.page-profile .left{order:1}`). No route lost, no new UI.
 4. `#tabReflectionCount` is updated by `updateTabCounts()` but exists in no page
    — a no-op, harmless.
 
@@ -170,6 +171,81 @@ creating a new Storage bucket, deploying edge functions, and anything needing th
 admin session — this environment has no credentials and the vault cannot prompt
 over Telegram. The reflection behaviour is therefore proven at the database and
 source level, not by a browser round trip.
+
+## A5 — Mobile bottom-sheet stacking: the eye no longer eats its parent (DONE)
+
+**Asked (owner, 2026-10-14, verbatim):** *"On mobile view when I click on task
+reflection daily task opens up. And when I click on eye icon on both task
+reflection and completed task it overlaps the button sheet and when closed closes
+the task reflection / completed task. It should be task reflection > eye >
+reflection history and when closing it should close back in order rather closing
+the main bottom sheet. Fix this for both task reflection and completed tasks."*
+
+**Root cause.** `showBottomSheet()` was a **single slot**: every call began with
+`const existing = document.querySelector('.bottom-sheet-overlay.active:not([data-static])'); if (existing) existing.remove();`.
+Opening a detail sheet therefore *destroyed* the sheet it was opened from — the
+reflection list (eye on a *Tasks Reflection* row → *Your Reflection*) and the
+completed-task list (eye on a *Completed Tasks* row → that task's full card).
+Because the parent was removed while still on screen, the two sheets overlapped
+for the length of the exit animation, the parent's buttons stayed clickable, and
+closing the detail left the member on the bare page instead of back on the list.
+
+Two more places assumed the single slot, so they silently looked at the wrong
+sheet: `document.querySelector('.bottom-sheet-overlay')` returns the **first**
+overlay in document order — the static *Edit Profile* sheet — so the mobile
+Daily-Tasks refresh after saving and the post-submit refresh of the *Tasks
+Reflection* list never fired.
+
+**After (both trees: `The Meadows react./public/js/profile.js` and
+`Hive-Nectar-Website-02-aug2026/js/profile.js`, plus the two `style.css` files):**
+
+- Sheets are a **stack** (`bottomSheetStack`). `showBottomSheet()` pushes; it
+  never deletes anything.
+- `topBottomSheet()` = the innermost connected sheet (falls back to the last
+  `.bottom-sheet-overlay.active:not([data-static])` in the DOM so a sheet built by
+  another module, e.g. `trial.js`, is still found).
+- `syncBottomSheetStack()` marks the top sheet `.sheet-top` and the ones below
+  `.sheet-behind`, and owns `document.body.style.overflow`.
+- `closeBottomSheet(target)` pops exactly one sheet; the one underneath becomes
+  live again immediately. `Escape` (new) closes the innermost sheet only.
+- Nested sheets get `z-index: 10000 + 10 * depth`.
+- CSS: `.bottom-sheet-overlay.sheet-behind { pointer-events:none }` plus a small
+  recess (`translateY(16px) scale(.985)`) — the sheet underneath is visible as the
+  step back but cannot be clicked, so it can no longer overlap the active sheet.
+- The four "which sheet is open" lookups now use `topBottomSheet()`.
+
+**Verification:** `verification/verify_mobile_sheet_stack.cjs` (new, in-repo,
+re-runnable) slices the shipped `BOTTOM SHEET` block and the shipped CSS rules
+byte-for-byte, runs them in jsdom and drives the real handlers — **43 PASS / 0
+FAIL on both trees**, exit 0. It asserts the reported symptoms specifically: the
+parent survives the child opening, the parent is inert, the child is on top, one
+close unwinds exactly one level, body scroll stays locked while a parent is open
+and is released only at the end, `Escape` pops one level, `closeAllBottomSheets()`
+still hides — not removes — the static sheets, and (T9) the mobile tiles open the
+sheet they are labelled with.
+Run: `cd "The Meadows react." && node verification/verify_mobile_sheet_stack.cjs`
+(dev-only `jsdom` devDependency added for this; an optional second argument runs
+the same assertions against another tree).
+
+**Second bug in the same report — "when I click on task reflection daily task
+opens up":** `#mobileMissionsBtn` is the mobile tile labelled **Tasks Reflection**
+and carries the pending-reflection badge `#mobilePendingSigmaBadge`, but it was
+bound to `openMissionsModal()` (the *Daily Tasks* sheet). The markup has no
+`#mobilePendingSigmaBtn`, so the reflection list had **no** mobile tile at all; it
+was reachable only through the sidebar row `#pendingSigmaSection` (the sidebar
+stacks above the feed on mobile, so it is visible). Fix in both trees'
+`profile.js`: the tile now calls `openPendingSigmaModal()`, matching its label.
+Missions keeps its own mobile entry — the sidebar "Go to Missions"
+(`#desktopMissionsBtn`, wired at the same place) — so no route was lost and no
+new UI was added.
+
+**Not verified by the agent:** a click-through on a real phone with a signed-in
+member — no credentials in this environment. The proof is DOM-level against the
+shipped source, not a device round trip.
+
+**Known remaining gap (deliberately untouched):** `public/js/trial.js` has its own
+`showBottomSheet()` with the same single-slot delete (line 9). It is a different
+page's flow, so it was left alone rather than changed without being asked.
 
 
 

@@ -24,6 +24,7 @@ WRITE SAFETY (rebuilt after a real incident)
 import json
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -71,7 +72,7 @@ ANON = load_env(PROJ / ".env").get("VITE_SUPABASE_ANON_KEY")
 URL = f"https://{REF}.supabase.co"
 
 
-def sql(query):
+def sql_once(query, timeout=90):
     req = urllib.request.Request(
         API,
         data=json.dumps({"query": query}).encode(),
@@ -79,12 +80,31 @@ def sql(query):
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=90) as r:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read().decode()), None
     except urllib.error.HTTPError as e:
         return None, e.read().decode()[:600]
     except json.JSONDecodeError as e:
         return None, f"bad json: {e}"
+
+
+def sql(query, attempts=6):
+    """Retry while the management API is rate-limiting.
+
+    The gate runs a dozen SQL-heavy verifiers back to back and the endpoint
+    answers bursts with `429 ThrottlerException: Too Many Requests`. That is a
+    transport limit, not a verdict on the migration, so it must never be
+    reported as `RESULT: cannot continue`.
+    """
+    last = (None, None)
+    for i in range(attempts):
+        rows, err = sql_once(query)
+        if not err or ("Too Many Requests" not in err and "429" not in err):
+            return rows, err
+        last = (None, f"{err} (after {i + 1} attempt(s))")
+        if i < attempts - 1:
+            time.sleep(10 * (i + 1))
+    return last
 
 
 def scalar(query):

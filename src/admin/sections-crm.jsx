@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { rpc, raw, cleanPayload, fmtDate, text } from './api.js';
 import { SectionHead, RawTable } from './sections.jsx';
+import { StatusTabs, QueueMember, queueWhen, statusPill, Pill, stageLabel, stageTone } from './sections-phase-a.jsx';
+import { sendQueuedMail, queueLine } from './mail.js';
 
 /*
  * CRM modules for the Hive Nectar admin surface.
@@ -12,9 +14,12 @@ import { SectionHead, RawTable } from './sections.jsx';
  *   - a refused call makes rpc() throw with the server's own error string, which
  *     is what gets shown — never a fabricated success.
  *
- * EMAIL IS NOT WIRED YET. Reply / notification RPCs return delivery_status
- * 'not_configured' with delivered:false. That is rendered honestly: the UI never
- * says an email was sent when the transport is absent.
+ * EMAIL IS WIRED. A reply/notification RPC records the message in-app and queues
+ * it in mail_outbox (migration 14); sendQueuedMail() then hands that queued row to
+ * the send-mail edge function, which calls Brevo and writes the real outcome back.
+ * Every delivery line below shows what the transport actually answered: 'sent'
+ * only ever appears after apply_mail_result() recorded a provider message id, and
+ * a refusal is shown as a failure. Nothing is presented as sent on assumption.
  *
  * No emoji. No mock data. No alert()/prompt()/confirm(): every confirmation is an
  * inline two-step control so it can never be dismissed blindly.
@@ -67,6 +72,9 @@ const whoName = (o) => (o && (o.name || [o.first_name, o.last_name].filter(Boole
 function deliveryLabel(status) {
   switch (status) {
     case 'sent': return 'sent';
+    case 'pending': return 'queued — waiting for the mail worker';
+    case 'sending': return 'handed to the transport now';
+    case 'skipped': return 'skipped — not sent (open Mail Queue for the reason)';
     case 'queued': return 'queued — not sent yet (no worker has picked it up)';
     case 'not_configured': return 'NOT emailed — no mail transport is configured; stored in-app only';
     case 'not_attempted': return 'not attempted (internal note, never emailed)';
@@ -79,7 +87,8 @@ function deliveryLabel(status) {
 }
 function deliveryKind(status) {
   if (status === 'sent') return 'adm-pill adm-pill--ok';
-  if (status === 'not_configured' || status === 'failed' || status === 'bounced') return 'adm-pill adm-pill--off';
+  if (status === 'pending' || status === 'sending') return 'adm-pill adm-pill--wait';
+  if (status === 'not_configured' || status === 'failed' || status === 'bounced' || status === 'skipped') return 'adm-pill adm-pill--off';
   return 'adm-pill';
 }
 
@@ -136,14 +145,20 @@ function Drawer({ title, note, onClose, children }) {
   );
 }
 
+/* Shared metric chips: one line of labelled counters instead of a row of
+   "key: value" pills. Used by the award, ledger and notification screens. */
 function CountsBar({ counts, note }) {
   const entries = Object.entries(counts || {});
+  if (!entries.length && !note) return null;
   return (
-    <div className="adm-filters">
+    <div className="ds-metrics">
       {entries.map(([k, v]) => (
-        <span key={k} className="adm-pill">{k.replace(/_/g, ' ')}: {text(v)}</span>
+        <span key={k} className="ds-metric">
+          <span className="ds-metric-k">{k.replace(/_/g, ' ')}</span>
+          <b className="ds-metric-v">{text(v)}</b>
+        </span>
       ))}
-      {note ? <span className="adm-note">{note}</span> : null}
+      {note ? <span className="ds-metric-note">{note}</span> : null}
     </div>
   );
 }
@@ -212,28 +227,73 @@ export function ReviewCentreSection({ notify }) {
         }
       />
       {queue.error ? <div className="adm-error">{queue.error}</div> : null}
-      <CountsBar counts={counts} note={`pending submissions: ${text(payload.pending_submissions ?? 0)}`} />
+
+      <div className="ds-queue-head">
+        <StatusTabs
+          statuses={REVIEW_STATUSES}
+          value={status}
+          counts={counts}
+          onChange={(v) => { setStatus(v); setOffset(0); }}
+        />
+        <span className="ds-chip-note">
+          {text(payload.pending_submissions ?? 0)} pending submissions · {total} in this view
+        </span>
+      </div>
+
       <div className="adm-filters">
-        <select value={status} onChange={(e) => { setStatus(e.target.value); setOffset(0); }}>
-          {opts(REVIEW_STATUSES, 'All statuses')}
-        </select>
-        <select value={source} onChange={(e) => { setSource(e.target.value); setOffset(0); }}>
-          {opts(REVIEW_SOURCES, 'All sources')}
-        </select>
-        <input value={searchInput} placeholder="Search name, email, username"
-               onChange={(e) => setSearchInput(e.target.value)}
-               onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setOffset(0); } }} />
+        <label className="ds-field">
+          <span className="ds-field-label">Source</span>
+          <select value={source} onChange={(e) => { setSource(e.target.value); setOffset(0); }}>
+            {opts(REVIEW_SOURCES, 'All sources')}
+          </select>
+        </label>
+        <label className="ds-field">
+          <span className="ds-field-label">Search</span>
+          <input type="search" value={searchInput} placeholder="Name, email or username"
+                 onChange={(e) => setSearchInput(e.target.value)}
+                 onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setOffset(0); } }} />
+        </label>
         <button type="button" className="adm-btn" onClick={() => { setSearch(searchInput); setOffset(0); }}>Search</button>
         <button type="button" className="adm-btn" onClick={() => { setSearchInput(''); setSearch(''); setStatus(''); setSource(''); setOffset(0); }}>Clear</button>
       </div>
-      {queue.loading ? <div className="adm-empty">Loading…</div> : (
-        <RawTable
-          list={list}
-          columns={['created_at', 'member_name', 'member_email', 'source', 'status', 'assignee_name', 'excerpt']}
-          empty="No submissions in the queue. Run Sync queue to import any waiting."
-          onRowClick={(r) => setOpenId(r.id)}
-        />
+
+      {queue.loading ? (
+        <div className="ds-empty"><p className="ds-empty-title">Loading…</p></div>
+      ) : (
+        <div className="ds-table-wrap">
+          <table className="ds-table ds-table--queue">
+            <thead>
+              <tr>
+                <th>Submitted</th>
+                <th>Member</th>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Assignee</th>
+                <th>Excerpt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((r) => (
+                <tr key={r.id} className="is-clickable" onClick={() => setOpenId(r.id)}>
+                  <td><span className="ds-when">{queueWhen(r.created_at)}</span></td>
+                  <td><QueueMember name={r.member_name} email={r.member_email} sub={r.member_username || r.member_email} /></td>
+                  <td><span className="ds-chip-note">{text(r.source).replace(/_/g, ' ')}</span></td>
+                  <td>{statusPill(r.status)}</td>
+                  <td><span className="ds-when">{text(r.assignee_name)}</span></td>
+                  <td className="ds-cell ds-cell--wide">{text(r.excerpt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {!list.length ? (
+            <div className="ds-empty">
+              <p className="ds-empty-title">No submissions in this view</p>
+              <p className="ds-empty-hint">Run “Sync queue” to import any waiting submissions, or clear the filters.</p>
+            </div>
+          ) : null}
+        </div>
       )}
+
       <Pager offset={offset} limit={PAGE} total={total}
              onPrev={() => setOffset((o) => Math.max(0, o - PAGE))}
              onNext={() => setOffset((o) => o + PAGE)} />
@@ -272,6 +332,7 @@ function ReviewDetail({ id, notify, onClose, onChanged }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
   const [delivery, setDelivery] = useState(null);
+  const [mailMsg, setMailMsg] = useState(null);
 
   const refresh = () => { item.reload(); if (onChanged) onChanged(); };
 
@@ -299,11 +360,17 @@ function ReviewDetail({ id, notify, onClose, onChanged }) {
   };
 
   const doReply = async () => {
-    setBusy(true); setErr(null); setDelivery(null);
+    setBusy(true); setErr(null); setDelivery(null); setMailMsg(null);
     try {
       const res = raw(await rpc('admin_reply_to_member', { p_id: id, p_body: reply, p_channel: channel }));
-      setDelivery(res.delivery_status || res.email_status || null);
-      notify('Reply recorded', 'ok');
+      // The reply is recorded in-app first (that is the record of truth). Then the
+      // queued row is actually transmitted and the answer is shown as it came back.
+      const mail = res.mail_id
+        ? await sendQueuedMail(res.mail_id)
+        : { message: queueLine(res), tone: 'error', row: null };
+      setDelivery(mail.row?.status || res.delivery_status || res.email_status || null);
+      setMailMsg(mail);
+      notify(`Reply recorded. ${mail.message}`, mail.tone);
       setReply('');
       refresh();
     } catch (e) { setErr(e.message); }
@@ -404,6 +471,9 @@ function ReviewDetail({ id, notify, onClose, onChanged }) {
                 Delivery: <span className={deliveryKind(delivery)}>{deliveryLabel(delivery)}</span>
               </p>
             ) : null}
+            {mailMsg ? (
+              <p className={mailMsg.tone === 'ok' ? 'adm-ok' : 'adm-error'} style={{ marginTop: 6 }}>{mailMsg.message}</p>
+            ) : null}
             <div className="adm-actions" style={{ marginTop: 10 }}>
               <button type="button" className="adm-btn adm-btn--primary" onClick={doReply} disabled={busy || !reply.trim()}>Record reply</button>
             </div>
@@ -500,28 +570,67 @@ export function RecognitionSection({ notify }) {
         <div className="adm-split">
           <div>
             <h4 className="adm-panel-title">Low stock</h4>
-            <RawTable list={toArr(dashData.low_stock)} columns={['name', 'sku', 'stock_quantity', 'unit_cost', 'is_active']} empty="No low-stock gifts." />
+            {toArr(dashData.low_stock).length ? (
+              <div className="ds-table-wrap">
+                <table className="ds-table">
+                  <thead>
+                    <tr>
+                      <th>Gift</th><th>SKU</th><th>On hand</th><th className="col-num">Unit cost</th><th>State</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {toArr(dashData.low_stock).map((g) => {
+                      const n = Number(g.stock_quantity) || 0;
+                      return (
+                        <tr key={g.id || g.sku}>
+                          <td>{text(g.name)}</td>
+                          <td className="ds-cell--mono">{text(g.sku)}</td>
+                          <td>
+                            <span className={`ds-stock ${n <= 0 ? 'is-out' : 'is-low'}`}>
+                              <span className="ds-stock-bar"><i style={{ width: `${n <= 0 ? 0 : Math.max(6, Math.min(100, n * 20))}%` }} /></span>
+                              <span className="ds-stock-num">{n}</span>
+                            </span>
+                          </td>
+                          <td className="col-num">{money(g.unit_cost)}</td>
+                          <td>{n <= 0 ? <Pill tone="danger">Out of stock</Pill> : <Pill tone="warn">Low</Pill>}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="ds-empty">
+                <p className="ds-empty-title">Stock is healthy</p>
+                <p>No gift is at or below its low-stock threshold.</p>
+              </div>
+            )}
           </div>
           <div>
             <h4 className="adm-panel-title">Needs action</h4>
             {toArr(dashData.needs_action).length ? (
-              <div className="adm-table-wrap">
-                <table className="adm-table">
-                  <thead><tr><th>status</th><th>member</th><th>gift</th><th>created</th><th /></tr></thead>
+              <div className="ds-table-wrap">
+                <table className="ds-table">
+                  <thead><tr><th>Stage</th><th>Member</th><th>Gift</th><th>Created</th><th className="ds-actions" /></tr></thead>
                   <tbody>
                     {toArr(dashData.needs_action).map((r) => (
                       <tr key={r.id}>
-                        <td>{text(r.status)}</td>
+                        <td>{<Pill tone={stageTone(r.status)}>{stageLabel(r.status)}</Pill>}</td>
                         <td>{text(r.member_name || r.member_email)}</td>
                         <td>{text(r.gift_name)}</td>
-                        <td>{fmtDate(r.created_at)}</td>
-                        <td><button type="button" className="adm-btn adm-btn--small" onClick={() => setOpenId(r.id)}>Open</button></td>
+                        <td><span className="ds-when">{queueWhen(r.created_at)}</span></td>
+                        <td className="ds-actions"><button type="button" className="adm-btn adm-btn--small" onClick={() => setOpenId(r.id)}>Open</button></td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            ) : <div className="adm-empty">Nothing needs action.</div>}
+            ) : (
+              <div className="ds-empty">
+                <p className="ds-empty-title">Nothing needs action</p>
+                <p>No recognition is waiting on a decision or a shipment.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1051,7 +1160,7 @@ export function SupportInboxSection({ notify }) {
     <>
       <SectionHead
         title="Support inbox"
-        note="Imported enquiries become tickets with a threaded conversation. Replies are stored on the thread; email delivery is reported honestly and is not yet wired."
+        note="Imported enquiries become tickets with a threaded conversation. A reply is stored on the thread, queued for email and transmitted immediately; the transport's answer is shown on the message. Internal notes are never emailed."
         actions={
           <>
             <button type="button" className="adm-btn" onClick={tickets.reload}>Refresh</button>
@@ -1062,36 +1171,61 @@ export function SupportInboxSection({ notify }) {
         }
       />
       {tickets.error ? <div className="adm-error">{tickets.error}</div> : null}
-      <CountsBar counts={counts} note={`unassigned: ${text(payload.unassigned ?? 0)} · overdue: ${text(payload.overdue ?? 0)}`} />
-      <CreateTicket notify={notify} onDone={() => { tickets.reload(); }} />
-      <div className="adm-filters">
-        <select value={status} onChange={(e) => { setStatus(e.target.value); setOffset(0); }}>{opts(TICKET_STATUSES, 'All statuses')}</select>
-        <select value={priority} onChange={(e) => { setPriority(e.target.value); setOffset(0); }}>{opts(TICKET_PRIORITIES, 'All priorities')}</select>
-        <input value={searchInput} placeholder="Search subject, requester, email"
-               onChange={(e) => setSearchInput(e.target.value)}
-               onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setOffset(0); } }} />
-        <button type="button" className="adm-btn" onClick={() => { setSearch(searchInput); setOffset(0); }}>Search</button>
-        <button type="button" className="adm-btn" onClick={() => { setSearchInput(''); setSearch(''); setStatus(''); setPriority(''); setOffset(0); }}>Clear</button>
-      </div>
-      {tickets.loading ? <div className="adm-empty">Loading…</div> : (
-        <RawTable
-          list={list}
-          columns={['last_activity', 'ticket_no', 'subject', 'requester_email', 'status', 'priority', 'assignee_name', 'messages', 'overdue']}
-          empty="No tickets. Import enquiries to create the first ones."
-          onRowClick={(r) => setOpenId(r.id)}
+
+      <div className="ds-queue-head">
+        <StatusTabs
+          statuses={TICKET_STATUSES}
+          value={status}
+          counts={counts}
+          onChange={(v) => { setStatus(v); setOffset(0); }}
         />
-      )}
-      <Pager offset={offset} limit={PAGE} total={Number(counts.total || 0)}
-             onPrev={() => setOffset((o) => Math.max(0, o - PAGE))}
-             onNext={() => setOffset((o) => o + PAGE)} />
+        <span className="ds-chip-note">
+          {text(payload.unassigned ?? 0)} unassigned · {text(payload.overdue ?? 0)} overdue
+        </span>
+      </div>
+
+      <CreateTicket notify={notify} onDone={() => { tickets.reload(); }} />
+      <div className="ds-inbox">
+        <div className="ds-queue">
+          <div className="adm-filters">
+            <label className="ds-field">
+              <span className="ds-field-label">Priority</span>
+              <select value={priority} onChange={(e) => { setPriority(e.target.value); setOffset(0); }}>{opts(TICKET_PRIORITIES, 'All priorities')}</select>
+            </label>
+            <label className="ds-field">
+              <span className="ds-field-label">Search</span>
+              <input type="search" value={searchInput} placeholder="Subject, requester, email"
+                     onChange={(e) => setSearchInput(e.target.value)}
+                     onKeyDown={(e) => { if (e.key === 'Enter') { setSearch(searchInput); setOffset(0); } }} />
+            </label>
+            <div className="ds-row-actions ds-row-actions--start">
+              <button type="button" className="adm-btn" onClick={() => { setSearch(searchInput); setOffset(0); }}>Search</button>
+              <button type="button" className="adm-btn" onClick={() => { setSearchInput(''); setSearch(''); setStatus(''); setPriority(''); setOffset(0); }}>Clear</button>
+            </div>
+          </div>
+          {tickets.loading ? <div className="ds-empty"><p className="ds-empty-title">Loading the queue</p><p>Reading the tickets.</p></div> : (
+            <TicketQueue list={list} openId={openId} onOpen={setOpenId} />
+          )}
+          <Pager offset={offset} limit={PAGE} total={Number(counts.total || 0)}
+                 onPrev={() => setOffset((o) => Math.max(0, o - PAGE))}
+                 onNext={() => setOffset((o) => o + PAGE)} />
+        </div>
+        <div className="ds-thread">
+          {openId ? (
+            <TicketDetail id={openId} inline notify={notify} templates={templateRows}
+                          onClose={() => setOpenId(null)}
+                          onChanged={() => tickets.reload()} />
+          ) : (
+            <div className="ds-empty">
+              <p className="ds-empty-title">No ticket open</p>
+              <p>Choose a ticket in the queue to read the thread and reply, or import the next enquiry.</p>
+            </div>
+          )}
+        </div>
+      </div>
 
       <TemplatesPanel notify={notify} templates={templateRows} reload={() => templates.reload()} />
 
-      {openId ? (
-        <TicketDetail id={openId} notify={notify} templates={templateRows}
-                      onClose={() => setOpenId(null)}
-                      onChanged={() => tickets.reload()} />
-      ) : null}
     </>
   );
 }
@@ -1144,7 +1278,7 @@ function CreateTicket({ notify, onDone }) {
   );
 }
 
-function TicketDetail({ id, notify, templates, onClose, onChanged }) {
+function TicketDetail({ id, inline, notify, templates, onClose, onChanged }) {
   const det = useApi(() => rpc('admin_get_ticket', { p_id: id }), [id]);
   const team = useApi(() => rpc('admin_get_team_overview'), []);
   const p = useMemo(() => raw(det.data), [det.data]);
@@ -1183,8 +1317,14 @@ function TicketDetail({ id, notify, templates, onClose, onChanged }) {
       const res = raw(await rpc('admin_reply_ticket', {
         p_ticket_id: id, p_body: reply, p_internal: internal, p_template_id: templateId || null,
       }));
-      setResult(res);
-      notify(internal ? 'Internal note added' : 'Reply recorded', 'ok');
+      // An internal note is never emailed; a member-facing reply is queued in
+      // mail_outbox and transmitted right here, and the transport's own answer is
+      // what gets reported — including when it refuses.
+      const mail = (!internal && res.mail_id)
+        ? await sendQueuedMail(res.mail_id)
+        : { message: internal ? 'Internal note — nothing emailed' : queueLine(res, 'email_status'), tone: internal ? 'ok' : 'error', row: null };
+      setResult({ ...res, email_status: mail.row?.status || res.email_status, mail_message: mail.message, mail_tone: mail.tone });
+      notify(internal ? 'Internal note added' : `Reply recorded. ${mail.message}`, mail.tone);
       setReply('');
       refresh();
     } catch (e) { setErr(e.message); }
@@ -1209,93 +1349,160 @@ function TicketDetail({ id, notify, templates, onClose, onChanged }) {
     if (t) setReply(t.body || '');
   };
 
-  return (
-    <Drawer title={`${text(ticket.ticket_no)} — ${text(ticket.subject)}`} note={`${text(ticket.status)} · ${text(ticket.priority)} · ${text(ticket.requester_email)}`} onClose={onClose}>
+  const drawerTitle = `${text(ticket.ticket_no)} — ${text(ticket.subject)}`;
+  const drawerNote = `${text(ticket.status)} · ${text(ticket.priority)} · ${text(ticket.requester_email)}`;
+  const body = (
+    <>
       {det.error ? <div className="adm-error">{det.error}</div> : null}
       {err ? <div className="adm-error" style={{ marginBottom: 12 }}>{err}</div> : null}
-      {det.loading ? <div className="adm-empty">Loading…</div> : (
-        <>
-          <div className="adm-panel">
-            <div className="adm-panel-title">Ticket</div>
-            <p className="adm-note">Requester {text(ticket.requester_name)} · {text(ticket.requester_email)} · member {text(member.name || member.email)}</p>
-            <p className="adm-note">Source {text(ticket.source)} · category {text(ticket.category)} · created {fmtDate(ticket.created_at)} · SLA due {fmtDate(ticket.sla_due_at)}</p>
-            <div className="adm-filters" style={{ marginTop: 8 }}>
-              <select value={ticket.status || ''} onChange={(e) => update({ status: e.target.value })} disabled={busy}>{opts(TICKET_STATUSES)}</select>
-              <select value={ticket.priority || ''} onChange={(e) => update({ priority: e.target.value })} disabled={busy}>{opts(TICKET_PRIORITIES)}</select>
-              {admins ? (
-                <select value={ticket.assignee_id || ''} onChange={(e) => update({ assignee_id: e.target.value || null })} disabled={busy}>
-                  <option value="">— unassigned —</option>
-                  {admins.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-                </select>
-              ) : null}
-            </div>
-          </div>
-
+      {det.loading ? <div className="ds-empty"><p className="ds-empty-title">Loading the ticket</p><p>Reading the thread.</p></div> : (
+        <div className="ds-ticket-grid">
+          <div className="ds-ticket-thread">
           <div className="adm-panel">
             <div className="adm-panel-title">Conversation</div>
             {messages.length ? messages.map((m) => (
-              <div key={m.id} style={{ borderLeft: '3px solid var(--adm-border)', paddingLeft: 10, marginBottom: 12 }}>
-                <p className="adm-note">
+              <div key={m.id} className={`ds-msg${m.direction === 'outbound' ? ' is-outbound' : ''}${m.direction === 'note' ? ' is-note' : ''}`}>
+                <p className="ds-msg-head">
                   <span className={m.direction === 'outbound' ? 'adm-pill adm-pill--ok' : m.direction === 'note' ? 'adm-pill adm-pill--off' : 'adm-pill'}>{text(m.direction)}</span>
-                  {' '}{text(m.author_name || m.author_email)} · {fmtDate(m.created_at)}
-                  {m.direction !== 'note' ? <> · email: <span className={deliveryKind(m.email_status)}>{deliveryLabel(m.email_status)}</span></> : null}
+                  <span>{text(m.author_name || m.author_email)}</span>
+                  <span>·</span>
+                  <span>{fmtDate(m.created_at)}</span>
+                  {m.direction !== 'note' ? (
+                    <>
+                      <span>·</span>
+                      <span>email: <span className={deliveryKind(m.email_status)}>{deliveryLabel(m.email_status)}</span></span>
+                    </>
+                  ) : null}
                 </p>
-                <p className="adm-note" style={{ whiteSpace: 'pre-wrap' }}>{text(m.body)}</p>
-                {m.email_error ? <p className="adm-note">{text(m.email_error)}</p> : null}
+                <p className="ds-msg-body">{text(m.body)}</p>
+                {m.email_error ? <p className="ds-msg-head">{text(m.email_error)}</p> : null}
               </div>
             )) : <p className="adm-note">No messages on this ticket.</p>}
           </div>
-
-          <div className="adm-panel">
-            <div className="adm-panel-title">Reply</div>
-            <div className="adm-form">
-              <Field label="template">
-                <select value={templateId} onChange={(e) => applyTemplate(e.target.value)}>
-                  <option value="">— none —</option>
-                  {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </select>
-              </Field>
-              <Field label="internal note"><input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} /></Field>
-              <Field label="body" wide><textarea value={reply} onChange={(e) => setReply(e.target.value)} /></Field>
-            </div>
-            {internal ? <p className="adm-note">An internal note is never emailed to the member.</p> : null}
-            {result ? (
-              <p className="adm-note" style={{ marginTop: 8 }}>
-                Delivery: <span className={deliveryKind(result.email_status)}>{deliveryLabel(result.email_status)}</span>
-                {result.delivered === false && result.email_status !== 'not_attempted' ? ' — the member was NOT emailed.' : ''}
-              </p>
-            ) : null}
-            <div className="adm-actions" style={{ marginTop: 10 }}>
-              <button type="button" className="adm-btn adm-btn--primary" onClick={sendReply} disabled={busy || !reply.trim()}>
-                {busy ? 'Working' : internal ? 'Add internal note' : 'Send reply'}
-              </button>
-            </div>
+              <div className="adm-panel">
+                <div className="adm-panel-title">Reply</div>
+                <div className="adm-form">
+                  <Field label="template">
+                    <select value={templateId} onChange={(e) => applyTemplate(e.target.value)}>
+                      <option value="">— none —</option>
+                      {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </select>
+                  </Field>
+                  <Field label="internal note"><input type="checkbox" checked={internal} onChange={(e) => setInternal(e.target.checked)} /></Field>
+                  <Field label="body" wide><textarea value={reply} onChange={(e) => setReply(e.target.value)} /></Field>
+                </div>
+                {internal ? <p className="adm-note">An internal note is never emailed to the member.</p> : null}
+                {result ? (
+                  <p className="adm-note" style={{ marginTop: 8 }}>
+                    Delivery: <span className={deliveryKind(result.email_status)}>{deliveryLabel(result.email_status)}</span>
+                    {result.delivered === false && result.email_status !== 'not_attempted' ? ' — the member was NOT emailed.' : ''}
+                  </p>
+                ) : null}
+                {result && result.mail_message ? (
+                  <p className={result.mail_tone === 'ok' ? 'adm-ok' : 'adm-error'} style={{ marginTop: 6 }}>{result.mail_message}</p>
+                ) : null}
+                <div className="adm-actions" style={{ marginTop: 10 }}>
+                  <button type="button" className="adm-btn adm-btn--primary" onClick={sendReply} disabled={busy || !reply.trim()}>
+                    {busy ? 'Working' : internal ? 'Add internal note' : 'Send reply'}
+                  </button>
+                </div>
+              </div>
+              <div className="adm-panel">
+                <div className="adm-panel-title">Merge another ticket into this one</div>
+                <div className="adm-form">
+                  <Field label="source ticket id"><input value={mergeSource} onChange={(e) => setMergeSource(e.target.value)} placeholder="uuid of the ticket to fold in" /></Field>
+                  <Field label="reason"><input value={mergeReason} onChange={(e) => setMergeReason(e.target.value)} /></Field>
+                </div>
+                <div className="adm-actions" style={{ marginTop: 10 }}>
+                  <button type="button" className="adm-btn" onClick={merge} disabled={busy || !mergeSource.trim()}>Merge into this ticket</button>
+                </div>
+              </div>
           </div>
-
-          <div className="adm-panel">
-            <div className="adm-panel-title">Merge another ticket into this one</div>
-            <div className="adm-form">
-              <Field label="source ticket id"><input value={mergeSource} onChange={(e) => setMergeSource(e.target.value)} placeholder="uuid of the ticket to fold in" /></Field>
-              <Field label="reason"><input value={mergeReason} onChange={(e) => setMergeReason(e.target.value)} /></Field>
-            </div>
-            <div className="adm-actions" style={{ marginTop: 10 }}>
-              <button type="button" className="adm-btn" onClick={merge} disabled={busy || !mergeSource.trim()}>Merge into this ticket</button>
-            </div>
-          </div>
-
-          {toArr(p.member_history).length ? (
-            <div className="adm-panel">
-              <div className="adm-panel-title">Other tickets from this requester</div>
-              {toArr(p.member_history).map((h) => (
-                <p className="adm-note" key={h.id}>{text(h.ticket_no)} · {text(h.subject)} · {text(h.status)} · {fmtDate(h.created_at)}</p>
-              ))}
-            </div>
-          ) : null}
-        </>
+          <aside className="ds-ticket-context">
+            <TicketMemberContext memberId={member.id || null} />
+              <div className="adm-panel">
+                <div className="adm-panel-title">Ticket</div>
+                <p className="adm-note">Requester {text(ticket.requester_name)} · {text(ticket.requester_email)} · member {text(member.name || member.email)}</p>
+                <p className="adm-note">Source {text(ticket.source)} · category {text(ticket.category)} · created {fmtDate(ticket.created_at)} · SLA due {fmtDate(ticket.sla_due_at)}</p>
+                <div className="adm-filters" style={{ marginTop: 8 }}>
+                  <select value={ticket.status || ''} onChange={(e) => update({ status: e.target.value })} disabled={busy}>{opts(TICKET_STATUSES)}</select>
+                  <select value={ticket.priority || ''} onChange={(e) => update({ priority: e.target.value })} disabled={busy}>{opts(TICKET_PRIORITIES)}</select>
+                  {admins ? (
+                    <select value={ticket.assignee_id || ''} onChange={(e) => update({ assignee_id: e.target.value || null })} disabled={busy}>
+                      <option value="">— unassigned —</option>
+                      {admins.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
+                    </select>
+                  ) : null}
+                </div>
+              </div>
+              {toArr(p.member_history).length ? (
+                <div className="adm-panel">
+                  <div className="adm-panel-title">Other tickets from this requester</div>
+                  {toArr(p.member_history).map((h) => (
+                    <p className="adm-note" key={h.id}>{text(h.ticket_no)} · {text(h.subject)} · {text(h.status)} · {fmtDate(h.created_at)}</p>
+                  ))}
+                </div>
+              ) : null}
+          </aside>
+        </div>
       )}
-    </Drawer>
+    </>
+  );
+  if (!inline) {
+    return <Drawer title={drawerTitle} note={drawerNote} onClose={onClose}>{body}</Drawer>;
+  }
+  return (
+    <section className="ds-ticket">
+      <header className="ds-ticket-head">
+        <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+          <p className="ds-ticket-title">{drawerTitle}</p>
+          <p className="ds-ticket-sub">{drawerNote} · created {fmtDate(ticket.created_at)} · SLA due {fmtDate(ticket.sla_due_at)}</p>
+        </div>
+        <button type="button" className="ds-btn ds-btn--sm" onClick={onClose}>Close</button>
+      </header>
+      {body}
+    </section>
   );
 }
+
+// The right-hand column of the inbox: the member behind the ticket. Every figure
+// comes from admin_get_member_360 — the same read-only RPC the Member 360 drawer
+// uses — so nothing here is derived or invented. A ticket with no member account
+// says so instead of showing an empty panel that looks like a failed read.
+function TicketMemberContext({ memberId }) {
+  const q = useApi(() => rpc('admin_get_member_360', { p_user_id: memberId }), [memberId], !!memberId);
+  const p = useMemo(() => raw(q.data), [q.data]);
+  const member = p.member || {};
+  const nectar = p.nectar || {};
+  const outstanding = p.outstanding || {};
+  const awards = p.awards || {};
+  const support = p.support || {};
+  return (
+    <div className="adm-panel">
+      <div className="adm-panel-title">Member</div>
+      {!memberId ? <p className="adm-note">This enquiry is not linked to a member account.</p> : null}
+      {memberId && q.error ? <p className="adm-note">Member 360 could not be read: {q.error}</p> : null}
+      {memberId && q.loading ? <p className="adm-note">Loading the member…</p> : null}
+      {memberId && !q.loading ? (
+        <>
+          <p className="ds-strong">{whoName(member)}</p>
+          <p className="adm-note">{text(member.email)} · {text(member.tier || member.member_tier)} · {text(member.subscription_status)}</p>
+          <div className="ds-kv"><span>Nectar balance</span><strong>{text(nectar.balance ?? member.nectar_points)}</strong></div>
+          <div className="ds-kv"><span>Earned all time</span><strong>{text(nectar.earned_total)}</strong></div>
+          <div className="ds-kv"><span>Reflections</span><strong>{toArr(p.reflections).length}</strong></div>
+          <div className="ds-kv"><span>Sigma logs</span><strong>{toArr(p.sigma_logs).length}</strong></div>
+          <div className="ds-kv"><span>Reviews due</span><strong>{text(outstanding.reviews ?? 0)}</strong></div>
+          <div className="ds-kv"><span>Recognition awaiting the member</span><strong>{text(outstanding.recognition_awaiting_member ?? 0)}</strong></div>
+          <div className="ds-kv"><span>Open tickets</span><strong>{text(outstanding.open_tickets ?? 0)}</strong></div>
+          <div className="ds-kv"><span>Tokens / badges won</span><strong>{toArr(awards.tokens).length} / {toArr(awards.badges).length}</strong></div>
+          <div className="ds-kv"><span>Open support tickets</span><strong>{toArr(support.tickets).length}</strong></div>
+          <div className="ds-kv"><span>Member since</span><strong>{fmtDate(member.join_date)}</strong></div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 
 function TemplatesPanel({ notify, templates, reload }) {
   const [open, setOpen] = useState(false);
@@ -1512,8 +1719,13 @@ export function NotificationsSection({ notify }) {
       const res = raw(await rpc('admin_send_member_notification', {
         p_user_id: form.user_id, p_title: form.title, p_body: form.body || null, p_link: form.link || null, p_kind: form.kind || 'admin.message',
       }));
-      setResult(res);
-      notify('Notification queued', 'ok');
+      // Stored in the member's in-app outbox and, when the member has an address,
+      // queued for email and sent now. The toast repeats the transport's answer.
+      const mail = res.mail_id
+        ? await sendQueuedMail(res.mail_id)
+        : { message: queueLine(res), tone: 'error', row: null };
+      setResult({ ...res, delivery_status: mail.row?.status || res.delivery_status, mail_message: mail.message, mail_tone: mail.tone });
+      notify(`Notification recorded. ${mail.message}`, mail.tone);
       setForm((s) => ({ ...s, title: '', body: '', link: '' }));
       notes.reload();
     } catch (e) { setErr(e.message); }
@@ -1524,7 +1736,7 @@ export function NotificationsSection({ notify }) {
     <>
       <SectionHead
         title="Notifications"
-        note="The member in-app outbox. Delivery status is reported as stored by the database and is not yet wired to a mail transport."
+        note="The member in-app outbox plus the email that left for it. Delivery status is the transport's own answer, written back by the mail worker; open Mail Queue for the raw ledger."
         actions={<button type="button" className="adm-btn" onClick={notes.reload}>Refresh</button>}
       />
       {notes.error ? <div className="adm-error">{notes.error}</div> : null}
@@ -1544,6 +1756,9 @@ export function NotificationsSection({ notify }) {
           <p className="adm-note" style={{ marginTop: 8 }}>
             Delivery: <span className={deliveryKind(result.delivery_status)}>{deliveryLabel(result.delivery_status)}</span>
           </p>
+        ) : null}
+        {result && result.mail_message ? (
+          <p className={result.mail_tone === 'ok' ? 'adm-ok' : 'adm-error'} style={{ marginTop: 6 }}>{result.mail_message}</p>
         ) : null}
         <div className="adm-actions" style={{ marginTop: 10 }}>
           <button type="button" className="adm-btn adm-btn--primary" onClick={send}
@@ -1577,12 +1792,26 @@ export function SettingsSection({ notify }) {
   const list = useMemo(() => toArr(payload.rows), [payload]);
   const [edits, setEdits] = useState({});
   const [busyKey, setBusyKey] = useState('');
+  const [savedKey, setSavedKey] = useState('');
   const [err, setErr] = useState(null);
+  const [q, setQ] = useState('');
   const [newKey, setNewKey] = useState('');
   const [newValue, setNewValue] = useState('');
   const [confirmKey, setConfirmKey] = useState(null);
 
   const valueOf = (row) => (row.key in edits ? edits[row.key] : (row.value ?? ''));
+  const isDirty = (row) => row.key in edits && String(edits[row.key]) !== String(row.value ?? '');
+
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    if (!needle) return list;
+    return list.filter((r) => `${r.key} ${r.value ?? ''}`.toLowerCase().includes(needle));
+  }, [list, q]);
+
+  const flashSaved = (key) => {
+    setSavedKey(key);
+    window.setTimeout(() => setSavedKey((k) => (k === key ? '' : k)), 2400);
+  };
 
   const saveRow = async (row) => {
     setBusyKey(row.key); setErr(null);
@@ -1590,8 +1819,9 @@ export function SettingsSection({ notify }) {
       await rpc('admin_save_setting', { p_key: row.key, p_value: valueOf(row) });
       notify(`Saved ${row.key}`, 'ok');
       setEdits((e) => { const n = { ...e }; delete n[row.key]; return n; });
+      flashSaved(row.key);
       st.reload();
-    } catch (e) { setErr(e.message); }
+    } catch (e) { setErr(`${row.key}: ${e.message}`); }
     finally { setBusyKey(''); }
   };
 
@@ -1602,7 +1832,7 @@ export function SettingsSection({ notify }) {
       notify(`Deleted ${row.key}`, 'ok');
       setConfirmKey(null);
       st.reload();
-    } catch (e) { setErr(e.message); }
+    } catch (e) { setErr(`${row.key}: ${e.message}`); }
     finally { setBusyKey(''); }
   };
 
@@ -1622,65 +1852,101 @@ export function SettingsSection({ notify }) {
     <>
       <SectionHead
         title="Settings"
-        note="app_config key/value pairs read by the member pages. Changes take effect on the member side on the next page load."
+        note="Runtime configuration the member site reads (app_config key/value pairs), the live health of every external dependency, and the size of the database behind them. A saved value applies on the member's next page load."
         actions={<button type="button" className="adm-btn" onClick={st.reload}>Refresh</button>}
       />
 
       <IntegrationHealthSection />
 
-      <div className="adm-panel">
-        <div className="adm-panel-title">Add a setting</div>
-        {err ? <div className="adm-error" style={{ marginBottom: 10 }}>{err}</div> : null}
-        <div className="adm-form">
-          <Field label="key (required)"><input value={newKey} onChange={(e) => setNewKey(e.target.value)} /></Field>
-          <Field label="value"><input value={newValue} onChange={(e) => setNewValue(e.target.value)} /></Field>
+      <section className="ds-card ds-card--flush">
+        <div className="ds-card-head">
+          <div>
+            <h3>Configuration</h3>
+            <p>Edit a value and save it, or add a new key. Deletes ask for confirmation first.</p>
+          </div>
+          <span className="ds-chip-note">{list.length} keys · {Object.keys(edits).filter((k) => isDirty(list.find((r) => r.key === k) || {})).length} unsaved</span>
         </div>
-        <div className="adm-actions" style={{ marginTop: 10 }}>
-          <button type="button" className="adm-btn adm-btn--primary" onClick={addKey} disabled={busyKey === '__new' || !newKey.trim()}>
-            {busyKey === '__new' ? 'Saving' : 'Save setting'}
-          </button>
-        </div>
-      </div>
 
-      {st.error ? <div className="adm-error">{st.error}</div> : null}
-      {st.loading ? <div className="adm-empty">Loading…</div> : (list.length ? (
-        <div className="adm-table-wrap">
-          <table className="adm-table">
-            <thead><tr><th>key</th><th>value</th><th /></tr></thead>
-            <tbody>
-              {list.map((row) => (
-                <tr key={row.key}>
-                  <td>{text(row.key)}</td>
-                  <td>
-                    <input value={valueOf(row)} style={{ minWidth: 220 }}
-                           onChange={(e) => setEdits((s) => ({ ...s, [row.key]: e.target.value }))} />
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button type="button" className="adm-btn adm-btn--small" disabled={busyKey === row.key || !(row.key in edits)} onClick={() => saveRow(row)}>
-                        {busyKey === row.key ? 'Saving' : 'Save'}
-                      </button>
-                      {confirmKey === row.key ? (
-                        <>
-                          <button type="button" className="adm-btn adm-btn--small adm-btn--danger" disabled={busyKey === row.key} onClick={() => removeRow(row)}>Confirm delete</button>
-                          <button type="button" className="adm-btn adm-btn--small" onClick={() => setConfirmKey(null)}>Cancel</button>
-                        </>
-                      ) : (
-                        <button type="button" className="adm-btn adm-btn--small adm-btn--danger" onClick={() => setConfirmKey(row.key)}>Delete</button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="ds-card-body">
+          {err ? <div className="adm-error">{err}</div> : null}
+          <div className="adm-filters">
+            <label className="ds-field">
+              <span className="ds-field-label">Search</span>
+              <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by key or value" />
+            </label>
+            <label className="ds-field">
+              <span className="ds-field-label">New key</span>
+              <input value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="feature_flag" />
+            </label>
+            <label className="ds-field">
+              <span className="ds-field-label">New value</span>
+              <input value={newValue} onChange={(e) => setNewValue(e.target.value)} placeholder="true" />
+            </label>
+            <button type="button" className="adm-btn adm-btn--primary" onClick={addKey}
+                    disabled={busyKey === '__new' || !newKey.trim()}>
+              {busyKey === '__new' ? 'Saving…' : 'Add setting'}
+            </button>
+          </div>
+
+          {st.error ? <div className="adm-error">{st.error}</div> : null}
+          {st.loading ? <div className="adm-empty">Loading settings…</div> : (filtered.length ? (
+            <table className="ds-table ds-kv-table">
+              <thead>
+                <tr><th className="ds-kv-key">Key</th><th>Value</th><th className="ds-kv-actions">Actions</th></tr>
+              </thead>
+              <tbody>
+                {filtered.map((row) => (
+                  <tr key={row.key}>
+                    <td className="ds-kv-key">
+                      <code>{text(row.key)}</code>
+                      {isDirty(row) ? <span className="ds-dirty" title="Unsaved change" aria-label="Unsaved change" /> : null}
+                    </td>
+                    <td>
+                      <input className="ds-input" value={valueOf(row)} aria-label={`Value of ${row.key}`}
+                             onChange={(e) => setEdits((s) => ({ ...s, [row.key]: e.target.value }))} />
+                    </td>
+                    <td className="ds-kv-actions">
+                      <div className="ds-row-actions">
+                        {savedKey === row.key ? <span className="ds-flash ds-flash--ok">saved</span> : null}
+                        <button type="button" className="adm-btn adm-btn--small" disabled={busyKey === row.key || !isDirty(row)} onClick={() => saveRow(row)}>
+                          {busyKey === row.key ? 'Saving…' : 'Save'}
+                        </button>
+                        {isDirty(row) ? (
+                          <button type="button" className="adm-btn adm-btn--small"
+                                  onClick={() => setEdits((e) => { const n = { ...e }; delete n[row.key]; return n; })}>
+                            Cancel
+                          </button>
+                        ) : null}
+                        {confirmKey === row.key ? (
+                          <>
+                            <span className="ds-confirm">Delete “{row.key}”?</span>
+                            <button type="button" className="adm-btn adm-btn--small adm-btn--danger" disabled={busyKey === row.key} onClick={() => removeRow(row)}>
+                              Confirm delete
+                            </button>
+                            <button type="button" className="adm-btn adm-btn--small" onClick={() => setConfirmKey(null)}>Cancel</button>
+                          </>
+                        ) : (
+                          <button type="button" className="adm-btn adm-btn--small adm-btn--danger" onClick={() => setConfirmKey(row.key)}>Delete</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <div className="adm-empty">No settings match this filter.</div>)}
         </div>
-      ) : <div className="adm-empty">No settings yet.</div>)}
+      </section>
     </>
   );
 }
 
 /* ───────────────────────────── 7. Integration health ───────────────────────────── */
+
+function healthLabel(name) {
+  const s = String(name || '').replace(/_/g, ' ');
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 export function IntegrationHealthSection() {
   const h = useApi(() => rpc('admin_get_integration_health'), []);
@@ -1690,7 +1956,7 @@ export function IntegrationHealthSection() {
     const out = [];
     for (const [name, val] of Object.entries(health)) {
       if (val && typeof val === 'object' && 'ready' in val) {
-        out.push({ name, ready: val.ready === true, detail: val.detail });
+        out.push({ name, ready: val.ready === true, detail: val.detail, raw: val });
       }
     }
     return out;
@@ -1699,52 +1965,121 @@ export function IntegrationHealthSection() {
     const t = health.tables || {};
     return Object.entries(t).map(([name, count]) => ({ name, count }));
   }, [health]);
+  const down = checks.filter((c) => !c.ready);
 
   return (
     <>
       <SectionHead
         title="Integration health"
         note="Whether each external dependency is actually wired, read from the database so nobody has to guess."
-        actions={<button type="button" className="adm-btn" onClick={h.reload}>Refresh</button>}
+        actions={<button type="button" className="adm-btn" onClick={h.reload}>Re-check</button>}
       />
       {h.error ? <div className="adm-error">{h.error}</div> : null}
 
-      {email.ready === false ? (
-        <div className="adm-error" style={{ marginBottom: 14 }}>
-          Email is NOT ready. {email.detail || 'No mail transport is configured.'} Replies and notifications are stored in-app only and are never marked as sent.
-        </div>
-      ) : null}
-
-      {h.loading ? <div className="adm-empty">Loading…</div> : (
+      {h.loading ? <div className="adm-empty">Checking dependencies…</div> : (
         <>
-          <div className="adm-table-wrap">
-            <table className="adm-table">
-              <thead><tr><th>dependency</th><th>ready</th><th>detail</th></tr></thead>
-              <tbody>
-                {checks.map((c) => (
-                  <tr key={c.name}>
-                    <td>{c.name.replace(/_/g, ' ')}</td>
-                    <td><span className={c.ready ? 'adm-pill adm-pill--ok' : 'adm-pill adm-pill--off'}>{c.ready ? 'ready' : 'not ready'}</span></td>
-                    <td className="wrap">{text(c.detail)}</td>
-                  </tr>
-                ))}
-                {checks.length === 0 ? <tr><td colSpan={3}>No checks reported.</td></tr> : null}
-              </tbody>
-            </table>
+          {down.length ? (
+            <div className="ds-alert ds-alert--danger">
+              <strong>{down.length === 1 ? `${healthLabel(down[0].name)} is not ready.` : `${down.length} dependencies are not ready.`}</strong>
+              <span>
+                {down.map((c) => `${healthLabel(c.name)}: ${c.detail || 'no detail reported'}`).join(' · ')}
+                {email.ready === false ? ' Email is NOT ready, so replies and notifications are stored in-app only and are never marked as sent.' : ''}
+              </span>
+            </div>
+          ) : (
+            <div className="ds-alert ds-alert--ok">
+              <strong>All dependencies ready.</strong>
+              <span>Every check below reported ready when this page loaded.</span>
+            </div>
+          )}
+
+          <div className="ds-health-grid">
+            {checks.map((c) => (
+              <article key={c.name} className={`ds-health-card ${c.ready ? 'is-ok' : 'is-down'}`}>
+                <header>
+                  <span className={`ds-dot ds-dot--${c.ready ? 'ok' : 'danger'} ds-dot--live`} />
+                  <strong>{healthLabel(c.name)}</strong>
+                  <span className={`ds-pill ds-pill--${c.ready ? 'ok' : 'danger'}`}>{c.ready ? 'Healthy' : 'Not ready'}</span>
+                </header>
+                <p className="ds-health-detail">{text(c.detail)}</p>
+                {c.name === 'email_transport' ? (
+                  <dl className="ds-health-kv">
+                    {[['transport', c.raw.transport], ['sender', c.raw.sender], ['waiting', c.raw.waiting],
+                      ['sent', c.raw.sent], ['failed', c.raw.failed]].map(([k, v]) => (
+                      v === undefined || v === null || v === '' ? null : (
+                        <div key={k}><dt>{k}</dt><dd>{text(v)}</dd></div>
+                      )
+                    ))}
+                  </dl>
+                ) : null}
+              </article>
+            ))}
+            {checks.length === 0 ? <div className="adm-empty">No checks reported.</div> : null}
           </div>
 
           {tables.length ? (
-            <div className="adm-panel" style={{ marginTop: 14 }}>
-              <div className="adm-panel-title">Row counts</div>
-              <div className="adm-cards">
-                {tables.map((t) => (
-                  <div className="adm-card" key={t.name}><div className="k">{t.name.replace(/_/g, ' ')}</div><div className="v">{text(t.count)}</div></div>
-                ))}
+            <section className="ds-card ds-card--flush">
+              <div className="ds-card-head">
+                <div>
+                  <h3>Database statistics</h3>
+                  <p>Live row counts read from the database on this page load — not cached and not estimated.</p>
+                </div>
+                <span className="ds-chip-note">{tables.length} tables</span>
               </div>
-            </div>
+              <div className="ds-card-body">
+                <div className="ds-stats ds-stats--db">
+                  {tables.map((t) => (
+                    <div className="ds-stat" key={t.name}>
+                      <span className="ds-stat-label">{t.name.replace(/_/g, ' ')}</span>
+                      <span className="ds-stat-value">{text(t.count)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
           ) : null}
         </>
       )}
     </>
+  );
+}
+
+// The queue column of the support inbox. Rows are the same admin_get_tickets
+// payload the table used; only the presentation is denser, so a ticket can be
+// read next to its thread instead of behind a full-width table.
+function TicketQueue({ list, openId, onOpen }) {
+  if (!list || !list.length) {
+    return (
+      <div className="ds-empty">
+        <p className="ds-empty-title">No tickets in this view</p>
+        <p>Import the next enquiries, or clear the filters.</p>
+      </div>
+    );
+  }
+  return (
+    <div>
+      {list.map((t) => (
+        <button
+          key={t.id}
+          type="button"
+          className={`ds-qitem${t.id === openId ? ' is-active' : ''}`}
+          onClick={() => onOpen(t.id)}
+          aria-current={t.id === openId ? 'true' : undefined}
+        >
+          <span className="ds-qitem-top">
+            <span className="ds-qitem-no">{text(t.ticket_no) || '—'}</span>
+            <span className="ds-qitem-subject">{text(t.subject)}</span>
+            {t.overdue ? <span className="ds-pill ds-pill--danger">overdue</span> : null}
+          </span>
+          <span className="ds-qitem-meta">
+            <span>{text(t.requester_email)}</span>
+            <span>&middot;</span>
+            <span>{text(t.status)}</span>
+            <span>&middot;</span>
+            <span>{fmtDate(t.last_activity)}</span>
+          </span>
+        </button>
+      ))}
+    </div>
   );
 }

@@ -723,11 +723,50 @@ async function fetchBaseTasksForTier(tierNum) {
 }
 
 // ======================== BOTTOM SHEET ========================
-function showBottomSheet(title, contentHtml, onClose) {
-    // Only remove dynamic sheets — never the static ones (Edit Profile, Upgrade Tier)
-    const existing = document.querySelector('.bottom-sheet-overlay.active:not([data-static])');
-    if (existing) existing.remove();
+/* Sheets are a STACK, not a single slot.
+   2026-10-14: showBottomSheet() used to delete the open sheet before building the
+   next one. Opening the eye on a Tasks Reflection row ("Your Reflection") or on a
+   Completed Tasks row (that task's full card) therefore destroyed the list the
+   member opened it from, and closing the detail dropped them back on the page.
+   Now every sheet is pushed ON TOP of its parent and closes innermost-first. */
+const bottomSheetStack = [];
 
+function topBottomSheet() {
+    for (let i = bottomSheetStack.length - 1; i >= 0; i--) {
+        if (bottomSheetStack[i].isConnected) return bottomSheetStack[i];
+    }
+    // a sheet created by another module (e.g. trial.js) is not in this stack
+    const others = document.querySelectorAll('.bottom-sheet-overlay.active:not([data-static])');
+    return others.length ? others[others.length - 1] : null;
+}
+
+/* Only the innermost sheet is live. The ones underneath stay on screen (that is
+   the step the member came from) but take no clicks and no scroll. */
+function syncBottomSheetStack() {
+    const top = topBottomSheet();
+    bottomSheetStack.forEach(sheet => {
+        if (!sheet.isConnected) return;
+        sheet.classList.toggle('sheet-top', sheet === top);
+        sheet.classList.toggle('sheet-behind', sheet !== top);
+    });
+    document.body.style.overflow = top ? 'hidden' : '';
+}
+
+/* Closes one sheet. Defaults to the innermost one; the sheet underneath, if any,
+   becomes the live sheet again the moment this one is popped. */
+function closeBottomSheet(target) {
+    const overlay = target || topBottomSheet();
+    if (!overlay) return null;
+    const idx = bottomSheetStack.indexOf(overlay);
+    if (idx !== -1) bottomSheetStack.splice(idx, 1);
+    overlay.classList.remove('active');
+    syncBottomSheetStack();
+    setTimeout(() => overlay.remove(), 300);
+    return overlay;
+}
+
+function showBottomSheet(title, contentHtml, onClose) {
+    // Static sheets (Edit Profile, Upgrade Tier) are page markup — never touched here.
     const overlay = document.createElement('div');
     overlay.className = 'bottom-sheet-overlay';
     overlay.innerHTML = `
@@ -742,13 +781,15 @@ function showBottomSheet(title, contentHtml, onClose) {
         </div>
     `;
     document.body.appendChild(overlay);
+    bottomSheetStack.push(overlay);
+    // every nested sheet paints above its parent, and above the static sheets
+    overlay.style.zIndex = String(10000 + bottomSheetStack.length * 10);
     document.body.style.overflow = 'hidden';
 
     const closeBtn = overlay.querySelector('.bottom-sheet-close');
     const close = () => {
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        setTimeout(() => overlay.remove(), 300);
+        if (!overlay.classList.contains('active')) return; // already closing
+        closeBottomSheet(overlay);
         if (onClose) onClose();
     };
     closeBtn.addEventListener('click', close);
@@ -758,13 +799,23 @@ function showBottomSheet(title, contentHtml, onClose) {
 
     overlay.offsetHeight;
     overlay.classList.add('active');
+    syncBottomSheetStack();
     return overlay;
 }
 
+/* Escape closes the innermost sheet only — never the one that opened it. */
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const top = topBottomSheet();
+    const closeBtn = top ? top.querySelector('.bottom-sheet-close') : null;
+    if (closeBtn) closeBtn.click();
+});
+
 function closeAllBottomSheets() {
+  bottomSheetStack.length = 0;
   const sheets = document.querySelectorAll('.bottom-sheet-overlay');
   sheets.forEach(sheet => {
-    sheet.classList.remove('active');
+    sheet.classList.remove('active', 'sheet-top', 'sheet-behind');
     if (sheet.dataset.static) {
       sheet.style.visibility = 'hidden';
       sheet.style.opacity = '0';
@@ -1204,7 +1255,7 @@ async function handleDone(checkbox) {
 
         await refreshTasks();
 
-        const openBottomSheet = document.querySelector('.bottom-sheet-overlay');
+        const openBottomSheet = topBottomSheet();
         if (openBottomSheet) {
             const title = openBottomSheet.querySelector('.bottom-sheet-header h3')?.innerText;
             if (title === 'Daily Tasks') {
@@ -1741,7 +1792,9 @@ async function openMissionsModal() {
             closeBtn.onclick = () => {
                 closeSheet();
                 if (originalClick) originalClick();
-                sheet.remove();
+                // pop this sheet off the stack (never a bare remove: the exit
+                // animation and the stack bookkeeping live in closeBottomSheet)
+                closeBottomSheet(sheet);
             };
         }
         sheet.addEventListener('click', (e) => {
@@ -2134,7 +2187,7 @@ function renderCompletedDetailHtml(task) {
 
 function refreshCompletedDetail() {
     if (!detailTaskId) return;
-    const overlay = document.querySelector('.bottom-sheet-overlay.active:not([data-static])');
+    const overlay = topBottomSheet();
     if (!overlay) return;
     const box = overlay.querySelector('.bottom-sheet-content');
     const task = findTaskForDetail(detailTaskId);
@@ -2685,7 +2738,7 @@ async function openTaskSigmaModal(taskId, taskTitle, editLogId) {
                 if (!existing) loggedSigmaTasks.add(taskIdVal);
                 sheet.querySelector('.bottom-sheet-close').click();
                 updatePendingSigmaBadge();
-                const pendingSheet = document.querySelector('.bottom-sheet-overlay');
+                const pendingSheet = topBottomSheet();
                 if (pendingSheet && pendingSheet.querySelector('#reflTabs')) {
                     const newHtml = await generatePendingSigmaHtml();
                     pendingSheet.querySelector('.bottom-sheet-content').innerHTML = newHtml;
@@ -3586,8 +3639,12 @@ export async function initProfile() {
         const desktopSigmaBtn = document.getElementById('addSigmaBtnDesktop');
         if (desktopSigmaBtn) desktopSigmaBtn.addEventListener('click', () => openSigmaModal());
 
+        // #mobileMissionsBtn carries the "Tasks Reflection" label and the pending
+        // reflection badge — it must open the reflection list, not Daily Tasks.
+        // (Missions keeps its own entry: the sidebar "Go to Missions" link, which
+        // is visible on mobile too.)
         const mobileMissions = document.getElementById('mobileMissionsBtn');
-        if (mobileMissions) mobileMissions.onclick = () => openMissionsModal();
+        if (mobileMissions) mobileMissions.onclick = () => openPendingSigmaModal();
         const mobileAchievements = document.getElementById('mobileAchievementsBtn');
         if (mobileAchievements) mobileAchievements.onclick = () => loadAchievementsModal();
         const mobileCompleted = document.getElementById('mobileCompletedTasksBtn');

@@ -17,6 +17,7 @@ Credentials come from ~/.hive-nectar/credentials.env and are never printed.
 import json
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -58,7 +59,7 @@ def bad(name, detail=""):
     FAIL.append(f"{name}{(' -- ' + detail) if detail else ''}")
 
 
-def sql(q, timeout=120):
+def sql_once(q, timeout=120):
     req = urllib.request.Request(
         API,
         data=json.dumps({"query": q}).encode(),
@@ -70,6 +71,24 @@ def sql(q, timeout=120):
             return json.loads(r.read().decode()), None
     except urllib.error.HTTPError as e:
         return None, f"HTTP {e.code}: {e.read().decode()[:600]}"
+
+
+def sql(q, timeout=120, attempts=6):
+    """Retry while the management API is rate-limiting.
+
+    `429 ThrottlerException` while the gate runs its scripts back to back is a
+    transport limit, not `APPLY FAILED` - retrying keeps a rate limit from
+    reading as a broken migration.
+    """
+    last = (None, None)
+    for i in range(attempts):
+        rows, err = sql_once(q, timeout)
+        if not err or ("Too Many Requests" not in err and "429" not in err):
+            return rows, err
+        last = (None, f"{err} (after {i + 1} attempt(s))")
+        if i < attempts - 1:
+            time.sleep(10 * (i + 1))
+    return last
 
 
 # ------------------------------------------------------------------ apply

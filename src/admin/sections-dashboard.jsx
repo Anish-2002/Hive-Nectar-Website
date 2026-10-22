@@ -182,7 +182,9 @@ function LineChart({ rows, series }) {
   const maxY = Math.max(1, ...rows.flatMap((r) => series.map((s) => Number(r[s.key]) || 0)));
   const xAt = (i) => (n <= 1 ? padL + plotW / 2 : padL + (i / (n - 1)) * plotW);
   const yAt = (v) => padT + (1 - (Number(v) || 0) / maxY) * plotH;
-  const ticks = [0, Math.round(maxY / 2), maxY];
+  /* maxY is floored at 1, so an empty series used to produce [0,1,1] and React
+     warned about two children with the same key — one grid line drawn twice. */
+  const ticks = [...new Set([0, Math.round(maxY / 2), maxY])];
   const every = Math.max(1, Math.ceil(n / 7));
   return (
     <svg className="admd-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Daily sign-ups and completed tasks">
@@ -235,7 +237,9 @@ function BarChart({ rows, valueKey, label }) {
   const barW = Math.max(2, step * 0.6);
   const maxY = Math.max(1, ...rows.map((r) => Number(r[valueKey]) || 0));
   const yAt = (v) => padT + (1 - (Number(v) || 0) / maxY) * plotH;
-  const ticks = [0, Math.round(maxY / 2), maxY];
+  /* maxY is floored at 1, so an empty series used to produce [0,1,1] and React
+     warned about two children with the same key — one grid line drawn twice. */
+  const ticks = [...new Set([0, Math.round(maxY / 2), maxY])];
   const every = Math.max(1, Math.ceil(n / 7));
   return (
     <svg className="admd-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Daily ${label}`}>

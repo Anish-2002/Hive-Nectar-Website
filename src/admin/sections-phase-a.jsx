@@ -105,7 +105,7 @@ function SlaStrip({ q }) {
 
 /* ── presentation primitives (chrome from admin.css, tones from phase-a.css) ─ */
 
-function Pill({ tone, title, children }) {
+export function Pill({ tone, title, children }) {
   const cls = tone === 'ok' ? 'adm-pill adm-pill--ok'
     : tone === 'off' ? 'adm-pill adm-pill--off'
       : tone === 'danger' ? 'adm-pill admpa-pill--danger'
@@ -163,13 +163,26 @@ function Pager({ total, offset, pageSize, onPage }) {
   );
 }
 
-function DataTable({ rows, columns, onRowClick, empty }) {
-  if (!rows.length) return <div className="adm-empty">{empty}</div>;
+function DataTable({ rows, columns, onRowClick, empty, className }) {
+  if (!rows.length) {
+    return (
+      <div className="ds-empty">
+        <p className="ds-empty-title">{empty}</p>
+        <p className="ds-empty-hint">Rows appear here as soon as there is something to act on.</p>
+      </div>
+    );
+  }
   return (
-    <div className="adm-table-wrap">
-      <table className="adm-table">
+    <div className="ds-table-wrap">
+      <table className={`ds-table${className ? ` ${className}` : ''}`}>
         <thead>
-          <tr>{columns.map((c) => <th key={c.key}>{c.label}</th>)}</tr>
+          <tr>
+            {columns.map((c) => (
+              <th key={c.key} className={[c.align === 'right' ? 'col-num' : '', c.width ? 'w-' + c.key : ''].filter(Boolean).join(' ') || undefined}>
+                {c.label}
+              </th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
@@ -184,7 +197,7 @@ function DataTable({ rows, columns, onRowClick, empty }) {
                 const isDate = !c.render && typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v);
                 const long = typeof v === 'string' && v.length > 70;
                 return (
-                  <td key={c.key} className={long ? 'wrap' : undefined}>
+                  <td key={c.key} className={[long ? 'wrap' : '', c.align === 'right' ? 'col-num' : ''].filter(Boolean).join(' ') || undefined}>
                     {isNode ? v : isDate ? fmtDate(v) : text(v)}
                   </td>
                 );
@@ -335,67 +348,308 @@ export function ActivityFeedSection({ onNavigate }) {
 
 const REVIEW_STATUSES = ['unreviewed', 'new', 'in_review', 'needs_clarification', 'reviewed', 'flagged'];
 
-function statusPill(status) {
+/* One vocabulary for the whole review surface: the SQL emits these exact
+   strings, and every queue renders them with the same word and the same tone. */
+const STATUS_LABEL = {
+  unreviewed: 'Awaiting review',
+  new: 'New',
+  in_review: 'In review',
+  needs_clarification: 'Needs clarification',
+  reviewed: 'Reviewed',
+  flagged: 'Flagged',
+  open: 'Open',
+  pending_customer: 'Pending customer',
+  pending_internal: 'Pending internal',
+  resolved: 'Resolved',
+  closed: 'Closed',
+};
+const STATUS_TONE = {
+  unreviewed: 'off',
+  new: 'info',
+  in_review: 'accent',
+  needs_clarification: 'warn',
+  reviewed: 'ok',
+  flagged: 'danger',
+  open: 'accent',
+  pending_customer: 'warn',
+  pending_internal: 'warn',
+  resolved: 'ok',
+  closed: 'off',
+};
+
+export function statusPill(status) {
   if (!status) return <Pill tone="off">No status</Pill>;
-  const tone = status === 'reviewed' ? 'ok'
-    : status === 'flagged' ? 'danger'
-      : status === 'needs_clarification' ? 'warn'
-        : 'off';
-  return <Pill tone={tone}>{text(status)}</Pill>;
+  return <Pill tone={STATUS_TONE[status] || 'off'}>{STATUS_LABEL[status] || text(status)}</Pill>;
 }
 
-function DmaicBlocks({ row }) {
-  const fields = [['define', 'Define'], ['measure', 'Measure'], ['analysis', 'Analyse'], ['improve', 'Improve'], ['control', 'Control']];
+/* Initials for the queue avatar; falls back to the email local part so a row
+   never renders an empty circle. */
+function initialsFrom(name, email) {
+  const n = String(name || '').trim();
+  if (n) {
+    const parts = n.split(/\s+/).filter(Boolean);
+    return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?';
+  }
+  const e = String(email || '').trim().replace(/[^A-Za-z0-9]/g, '');
+  return (e.slice(0, 2) || '?').toUpperCase();
+}
+
+export function QueueMember({ name, email, sub }) {
   return (
-    <div className="admpa-dmaic">
-      {fields.map(([k, label]) => (
-        <div className="admpa-dmaic-item" key={k}>
-          <div className="admpa-dmaic-label">{label}</div>
-          <p className="admpa-dmaic-body">{text(row[k])}</p>
-        </div>
+    <div className="ds-member">
+      <span className="ds-avatar ds-avatar--sm" aria-hidden="true">{initialsFrom(name, email)}</span>
+      <span className="ds-member-text">
+        <span className="ds-member-name">{text(name) || text(email) || 'Unknown'}</span>
+        <span className="ds-member-mail">{sub || text(email) || '—'}</span>
+      </span>
+    </div>
+  );
+}
+
+/* Status tabs carry the counts the read layer already returns, so the queue
+   answers "how much is waiting?" before a single row is opened. */
+export function StatusTabs({ statuses, value, onChange, counts }) {
+  const total = counts && typeof counts.total === 'number' ? counts.total : null;
+  return (
+    <div className="ds-tabs" role="tablist" aria-label="Filter by status">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={value === ''}
+        className={`ds-tab${value === '' ? ' is-active' : ''}`}
+        onClick={() => onChange('')}
+      >
+        All{total !== null ? <span className="ds-tab-count">{total}</span> : null}
+      </button>
+      {statuses.map((s) => (
+        <button
+          key={s}
+          type="button"
+          role="tab"
+          aria-selected={value === s}
+          className={`ds-tab${value === s ? ' is-active' : ''}`}
+          onClick={() => onChange(s)}
+        >
+          {STATUS_LABEL[s] || s}
+          {counts && typeof counts[s] === 'number' ? <span className="ds-tab-count">{counts[s]}</span> : null}
+        </button>
       ))}
     </div>
   );
 }
 
-function QueueDetailDrawer({ row, kind, onClose, onOpenMember }) {
-  const label = kind === 'sigma' ? 'Sigma log' : 'Reflection';
-  const note = kind === 'reflection'
-    ? `${row.task_title ? `${row.task_title} · ` : ''}${row.task_stage ? `${row.task_stage} · ` : ''}submitted ${fmtDate(row.created_at)}`
-    : `submitted ${fmtDate(row.created_at)}`;
+/* Submitted, then (clarification, member reply), then reviewed/flagged, using
+   only the timestamps the read layer returned. Nothing is inferred. */
+function QueueTimeline({ row }) {
+  const steps = [
+    { label: 'Submitted', when: row.created_at, done: true },
+    row.clarification_requested_at
+      ? { label: 'Clarification requested', when: row.clarification_requested_at, done: true }
+      : null,
+    row.member_response
+      ? { label: 'Member replied', when: row.member_responded_at || row.updated_at, done: true }
+      : null,
+    row.reviewed_at ? { label: 'Review completed', when: row.reviewed_at, done: true } : null,
+    row.flagged_reason ? { label: `Flagged — ${row.flagged_reason}`, when: row.updated_at, done: true } : null,
+  ].filter(Boolean);
+
   return (
-    <Drawer title={`${label} — ${whoName({ name: row.user_name, email: row.user_email })}`} note={note} onClose={onClose}>
-      {row.user_id ? (
-        <div className="adm-filters">
-          <button type="button" className="adm-btn adm-btn--small" onClick={() => onOpenMember(row.user_id)}>Member 360</button>
-        </div>
+    <ul className="ds-timeline">
+      {steps.map((s, i) => (
+        <li key={`${s.label}-${i}`} className={s.done ? 'is-done' : (i === steps.length - 1 ? 'is-now' : '')}>
+          <div>{s.label}</div>
+          <div className="ds-timeline-when">{fmtDate(s.when)}</div>
+        </li>
+      ))}
+      {!row.reviewed_at ? (
+        <li className="is-now">
+          <div>Waiting for a decision</div>
+          <div className="ds-timeline-when">{row.review_status ? STATUS_LABEL[row.review_status] || row.review_status : 'no status set'}</div>
+        </li>
       ) : null}
-      <div className="admpa-stack">
-        <div className="admpa-kv">
-          <Kv k="Member">{text(row.user_name)}</Kv>
-          <Kv k="Email">{text(row.user_email)}</Kv>
-          <Kv k="Kind">{text(row.kind)}</Kv>
-          <Kv k="Created">{fmtDate(row.created_at)}</Kv>
-          {row.task_id ? <Kv k="Task">{text(row.task_title)}</Kv> : null}
-          {row.task_id ? <Kv k="Task stage">{text(row.task_stage)}</Kv> : null}
-          {row.completed_at ? <Kv k="Completed">{fmtDate(row.completed_at)}</Kv> : null}
-          <Kv k="Review status">{statusPill(row.review_status)}</Kv>
-          <Kv k="Reviewer">{text(row.reviewer_id)}</Kv>
-          <Kv k="Assignee">{text(row.assignee_id)}</Kv>
-          <Kv k="Reviewed at">{row.reviewed_at ? fmtDate(row.reviewed_at) : '—'}</Kv>
-          {kind === 'reflection' ? <Kv k="Clarification requested">{row.clarification_requested_at ? fmtDate(row.clarification_requested_at) : '—'}</Kv> : null}
-          <Kv k="Flag reason">{text(row.flagged_reason)}</Kv>
-          <Kv k="Member response">{text(row.member_response)}</Kv>
-          <Kv k="Internal notes">{text(row.internal_notes)}</Kv>
-          {row.nominated_recognition_id ? <Kv k="Recognition nomination">{text(row.nominated_recognition_id)}</Kv> : null}
-        </div>
-        <DmaicBlocks row={row} />
+    </ul>
+  );
+}
+
+function DmaicBlocks({ row }) {
+  const fields = [['define', 'Define'], ['measure', 'Measure'], ['analysis', 'Analyse'], ['improve', 'Improve'], ['control', 'Control']];
+  const filled = fields.filter(([k]) => String(row[k] || '').trim());
+  if (!filled.length) {
+    return (
+      <div className="ds-empty">
+        <p className="ds-empty-title">No written submission</p>
+        <p className="ds-empty-hint">This row carries no Define / Measure / Analyse / Improve / Control text.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="ds-dmaic">
+      {filled.map(([k, label]) => (
+        <section className="ds-dmaic-item" key={k}>
+          <h4>{label}</h4>
+          <p>{String(row[k]).trim()}</p>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+/* Review actions. The queue row already carries review_id (the read layer joins
+   it), so the same RPCs the Member-reviews module uses can act from here. When a
+   row has no review record the drawer says so instead of showing dead buttons. */
+function QueueActions({ row, notify, onChanged }) {
+  const reviewId = row.review_id;
+  const [status, setStatus] = useState(row.review_status || '');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState(null);
+  const [ok, setOk] = useState('');
+
+  useEffect(() => {
+    setStatus(row.review_status || '');
+    setNote('');
+    setErr(null);
+    setOk('');
+  }, [row.id, row.review_id, row.review_status]);
+
+  if (!reviewId) {
+    return <p className="ds-note">This row is not linked to a review record, so it can be read here but not actioned.</p>;
+  }
+
+  const apply = async () => {
+    if (!status) { setErr('Choose a status first.'); return; }
+    setBusy(true); setErr(null); setOk('');
+    try {
+      const res = raw(await rpc('admin_set_review_status', { p_id: reviewId, p_status: status, p_note: note || null }));
+      const now = res.status || status;
+      setOk(`Status set to ${STATUS_LABEL[now] || now}`);
+      if (notify) notify(`Status set to ${now}`, 'ok');
+      setNote('');
+      if (onChanged) onChanged();
+    } catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div className="ds-actions-stack">
+      <label className="ds-field">
+        <span className="ds-field-label">Review status</span>
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option value="">Choose a status…</option>
+          {REVIEW_STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s] || s}</option>)}
+        </select>
+      </label>
+      <label className="ds-field">
+        <span className="ds-field-label">Note (optional)</span>
+        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reason for this decision" />
+      </label>
+      <div className="ds-row-actions ds-row-actions--start">
+        <button type="button" className="adm-btn adm-btn--primary" disabled={busy || !status} onClick={apply}>
+          {busy ? 'Saving…' : 'Apply status'}
+        </button>
+      </div>
+      {err ? <div className="adm-error">{err}</div> : null}
+      {ok ? <div className="ds-flash ds-flash--ok">{ok}</div> : null}
+    </div>
+  );
+}
+
+function QueueDetailDrawer({ row, kind, onClose, onOpenMember, notify, onChanged }) {
+  const label = kind === 'sigma' ? 'Sigma log' : 'Reflection';
+  const name = row.user_name || row.member_name;
+  const email = row.user_email || row.member_email;
+  const holder = kind === 'sigma' ? name : (name || email);
+
+  return (
+    <Drawer
+      title={`${label} — ${text(holder) || 'unknown member'}`}
+      note={[
+        row.task_title ? `Task: ${row.task_title}` : null,
+        row.task_stage ? `Stage: ${row.task_stage}` : null,
+        `Submitted ${fmtDate(row.created_at)}`,
+      ].filter(Boolean).join(' · ')}
+      onClose={onClose}
+    >
+      <div className="ds-detail">
+        <section className="ds-card">
+          <div className="ds-card-head">
+            <div>
+              <h3>Member</h3>
+              <p>Who submitted this, and the fastest route to their full record.</p>
+            </div>
+          </div>
+          <div className="ds-card-body">
+            <QueueMember name={name} email={email} sub={row.user_email || row.member_email} />
+            <div className="ds-row-actions ds-row-actions--start" style={{ marginTop: 12 }}>
+              {row.user_id || row.member_id ? (
+                <button type="button" className="adm-btn adm-btn--small" onClick={() => onOpenMember(row.user_id || row.member_id)}>
+                  Open member record
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
+        <section className="ds-card">
+          <div className="ds-card-head">
+            <div>
+              <h3>Timeline</h3>
+              <p>Every step the read layer recorded for this submission.</p>
+            </div>
+          </div>
+          <div className="ds-card-body">
+            <QueueTimeline row={row} />
+          </div>
+        </section>
+
+        <section className="ds-card">
+          <div className="ds-card-head">
+            <div>
+              <h3>Submission</h3>
+              <p>{kind === 'sigma' ? 'The sigma log as the member wrote it.' : 'The reflection as the member wrote it.'}</p>
+            </div>
+          </div>
+          <div className="ds-card-body">
+            <DmaicBlocks row={row} />
+          </div>
+        </section>
+
+        <section className="ds-card">
+          <div className="ds-card-head">
+            <div>
+              <h3>Review</h3>
+              <p>Current state, then the decision this screen can record.</p>
+            </div>
+            <span className="ds-chip-note">{statusPill(row.review_status)}</span>
+          </div>
+          <div className="ds-card-body">
+            <dl className="ds-kv">
+              <div><dt>Kind</dt><dd>{text(row.kind)}</dd></div>
+              {row.task_id ? <div><dt>Task</dt><dd>{text(row.task_title)}</dd></div> : null}
+              {row.completed_at ? <div><dt>Completed</dt><dd>{fmtDate(row.completed_at)}</dd></div> : null}
+              <div><dt>Reviewed at</dt><dd>{row.reviewed_at ? fmtDate(row.reviewed_at) : '—'}</dd></div>
+              <div><dt>Assignee</dt><dd>{text(row.assignee_id)}</dd></div>
+              {row.flagged_reason ? <div><dt>Flag reason</dt><dd>{text(row.flagged_reason)}</dd></div> : null}
+              {row.member_response ? <div><dt>Member response</dt><dd>{text(row.member_response)}</dd></div> : null}
+              {row.internal_notes ? <div><dt>Internal notes</dt><dd>{text(row.internal_notes)}</dd></div> : null}
+            </dl>
+            <QueueActions row={row} notify={notify} onChanged={onChanged} />
+          </div>
+        </section>
       </div>
     </Drawer>
   );
 }
 
-function QueueSection({ title, note, kind, statuses, initialStatus, emptyAwaiting, emptyFiltered, fetchPage, columns }) {
+/* Compact timestamp for queue tables: "14 Oct, 10:47". */
+export function queueWhen(iso) {
+  if (!iso) return '—';
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return text(iso);
+  return new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+function QueueSection({ title, note, kind, statuses, initialStatus, emptyAwaiting, emptyFiltered, fetchPage, columns, notify }) {
   const PAGE = 50;
   const [status, setStatus] = useState(initialStatus || '');
   const [offset, setOffset] = useState(0);
@@ -406,8 +660,13 @@ function QueueSection({ title, note, kind, statuses, initialStatus, emptyAwaitin
   const payload = useMemo(() => raw(q.data), [q.data]);
   const rows = useMemo(() => toArr(payload.rows), [payload]);
   const total = Number(payload.total || 0);
+  const counts = payload.counts && typeof payload.counts === 'object' ? payload.counts : null;
 
-  const changeStatus = (v) => { setStatus(v); setOffset(0); };
+  /* The rows are re-fetched after an action, so the open drawer follows the new
+     state instead of showing the status it had when it was opened. */
+  const liveRow = openRow
+    ? (rows.find((r) => (r.id !== undefined && String(r.id) === String(openRow.id))) || openRow)
+    : null;
 
   return (
     <>
@@ -417,37 +676,44 @@ function QueueSection({ title, note, kind, statuses, initialStatus, emptyAwaitin
         actions={<button type="button" className="adm-btn" onClick={q.reload}>Refresh</button>}
       />
 
-      <div className="adm-filters">
-        <Field label="Status">
-          <select value={status} onChange={(e) => changeStatus(e.target.value)}>
-            <option value="">All statuses</option>
-            {statuses.map((s) => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
-          </select>
-        </Field>
-        {payload.note ? <span className="adm-note">{text(payload.note)}</span> : null}
+      <div className="ds-queue-head">
+        <StatusTabs
+          statuses={statuses}
+          value={status}
+          counts={counts}
+          onChange={(v) => { setStatus(v); setOffset(0); }}
+        />
+        <span className="ds-chip-note">{q.loading ? 'Loading…' : `${total} in this view`}</span>
       </div>
 
+      {payload.note ? <p className="ds-note">{text(payload.note)}</p> : null}
       {q.error ? <div className="adm-error">Could not load: {q.error}</div> : null}
-      {q.loading ? <div className="adm-empty">Loading…</div> : null}
 
-      {!q.loading && !q.error ? (
+      {q.loading && !rows.length ? (
+        <div className="ds-empty">
+          <p className="ds-empty-title">Loading…</p>
+        </div>
+      ) : (
         <>
           <DataTable
             rows={rows}
             onRowClick={setOpenRow}
             empty={status === 'unreviewed' ? emptyAwaiting : emptyFiltered}
             columns={columns}
+            className="ds-table--queue"
           />
           <Pager total={total} offset={offset} pageSize={PAGE} onPage={setOffset} />
         </>
-      ) : null}
+      )}
 
-      {openRow ? (
+      {liveRow ? (
         <QueueDetailDrawer
-          row={openRow}
+          row={liveRow}
           kind={kind}
           onClose={() => setOpenRow(null)}
           onOpenMember={(id) => { setOpenRow(null); setMemberId(id); }}
+          notify={notify}
+          onChanged={q.reload}
         />
       ) : null}
       {memberId ? <Member360Drawer userId={memberId} onClose={() => setMemberId(null)} /> : null}
@@ -455,11 +721,12 @@ function QueueSection({ title, note, kind, statuses, initialStatus, emptyAwaitin
   );
 }
 
-export function ReflectionsSection() {
+export function ReflectionsSection({ notify }) {
   return (
     <QueueSection
+      notify={notify}
       title="Task reflections"
-      note="Define / Measure / Analyse / Improve / Control write-ups submitted against tasks. Open a row for the full text."
+      note="Define / Measure / Analyse / Improve / Control write-ups submitted against tasks. Open a row for the full text, the member and the decision."
       kind="reflection"
       statuses={REVIEW_STATUSES}
       initialStatus="unreviewed"
@@ -471,23 +738,22 @@ export function ReflectionsSection() {
         p_offset: offset,
       })}
       columns={[
-        { key: 'created_at', label: 'Submitted' },
-        { key: 'user_name', label: 'Member' },
-        { key: 'user_email', label: 'Email' },
+        { key: 'user_name', label: 'Member', render: (r) => <QueueMember name={r.user_name} email={r.user_email} /> },
         { key: 'task_title', label: 'Task' },
         { key: 'task_stage', label: 'Stage' },
-        { key: 'review_status', label: 'Review', render: (r) => statusPill(r.review_status) },
-        { key: 'completed_at', label: 'Completed' },
+        { key: 'created_at', label: 'Submitted', render: (r) => queueWhen(r.created_at) },
+        { key: 'review_status', label: 'Status', render: (r) => statusPill(r.review_status) },
       ]}
     />
   );
 }
 
-export function SigmaInboxSection() {
+export function SigmaInboxSection({ notify }) {
   return (
     <QueueSection
+      notify={notify}
       title="Sigma inbox"
-      note="General sigma logs (not tied to a task) plus task reflections routed here for review. Open a row for the full text."
+      note="General sigma logs (not tied to a task) plus task reflections routed here for review. Open a row for the full text, the member and the decision."
       kind="sigma"
       statuses={REVIEW_STATUSES}
       initialStatus="unreviewed"
@@ -499,12 +765,11 @@ export function SigmaInboxSection() {
         p_offset: offset,
       })}
       columns={[
-        { key: 'created_at', label: 'Submitted' },
-        { key: 'user_name', label: 'Member' },
-        { key: 'user_email', label: 'Email' },
+        { key: 'user_name', label: 'Member', render: (r) => <QueueMember name={r.user_name} email={r.user_email} /> },
         { key: 'kind', label: 'Kind' },
-        { key: 'review_status', label: 'Review', render: (r) => statusPill(r.review_status) },
-        { key: 'reviewed_at', label: 'Reviewed' },
+        { key: 'created_at', label: 'Submitted', render: (r) => queueWhen(r.created_at) },
+        { key: 'reviewed_at', label: 'Reviewed', render: (r) => queueWhen(r.reviewed_at) },
+        { key: 'review_status', label: 'Status', render: (r) => statusPill(r.review_status) },
       ]}
     />
   );
@@ -675,8 +940,18 @@ export function TicketHistorySection() {
 
 const FULFILMENT_LIMIT = 200;
 
-function stageLabel(s) {
+export function stageLabel(s) {
   return String(s || '').replace(/_/g, ' ');
+}
+
+/* Tone per fulfilment stage, from the terminal list the read layer returns
+   (cancelled | declined | delivery_failed) plus the shipping end of the flow. */
+export function stageTone(s) {
+  const v = String(s || '');
+  if (['cancelled', 'declined', 'delivery_failed', 'removed'].includes(v)) return 'danger';
+  if (['fulfilled', 'posted', 'delivered', 'completed'].includes(v)) return 'ok';
+  if (['to_post', 'to_send', 'ordered', 'awaiting', 'pending'].includes(v)) return 'warn';
+  return 'off';
 }
 
 export function GiftFulfilmentSection() {
@@ -744,10 +1019,30 @@ export function GiftFulfilmentSection() {
             columns={[
               { key: 'name', label: 'Gift' },
               { key: 'sku', label: 'SKU' },
-              { key: 'stock_quantity', label: 'On hand' },
-              { key: 'unit_cost', label: 'Unit cost', render: (r) => money(r.unit_cost) },
-              { key: 'is_active', label: 'Active', render: (r) => (r.is_active ? <Pill tone="ok">Active</Pill> : <Pill tone="off">Inactive</Pill>) },
-              { key: 'low', label: 'Stock', render: (r) => (r.low ? <Pill tone="danger">Low</Pill> : <Pill tone="ok">OK</Pill>) },
+              {
+                key: 'stock_quantity',
+                label: 'On hand',
+                render: (r) => {
+                  const n = Number(r.stock_quantity) || 0;
+                  const cls = n <= 0 ? 'is-out' : n <= 2 ? 'is-low' : '';
+                  return (
+                    <span className={`ds-stock ${cls}`}>
+                      <span className="ds-stock-bar"><i style={{ width: `${Math.max(6, Math.min(100, n * 20))}%` }} /></span>
+                      <span className="ds-stock-num">{n}</span>
+                    </span>
+                  );
+                },
+              },
+              { key: 'unit_cost', label: 'Unit cost', align: 'right', render: (r) => money(r.unit_cost) },
+              {
+                key: 'is_active',
+                label: 'Stock state',
+                render: (r) => (Number(r.stock_quantity) <= 0
+                  ? <Pill tone="danger">Out of stock</Pill>
+                  : r.low
+                    ? <Pill tone="warn">Low</Pill>
+                    : <Pill tone="ok">Healthy</Pill>),
+              },
             ]}
           />
 
@@ -755,18 +1050,16 @@ export function GiftFulfilmentSection() {
           <DataTable
             rows={rows}
             onRowClick={setOpenRow}
+            className="ds-table--queue"
             empty={status ? 'No recognition gifts in this stage.' : 'Nothing in the fulfilment queue.'}
             columns={[
-              { key: 'created_at', label: 'Queued' },
-              { key: 'member_name', label: 'Member' },
-              { key: 'member_email', label: 'Email' },
+              { key: 'created_at', label: 'Queued', render: (r) => queueWhen(r.created_at) },
+              { key: 'member_name', label: 'Member', render: (r) => <QueueMember name={r.member_name} email={r.member_email} /> },
               { key: 'gift_name', label: 'Gift' },
-              { key: 'gift_sku', label: 'SKU' },
-              { key: 'status', label: 'Stage' },
-              { key: 'address_on_file', label: 'Address', render: (r) => (r.address_on_file ? 'On file' : 'Missing') },
-              { key: 'carrier', label: 'Carrier' },
-              { key: 'tracking_number', label: 'Tracking' },
-              { key: 'updated_at', label: 'Updated' },
+              { key: 'status', label: 'Stage', render: (r) => <Pill tone={stageTone(r.status)}>{stageLabel(r.status)}</Pill> },
+              { key: 'address_on_file', label: 'Address', render: (r) => (r.address_on_file ? <Pill tone="ok">On file</Pill> : <Pill tone="warn">Missing</Pill>) },
+              { key: 'tracking_number', label: 'Tracking', render: (r) => (r.tracking_number ? String(r.tracking_number).slice(0, 18) : '—') },
+              { key: 'updated_at', label: 'Updated', render: (r) => queueWhen(r.updated_at) },
             ]}
           />
         </>

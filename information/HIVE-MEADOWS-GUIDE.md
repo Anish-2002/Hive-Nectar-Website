@@ -1639,10 +1639,10 @@ renders `message`.
 - **No new identity, no new database, no second copy of member data.** The anon key remains the
   only key in client code; `service_role` is never used by the app.
 
-### 23.3 The thirty-two sections
+### 23.3 The thirty-three sections
 
 The navigation is six collapsible groups (OVERVIEW, MEMBERS & RECOGNITION, THE MEADOW,
-COMMUNICATIONS, CONTENT & BUSINESS, OPERATIONS) holding thirty-two sections. Grouping is
+COMMUNICATIONS, CONTENT & BUSINESS, OPERATIONS) holding thirty-three sections. Grouping is
 presentational only: every section id appears in NAV_TARGETS, so a deep link opens the group
 that hosts it, and the group state is remembered per group in localStorage.
 
@@ -1651,7 +1651,7 @@ Member Reviews, Reflections, Sigma Logs, Nectar & Impact, Impact Logs, Member Pr
 Recognition & Rewards, Physical Gift Fulfilment, Memberships & Subscriptions), The Meadow
 (Tasks, Themes & Stages, Tokens & Achievements, Milestones & Badges, Collaborations &
 Invitations), Communications (Support Inbox, Ticket History, Communication Board, Email &
-Notifications), Content & Business (Website CMS, Navigation Menu, Social Links, Policy
+Notifications, Mail Queue), Content & Business (Website CMS, Navigation Menu, Social Links, Policy
 Briefs, Founders), Operations (Admin Team & Permissions, Audit Logs, System Health,
 Settings).
 
@@ -1661,10 +1661,10 @@ configuration entry, not new UI. The eight sections from Review centre to Integr
 (entered as Review centre, Recognition & gifts, Support inbox, Nectar ledger, Notifications,
 Settings, Integration health) are the CRM core modules; the Auditing entry is "Audit log".
 
-### 23.4 The RPC surface — 113 functions live today
+### 23.4 The RPC surface — 117 functions live today
 
 The count in this heading is generated, not remembered: `dump_live_admin_sigs.py` reads
-`pg_proc` and writes `admin-crm/05-LIVE-RPC-SIGNATURES.md` (`113` admin functions on
+`pg_proc` and writes `admin-crm/05-LIVE-RPC-SIGNATURES.md` (`117` admin functions on
 14 October 2026, of which `PUBLIC` holds `EXECUTE` on none). The table below records what the
 first four migrations added; 23.10 records what came after.
 
@@ -1913,7 +1913,7 @@ audit row.
 ### 23.11 The live admin RPC catalogue (generated)
 
 Generated from `pg_proc` on the production project by `dump_live_admin_sigs.py`;
-rendered into this file by `render_admin_inventory.py`. **113 functions.**
+rendered into this file by `render_admin_inventory.py`. **117 functions.**
 Do not hand-edit the table: rerun the scripts. `defaults` counts the trailing
 parameters that carry a DEFAULT, which PostgREST may omit from a call.
 
@@ -1962,6 +1962,7 @@ parameters that carry a DEFAULT, which PostgREST may omit from a call.
 | `admin_get_gifts` | `p_search text, p_include_inactive boolean` | 2 | jsonb | no |
 | `admin_get_inquiries` | `-` | 0 | jsonb | no |
 | `admin_get_integration_health` | `-` | 0 | jsonb | no |
+| `admin_get_mail_outbox` | `p_status text, p_limit integer, p_offset integer` | 3 | jsonb | no |
 | `admin_get_member_360` | `p_user_id uuid` | 0 | jsonb | no |
 | `admin_get_member_subscription` | `p_user_id uuid` | 0 | jsonb | no |
 | `admin_get_milestones` | `-` | 0 | jsonb | no |
@@ -2001,11 +2002,14 @@ parameters that carry a DEFAULT, which PostgREST may omit from a call.
 | `admin_list_user_tasks` | `-` | 0 | jsonb | no |
 | `admin_list_user_tokens` | `-` | 0 | jsonb | no |
 | `admin_log_action` | `p_action text, p_target_type text, p_target_id text, p_reason text` | 3 | jsonb | no |
+| `admin_mail_flush_claim` | `p_ids uuid[], p_limit integer` | 2 | jsonb | no |
 | `admin_merge_ticket` | `p_target uuid, p_source uuid, p_reason text` | 1 | jsonb | no |
 | `admin_nominate_recognition` | `p_user_id uuid, p_gift_id uuid, p_reason text, p_evidence jsonb, p_review_id uuid` | 2 | jsonb | no |
 | `admin_ok` | `-` | 0 | boolean | no |
+| `admin_queue_test_email` | `p_to text` | 1 | jsonb | no |
 | `admin_reply_ticket` | `p_ticket_id uuid, p_body text, p_internal boolean, p_template_id uuid` | 2 | jsonb | no |
 | `admin_reply_to_member` | `p_id uuid, p_body text, p_channel text` | 1 | jsonb | no |
+| `admin_retry_mail` | `p_id uuid` | 0 | jsonb | no |
 | `admin_revoke_invitation` | `p_id uuid, p_reason text` | 1 | jsonb | no |
 | `admin_role_of` | `p_user_id uuid` | 1 | text | no |
 | `admin_save_communication` | `p_data jsonb` | 0 | jsonb | no |
@@ -2118,7 +2122,7 @@ Three real defects closed alongside it:
 ### 23.14 The admin navigation and the Phase A screens
 
 The sidebar is no longer a flat list. It is six collapsible groups (OVERVIEW, MEMBERS &
-RECOGNITION, THE MEADOW, COMMUNICATIONS, CONTENT & BUSINESS, OPERATIONS) holding thirty-two
+RECOGNITION, THE MEADOW, COMMUNICATIONS, CONTENT & BUSINESS, OPERATIONS) holding thirty-three
 sections; the header buttons carry `aria-expanded`/`aria-controls`, the open state is
 remembered per group, and the group hosting the active section is always rendered open, so a
 deep link cannot land on a hidden entry. Grouping is presentational: every section id is in
@@ -2149,7 +2153,67 @@ read-only, so both are kept and the 360 view opens from the member record instea
 it.
 
 Verified 14 October 2026 by `verify_admin_module_graph.py` (5/0), `verify_admin_ui_wiring.py`
-(90/0/0), `verify_guide_admin_section.py` (25/0), `verify_crm_payload_shapes.py` (25/0),
+(90/0/0 at the time of this phase; 95/0/0 once the mail section was wired and the verifier was
+taught to read every admin stylesheet), `verify_guide_admin_section.py` (25/0),
+`verify_crm_payload_shapes.py` (25/0),
 `verify_admin_rpc_path.py` (33/0), migrations 13/12/11/10/09/06/03/02/01 (73/34/137/24/46/20/
 18/29/16 PASS, 0 FAIL), the reflections flow (6/6), `oxlint` 0 errors and `vite build` 0 -
-581 checks PASS, 0 FAIL. See `admin-crm/12-PHASE-A-UI.md`.
+581 checks PASS, 0 FAIL for this phase. The consolidated gate,
+`information/admin-crm/verification/run_admin_gate.sh`, now runs the identical list plus the
+mail steps of §23.15 and reports **662 PASS / 0 FAIL across 19 verifier scripts, exit 0, no
+throttle retries**. See `admin-crm/12-PHASE-A-UI.md`.
+
+### 23.15 Outbound email - the CRM can actually send (14 October 2026)
+
+**The defect.** Every CRM path that was supposed to email somebody wrote a row and stopped there.
+There was no mail function in the database at all: the review reply and ticket reply paths
+hardcoded `not_configured` ("stays in-app only"), the six `support_messages` rows read
+`not_attempted`, the twelve review replies read `stored_only`, and the integration-health read
+said `ready: false` with "No mail function in the database: nothing can be emailed from the CRM
+yet." The only transport that existed was an edge function for the welcome message, and it
+returned `success: true` even when the provider refused - so a broken key looked healthy.
+
+**The transport, in three migrations.** Migration 14 adds `mail_outbox` (one row per message that
+was ever meant to leave: `pending`/`sending`/`sent`/`failed`/`skipped`, `attempts`, `provider`,
+`provider_message_id`, `error`, `claimed_at`, `sent_at`, linked back to the notification, review
+or ticket message that produced it) plus `queue_email`, `apply_mail_result`, `mail_config`,
+`admin_get_mail_outbox`, `admin_mail_flush_claim` and `admin_queue_test_email`, and rewires the
+three send paths (member notification, review reply, ticket reply) to queue through it. The
+database owns the ledger and the state; `send-mail` (edge function, JWT-protected) owns only
+transmission - it claims a row with the caller's own identity, posts to Brevo, and writes the
+provider's real answer back, so a refusal stores Brevo's own error text instead of a fabricated
+success.
+
+Migration 15 fixes two live bugs the first apply exposed: the outbox word `pending` mirrored into
+member-facing columns whose CHECK constraints predate the outbox and reject it (`23514`, all three
+send paths dead), and `coalesce(ticket_no, '')` on a `bigint` (`22P02`). The fix is a
+`mail_legacy_status(kind, status)` mapping helper so each column writes a word its own constraint
+accepts - the constraints are not loosened, because that would change existing data semantics.
+Migration 16 rebuilds `admin_get_integration_health` so the health screen describes the transport
+that is actually installed (provider, sender, waiting/sent/failed counts) instead of asserting
+that nothing can be emailed.
+
+**The replay hazard.** All three migrations were briefly, silently undone - by this project's own
+verification. `apply_verify_migration11.py` proves migration 11 still applies by replaying its
+file against the live database, and that file defines four functions the mail work replaced
+(`admin_reply_to_member`, `admin_reply_ticket`, `admin_send_member_notification`,
+`admin_get_integration_health`). Every replay therefore reset the CRM to "`queued` but nothing
+queued" and the health block to its old text, while the gate stayed green because the mail probe
+ran earlier in the list. `run_admin_gate.sh` now runs the migration replays first and ends with a
+convergence block (`reapply_mail_migrations.py`, migrations 14 -> 15 -> 16, idempotent) followed
+by the live mail probes; `verify_mail_live_state.py` reads the live function bodies from
+`pg_proc` and fails if a stale one is left behind. A new verifier that replays an old migration
+belongs above that block, never below it.
+
+**Credentials.** `BREVO_API_KEY` is an edge-function secret and is never in the browser or in the
+repository; the new internal RPCs are revoked from `public` *and* `anon` (revoking from `anon`
+alone leaves the default PUBLIC EXECUTE grant). `not_configured` stays reachable on purpose: when
+there is no recipient or no configured sender, the row says so rather than reporting a send.
+
+Verified 14 October 2026 by `probe_mail_paths.py --live` (10/0 - notification, review reply and
+ticket reply all queue, and every staged row is deleted), `verify_mail_live_state.py` (15/0),
+`reapply_mail_migrations.py` (14/0), `prove-live-mail.py` (exit 0 - a real Brevo send that
+returned a message id, no browser involved), `probe_mail_rpc.py`, `verify_mail_wiring.py` (37/0
+including a negative control) and the full gate: `run_admin_gate.sh` ends with this convergence
+block and reports **662 PASS / 0 FAIL across 19 scripts, exit 0, 0 throttle retries**. See
+`admin-crm/13-MAIL-TRANSPORT.md`.

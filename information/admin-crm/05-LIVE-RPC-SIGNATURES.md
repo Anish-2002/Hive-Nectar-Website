@@ -1,7 +1,7 @@
 # Live admin RPC signatures (generated)
 
 Generated from `pg_proc` on the production project `gxboojbfmpejbjolfmjq` by
-`dump_live_admin_sigs.py`. Do not hand-edit: rerun the script (113 functions).
+`dump_live_admin_sigs.py`. Do not hand-edit: rerun the script (117 functions).
 
 `defaults` = trailing parameters carrying a DEFAULT, which PostgREST may omit.
 `public` = PUBLIC still holds EXECUTE (an anon-key caller can reach the guard).
@@ -51,6 +51,7 @@ Generated from `pg_proc` on the production project `gxboojbfmpejbjolfmjq` by
 | `admin_get_gifts` | `p_search text, p_include_inactive boolean` | 2 | jsonb | definer | no |
 | `admin_get_inquiries` | `-` | 0 | jsonb | definer | no |
 | `admin_get_integration_health` | `-` | 0 | jsonb | definer | no |
+| `admin_get_mail_outbox` | `p_status text, p_limit integer, p_offset integer` | 3 | jsonb | definer | no |
 | `admin_get_member_360` | `p_user_id uuid` | 0 | jsonb | definer | no |
 | `admin_get_member_subscription` | `p_user_id uuid` | 0 | jsonb | definer | no |
 | `admin_get_milestones` | `-` | 0 | jsonb | definer | no |
@@ -90,11 +91,14 @@ Generated from `pg_proc` on the production project `gxboojbfmpejbjolfmjq` by
 | `admin_list_user_tasks` | `-` | 0 | jsonb | definer | no |
 | `admin_list_user_tokens` | `-` | 0 | jsonb | definer | no |
 | `admin_log_action` | `p_action text, p_target_type text, p_target_id text, p_reason text` | 3 | jsonb | definer | no |
+| `admin_mail_flush_claim` | `p_ids uuid[], p_limit integer` | 2 | jsonb | definer | no |
 | `admin_merge_ticket` | `p_target uuid, p_source uuid, p_reason text` | 1 | jsonb | definer | no |
 | `admin_nominate_recognition` | `p_user_id uuid, p_gift_id uuid, p_reason text, p_evidence jsonb, p_review_id uuid` | 2 | jsonb | definer | no |
 | `admin_ok` | `-` | 0 | boolean | definer | no |
+| `admin_queue_test_email` | `p_to text` | 1 | jsonb | definer | no |
 | `admin_reply_ticket` | `p_ticket_id uuid, p_body text, p_internal boolean, p_template_id uuid` | 2 | jsonb | definer | no |
 | `admin_reply_to_member` | `p_id uuid, p_body text, p_channel text` | 1 | jsonb | definer | no |
+| `admin_retry_mail` | `p_id uuid` | 0 | jsonb | definer | no |
 | `admin_revoke_invitation` | `p_id uuid, p_reason text` | 1 | jsonb | definer | no |
 | `admin_role_of` | `p_user_id uuid` | 1 | text | definer | no |
 | `admin_save_communication` | `p_data jsonb` | 0 | jsonb | definer | no |

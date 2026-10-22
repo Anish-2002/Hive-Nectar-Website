@@ -6,6 +6,75 @@ const Member360Drawer = lazy(() => import('./sections-phase-a.jsx').then((m) => 
 
 /* ═══════════════════════════ shared pieces ═══════════════════════════ */
 
+/* ── directory vocabulary: avatar, display name, relative activity ──
+   admin_get_users() returns tier (free|collective), member_tier (0–3),
+   user_level (Novice|Experienced), experience, task_count, join_date and
+   updated_at. Nothing else is invented here. */
+const TIER_TONE = { free: 'off', plus: 'info', steward: 'ok', collective: 'accent' };
+
+function nameOf(u) {
+  const full = [u.first_name, u.last_name].map((s) => String(s || '').trim()).filter(Boolean).join(' ');
+  return full || String(u.username || '').trim() || String(u.email || '').trim() || 'Member';
+}
+
+function initialsOf(u) {
+  const a = String(u.first_name || '').trim();
+  const b = String(u.last_name || '').trim();
+  if (a || b) return `${a.slice(0, 1)}${b.slice(0, 1)}`.toUpperCase() || '?';
+  const s = nameOf(u).replace(/[^A-Za-z0-9]/g, '');
+  return (s.slice(0, 2) || '?').toUpperCase();
+}
+
+function daysSince(iso) {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+}
+
+function relTime(iso) {
+  const d = daysSince(iso);
+  if (d === null) return '—';
+  if (d <= 0) return 'today';
+  if (d === 1) return 'yesterday';
+  if (d < 30) return `${d}d ago`;
+  if (d < 365) return `${Math.round(d / 30)}mo ago`;
+  return `${Math.round(d / 365)}y ago`;
+}
+
+function activityOf(u) {
+  const d = daysSince(u.updated_at);
+  if (d === null) return { tone: 'off', label: 'No activity' };
+  if (d <= 7) return { tone: 'ok', label: 'Active' };
+  if (d <= 30) return { tone: 'warn', label: 'Recent' };
+  return { tone: 'off', label: 'Dormant' };
+}
+
+function MemberCell({ user, sub }) {
+  return (
+    <div className="ds-member">
+      <span className="ds-avatar" aria-hidden="true">{initialsOf(user)}</span>
+      <span className="ds-member-text">
+        <span className="ds-member-name">
+          {nameOf(user)}
+          {user.is_admin ? <span className="ds-tag">admin</span> : null}
+        </span>
+        <span className="ds-member-mail">{sub || user.email || '—'}</span>
+      </span>
+    </div>
+  );
+}
+
+/* A short, unambiguous date for dense tables: "14 Oct 2026". The long
+   toLocaleString default ("10/14/2026, 10:47:09 PM") does not fit a column and
+   carries a time nobody reads in a directory. */
+function shortDate(iso) {
+  if (!iso) return '—';
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return text(iso);
+  return new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export function SectionHead({ title, note, actions }) {
   return (
     <div className="adm-head">
@@ -846,39 +915,149 @@ export function MembersSection({ notify }) {
   const list = useMemo(() => rows(data), [data]);
   const [q, setQ] = useState('');
   const [tier, setTier] = useState('');
+  const [activity, setActivity] = useState('');
+  const [sort, setSort] = useState('activity');
   const [openId, setOpenId] = useState(null);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return list.filter((u) => {
+    const out = list.filter((u) => {
       if (tier && String(u.tier || '') !== tier) return false;
+      if (activity && activityOf(u).tone !== activity) return false;
       if (!needle) return true;
       return [u.first_name, u.last_name, u.username, u.email].some((v) => String(v || '').toLowerCase().includes(needle));
     });
-  }, [list, q, tier]);
+    const by = {
+      activity: (u) => -(Date.parse(u.updated_at || 0) || 0),
+      joined: (u) => -(Date.parse(u.join_date || 0) || 0),
+      tasks: (u) => -(Number(u.task_count) || 0),
+      experience: (u) => -(Number(u.experience) || 0),
+      name: (u) => nameOf(u).toLowerCase(),
+    }[sort] || ((u) => 0);
+    return [...out].sort((a, b) => {
+      const va = by(a);
+      const vb = by(b);
+      if (typeof va === 'string') return va.localeCompare(vb);
+      return va - vb;
+    });
+  }, [list, q, tier, activity, sort]);
 
-  const columns = ['first_name', 'last_name', 'username', 'email', 'tier', 'member_tier',
-                   'nectar_points', 'total_tasks_completed', 'subscription_status', 'join_date'];
+  const summary = useMemo(() => ({
+    total: list.length,
+    collective: list.filter((u) => String(u.tier || '') === 'collective' || Number(u.member_tier) >= 2).length,
+    active: list.filter((u) => activityOf(u).tone === 'ok').length,
+    tasks: list.reduce((n, u) => n + (Number(u.task_count) || 0), 0),
+  }), [list]);
 
   return (
     <>
       <SectionHead
         title="Members"
-        note="Read through admin_get_users(). Open a row for the full member record: tasks, tokens, milestones, theme progress, sigma logs, decorations and collaborations, with the admin actions that exist for each."
+        note="Every registered member with their tier, progress and last recorded activity. Open a row for the full record: tasks, tokens, milestones, theme progress, sigma logs, decorations and collaborations."
         actions={<button className="adm-btn" onClick={reload}>Refresh</button>}
       />
       {error ? <div className="adm-error">{error}</div> : null}
+
+      <div className="ds-stats">
+        <div className="ds-stat">
+          <span className="ds-stat-label">Members</span>
+          <span className="ds-stat-value">{summary.total}</span>
+        </div>
+        <div className="ds-stat">
+          <span className="ds-stat-label">Collective</span>
+          <span className="ds-stat-value">{summary.collective}</span>
+        </div>
+        <div className="ds-stat">
+          <span className="ds-stat-label">Active this week</span>
+          <span className="ds-stat-value">{summary.active}</span>
+        </div>
+        <div className="ds-stat">
+          <span className="ds-stat-label">Tasks completed</span>
+          <span className="ds-stat-value">{summary.tasks}</span>
+        </div>
+      </div>
+
       <div className="adm-filters">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, username or email…" />
-        <select value={tier} onChange={(e) => setTier(e.target.value)}>
-          <option value="">All tiers</option>
-          {TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
+        <label className="ds-field">
+          <span className="ds-field-label">Search</span>
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, username or email" />
+        </label>
+        <label className="ds-field">
+          <span className="ds-field-label">Tier</span>
+          <select value={tier} onChange={(e) => setTier(e.target.value)}>
+            <option value="">All tiers</option>
+            {TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </label>
+        <label className="ds-field">
+          <span className="ds-field-label">Activity</span>
+          <select value={activity} onChange={(e) => setActivity(e.target.value)}>
+            <option value="">Any activity</option>
+            <option value="ok">Active (7 days)</option>
+            <option value="warn">Recent (30 days)</option>
+            <option value="off">Dormant</option>
+          </select>
+        </label>
+        <label className="ds-field">
+          <span className="ds-field-label">Sort</span>
+          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="activity">Last activity</option>
+            <option value="joined">Newest member</option>
+            <option value="tasks">Most tasks</option>
+            <option value="experience">Most experience</option>
+            <option value="name">Name (A–Z)</option>
+          </select>
+        </label>
         <span className="adm-note">{filtered.length} of {list.length} members</span>
       </div>
-      {loading ? <div className="adm-empty">Loading…</div> : (
-        <RawTable list={filtered} columns={columns} empty="No members match." onRowClick={(u) => setOpenId(u.id)} />
-      )}
+
+      {loading ? <div className="adm-empty">Loading members…</div> : (filtered.length ? (
+        <div className="ds-table-wrap">
+          <table className="ds-table ds-table--dir">
+            <thead>
+              <tr>
+                <th className="col-member">Member</th>
+                <th className="col-tier">Tier</th>
+                <th className="col-level">Level</th>
+                <th className="col-num">Tasks</th>
+                <th className="col-when">Activity</th>
+                <th className="col-when">Joined</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((u) => {
+                const act = activityOf(u);
+                const tierKey = String(u.tier || 'free').toLowerCase();
+                return (
+                  <tr key={u.id} className="is-clickable" onClick={() => setOpenId(u.id)}>
+                    <td>
+                      <MemberCell user={u} />
+                    </td>
+                    <td>
+                      <span className={`ds-pill ds-pill--${TIER_TONE[tierKey] || 'off'}`}>{tierKey}</span>
+                      {Number(u.member_tier) > 0 ? <span className="ds-chip-note">stage {Number(u.member_tier)}</span> : null}
+                    </td>
+                    <td>
+                      <span className="ds-level">{text(u.user_level)}</span>
+                      {Number(u.experience) > 0 ? <span className="ds-chip-note">{Number(u.experience)} xp</span> : null}
+                    </td>
+                    <td className="col-num">{Number(u.task_count) || 0}</td>
+                    <td>
+                      <span className="ds-activity">
+                        <span className={`ds-dot ds-dot--${act.tone}${act.tone === 'ok' ? ' ds-dot--live' : ''}`} />
+                        {act.label}
+                        <em className="ds-activity-when">{relTime(u.updated_at)}</em>
+                      </span>
+                    </td>
+                    <td><span className="ds-when">{shortDate(u.join_date)}</span></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : <div className="adm-empty">No members match this filter.</div>)}
+
       {openId ? (
         <MemberDrawer userId={openId} notify={notify} onClose={() => setOpenId(null)} onChanged={reload} />
       ) : null}
