@@ -430,6 +430,18 @@
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
 
+
+    <!-- Jar detail modal — same interaction pattern as the token popup on the profile page -->
+    <div class="pp2-modal" id="ppJarModal" hidden>
+      <div class="pp2-modal-card" role="dialog" aria-modal="true" aria-labelledby="ppJarTitle">
+        <button type="button" class="pp2-modal-close" id="ppJarClose" aria-label="Close">&times;</button>
+        <div class="pp2-modal-art"><div class="pp2-modal-disc" id="ppJarArt"></div></div>
+        <span class="pp2-modal-chip" id="ppJarChip">Core jar</span>
+        <h2 class="pp2-modal-title" id="ppJarTitle">Jar</h2>
+        <p class="pp2-modal-desc" id="ppJarDesc">What is inside this jar, and how a member earns one, is being written by the design team.</p>
+      </div>
+    </div>
+
 <script type="module">
   import { supabase } from './js/supabase-config.js';
 
@@ -471,6 +483,50 @@
   });
 </script>
 
+
+
+<script type="module">
+  // Jar detail popup — mirrors the reveal popup used for tokens on the profile page.
+  const jarModal = document.getElementById('ppJarModal');
+  const jarArt = document.getElementById('ppJarArt');
+  const jarChip = document.getElementById('ppJarChip');
+  const jarTitle = document.getElementById('ppJarTitle');
+  const jarClose = document.getElementById('ppJarClose');
+
+  const openJar = (fig) => {
+    const svg = fig.querySelector('svg');
+    const name = (fig.querySelector('figcaption b') || {}).textContent || 'Jar';
+    const kind = (fig.querySelector('figcaption span') || {}).textContent || 'Core jar';
+    jarArt.innerHTML = '';
+    if (svg) jarArt.appendChild(svg.cloneNode(true));
+    jarChip.textContent = kind.trim();
+    jarTitle.textContent = name.trim();
+    jarModal.hidden = false;
+    document.body.classList.add('pp2-modal-open');
+    jarClose.focus();
+  };
+
+  const closeJar = () => {
+    jarModal.hidden = true;
+    document.body.classList.remove('pp2-modal-open');
+  };
+
+  document.querySelectorAll('.pp2-jar').forEach((fig) => {
+    fig.setAttribute('tabindex', '0');
+    fig.setAttribute('role', 'button');
+    fig.setAttribute('aria-haspopup', 'dialog');
+    const label = (fig.querySelector('figcaption b') || {}).textContent || 'Jar';
+    fig.setAttribute('aria-label', 'Open ' + label.trim());
+    fig.addEventListener('click', () => openJar(fig));
+    fig.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openJar(fig); }
+    });
+  });
+
+  jarClose.addEventListener('click', closeJar);
+  jarModal.addEventListener('click', (e) => { if (e.target === jarModal) closeJar(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !jarModal.hidden) closeJar(); });
+</script>
 
 <script type="module" src="js/app.js"></script>
 </body>
