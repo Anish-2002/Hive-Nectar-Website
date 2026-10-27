@@ -75,7 +75,7 @@ function generateCardHTML(stats) {
     </div>
     <div style="font-size:0.7rem;color:#aaa;border-top:1px solid rgba(200,160,80,0.2);padding-top:12px;">
       Member since ${new Date(stats.memberSince).toLocaleDateString()} · ${stats.tier} Tier
-      <div style="margin-top:4px;">Join the hive at hivenectar.earth</div>
+      <div style="margin-top:4px;">Join the hive at ${location.host}</div>
     </div>
   </div>`;
 }

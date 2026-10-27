@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <!-- Profile-page design layer. Tokens: design/DESIGN.md (lint: 0 errors). Loads LAST on purpose. -->
     <link rel="stylesheet" href="meadow-theme.css" />
+  <link rel="stylesheet" href="pw-toggle.css" />
 <link rel="stylesheet" href="profile-meadow.css?v=20261013" />
 <script src="js/emoji.js"></script>
 </head>
@@ -115,6 +116,14 @@
       <div><div class="eb">Membership</div><div class="v"><b id="userTierBadgeCompact">Free</b><small>Current tier</small></div></div>
       <span class="ico"><i class="fas fa-seedling"></i></span>
     </div>
+  </div>
+
+  <!-- PWA: install prompt (hidden unless the browser offers one) -->
+  <div class="pwa-row" id="pwaRow" hidden>
+    <button type="button" id="pwaInstallBtn" class="btn sec">
+      <i class="fas fa-mobile-screen-button"></i> Install app
+    </button>
+    <span class="pwa-note" id="pwaNote">Add The Meadow to your home screen</span>
   </div>
 
   <!-- Mobile action buttons – each opens a bottom sheet (unchanged behaviour) -->
@@ -272,7 +281,9 @@
   <div class="footer-links"><a href="profile.html">My Profile</a> <span>|</span> <a href="founders.html">Founders</a></div>
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
+<script src="js/pw-toggle.js" defer></script>
 <script type="module" src="js/app.js"></script>
+<script type="module" src="js/pwa.js"></script>
 <script>
   // Failsafe: never leave the page stuck on the loader if a module fails
   setTimeout(() => {

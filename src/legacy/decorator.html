@@ -1,8 +1,8 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Honey Jar - Lid Decorator | The Meadow</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 8c14 22 30 38 30 52a30 30 0 0 1-60 0C20 46 36 30 50 8z' fill='%23D9A441'/><circle cx='41' cy='58' r='6' fill='%23FFF3D6' opacity='.75'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +22,11 @@
       background-image: radial-gradient(circle at 20% 80%, rgba(200,169,110,0.08) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(200,169,110,0.08) 0%, transparent 50%);
       overflow-y: auto;
-      touch-action: none;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      /* pan-y: the page must scroll on touch. The jar canvas keeps
+         touch-action:none so dragging a sticker still never scrolls. */
+      touch-action: pan-y;
       user-select: none;
       position: relative;
     }
@@ -113,6 +117,19 @@
       #tray-tokens { max-width: 292px; }
     }
 
+    /* ─── Phones: keep the jar AND the whole token tray reachable ─── */
+    @media (max-width: 899px) {
+      body { justify-content: flex-start; }
+      #canvas {
+        max-height: 46dvh;
+        max-width: min(92vw, calc(46dvh * 0.6));
+        margin: 0 auto;
+      }
+      #tray-tokens { max-width: 100%; gap: 8px; }
+      #jar-wrap { padding-bottom: 10px; }
+      #tray { padding-bottom: 16px; }
+    }
+
     #token-count { font-size: 13px; font-weight: 800; color: var(--primary-dark); letter-spacing: .03em; }
     #token-count span { color: var(--fg); font-size: 14px; }
 
@@ -140,7 +157,7 @@
       background: transparent;
       box-shadow: 0 2px 10px rgba(0,0,0,.18);
       border: none;
-      cursor: pointer; touch-action: none;
+      cursor: pointer; touch-action: manipulation;
       transition: transform .14s, box-shadow .14s, filter .14s;
     }
     .tray-token:hover { transform: scale(1.12); box-shadow: 0 6px 22px rgba(0,0,0,.30); filter: brightness(1.15); }
@@ -1589,7 +1606,7 @@
     buildJarPng().then(({ blob, width, height }) => {
       const file = new File([blob], 'my-honey-jar.png', { type: 'image/png' });
       if (wantShare && navigator.canShare && navigator.canShare({ files: [file] })) {
-        return navigator.share({ files: [file], title: 'My honey jar', text: 'My jar on The Meadow — hivenectar.earth' })
+        return navigator.share({ files: [file], title: 'My honey jar', text: 'My jar on The Meadow — ' + location.host })
           .then(() => ({ shared: true, width, height }))
           .catch((err) => {
             if (err && err.name === 'AbortError') return { cancelled: true };

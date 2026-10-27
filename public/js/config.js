@@ -49,7 +49,8 @@ export function clearConfigCache() {
  */
 export async function sendEmail(to, subject, html) {
   // The edge function lives on the Supabase project host, NOT on the website host.
-  // This used app_config.site_url -> https://www.hivenectar.earth/functions/v1/... -> 404.
+  // This used app_config.site_url, which resolved to the marketing host for the
+  // functions API and returned 404.
   const functionUrl = `${SUPABASE_URL}/functions/v1/send-email`;
 
   try {

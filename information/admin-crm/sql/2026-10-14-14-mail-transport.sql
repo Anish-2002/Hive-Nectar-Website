@@ -341,8 +341,8 @@ begin
     into v_email, v_name
     from public.profiles p where p.id = v_rev.user_id;
 
-  v_link    := coalesce(public.mail_config('site_url', 'https://www.hivenectar.earth'),
-                        'https://www.hivenectar.earth') || '/the-meadow.html';
+  v_link    := coalesce(public.mail_config('site_url', 'https://www.pollenpop.org'),
+                        'https://www.pollenpop.org') || '/the-meadow.html';
   v_subject := coalesce(public.mail_config('subject_review_reply', 'A message from the Hive team'),
                         'A message from the Hive team');
   v_html    := public.mail_shell(v_subject,
@@ -443,8 +443,8 @@ begin
   if coalesce(trim(v_subject), '') = '' then v_subject := p_title; end if;
 
   v_url  := coalesce(nullif(trim(coalesce(p_link, '')), ''),
-                     coalesce(public.mail_config('site_url', 'https://www.hivenectar.earth'),
-                              'https://www.hivenectar.earth'));
+                     coalesce(public.mail_config('site_url', 'https://www.pollenpop.org'),
+                              'https://www.pollenpop.org'));
   v_html := public.mail_shell(v_subject,
               '<p style="margin:0 0 12px;">'
               || public.mail_escape('Hi ' || coalesce(v_name, 'there') || ',') || '</p>'

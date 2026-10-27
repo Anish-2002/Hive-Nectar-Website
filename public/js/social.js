@@ -147,6 +147,16 @@ async function openLeaderboard() {
     return;
   }
   const meRow = d.me && d.me.rank ? `<p class="soc-sub">You are <b>#${d.me.rank}</b> of ${nectar(d.total)} with <b>${nectar(d.me.nectar)}</b> nectar.</p>` : '';
+  // Keep the "Meadow rank" stat card identical to the leaderboard it opens.
+  // Keep the rank badges in step with the leaderboard the member is looking at:
+  // same RANK() server-side, one paint for the desktop and mobile cards.
+  if (d.me && d.me.rank) {
+    const text = `#${d.me.rank}`;
+    const rankEl = document.getElementById('rankLevel');
+    if (rankEl) rankEl.innerText = text;
+    const mobileRankEl = document.getElementById('mobileRankLevel');
+    if (mobileRankEl) mobileRankEl.innerText = text;
+  }
   const rows = d.rows.map((r) => `
     <button type="button" class="soc-row${r.is_me ? ' me' : ''}" data-uid="${esc(r.id)}">
       <span class="soc-rank${r.rank <= 3 ? ' top' : ''}">${r.rank}</span>

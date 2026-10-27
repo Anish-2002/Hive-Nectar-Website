@@ -1374,6 +1374,33 @@ async function handleComment(btn) {
 }
 
 // ======================== UI UPDATES ========================
+
+/* Meadow rank = the member's position on the public leaderboard, computed by
+ * get_public_profile() with the same RANK() OVER (ORDER BY nectar_points DESC,
+ * join_date ASC) that get_leaderboard() uses, so the badge and the leaderboard
+ * can never disagree. It is NOT member_tier: that is the subscription tier, and
+ * using it printed "#3" for a tier-3 member who is actually ranked #1.
+ */
+let meadowRank = null; // null = not fetched yet
+
+function paintMeadowRank() {
+    const text = meadowRank > 0 ? `#${meadowRank}` : '#--';
+    const desktop = document.getElementById('rankLevel');
+    if (desktop) desktop.innerText = text;
+    const mobile = document.getElementById('mobileRankLevel');
+    if (mobile) mobile.innerText = text;
+}
+
+async function refreshMeadowRank(userId) {
+    try {
+        const { data } = await supabase.rpc('get_public_profile', { p_id: userId });
+        meadowRank = data && data.ok ? (Number(data.rank) || 0) : 0;
+    } catch (_) {
+        meadowRank = 0;
+    }
+    paintMeadowRank();
+}
+
 function updateProfileUI() {
     const totalPoints = userProfile.total_points || 0;
     const nectarEarned = Math.floor(totalPoints / 100);
@@ -1396,26 +1423,10 @@ function updateProfileUI() {
     const pointsVal = document.getElementById('pointsVal');
     if (pointsVal) pointsVal.innerText = nectarEarned;
 
-    const rankLevel = document.getElementById('rankLevel');
-    if (rankLevel) rankLevel.innerText = `#${userProfile.member_tier || 0}`;
+    if (meadowRank === null) refreshMeadowRank(userProfile.id);
+    paintMeadowRank();
 
-    const expText = document.getElementById('expText');
-    if (expText) expText.innerText = `${progressToNext}/100 towards next Nectar`;
-
-    const nectarDisplay = document.getElementById('nectarPointsDisplay');
-    if (nectarDisplay) nectarDisplay.innerText = nectarEarned;
-
-    const experienceBar = document.getElementById('experienceBar');
-    if (experienceBar) experienceBar.value = progressToNext;
-
-    const knobEl = document.getElementById('customProgressKnob');
-    if (knobEl) knobEl.style.left = `${percent}%`;
-
-    const mobilePointsVal = document.getElementById('mobilePointsVal');
-    if (mobilePointsVal) mobilePointsVal.innerText = totalPoints;
-
-    const mobileRankLevel = document.getElementById('mobileRankLevel');
-    if (mobileRankLevel) mobileRankLevel.innerText = `#${userProfile.member_tier || 0}`;
+    paintMeadowRank();
 
     const mobileExpBar = document.getElementById('mobileExperienceBar');
     const mobileExpText = document.getElementById('mobileExpText');
@@ -3518,6 +3529,14 @@ export async function initProfile() {
     Loader.show("Gathering your nectar...");
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+        // Installed PWA: /login.html is outside the manifest scope, so the
+        // navigation would be handed to the browser and the member would fall
+        // out of the app. Ask for the credentials in place instead.
+        if (window.MeadowPwa && window.MeadowPwa.isStandalone()) {
+            Loader.hide();
+            window.MeadowPwa.showSignIn();
+            return;
+        }
         window.location.replace(getBaseURL() + 'login.html');
         return;
     }

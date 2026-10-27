@@ -60,7 +60,7 @@ export function clearConfigCache() {
 // ── sendEmail via edge function — mirrors js/config.js ──
 export async function sendEmail(to, subject, html) {
   // Edge functions are served by the Supabase project, not the website domain —
-  // using site_url here sent the request to www.hivenectar.earth and got a 404.
+  // using site_url here pointed the request at the marketing host and got a 404.
   const functionUrl = `${SUPABASE_URL.replace(/\/$/, '')}/functions/v1/send-email`;
   try {
     const { data: { session } } = await supabase.auth.getSession();

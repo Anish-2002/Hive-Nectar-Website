@@ -382,7 +382,8 @@ window.sendBroadcast = async () => {
   getConfig('notify_broadcast').then(enabled => {
     if (enabled !== 'false') {
       getConfig('notification_email').then(notifEmail => {
-        getConfig('site_url').then(siteUrl => {
+        // Origin-derived: the broadcast link follows the domain the admin is on.
+        Promise.resolve(window.location.origin).then(siteUrl => {
           sendEmail(
             notifEmail || 'follydevs@gmail.com',
             `Broadcast: ${title}`,
@@ -393,7 +394,7 @@ window.sendBroadcast = async () => {
               <p>${content}</p>
               <hr style="border:none;border-top:1px solid #e0d5c0;margin:16px 0;">
               <p style="font-size:0.85rem;color:#7A6B5D;">
-                <a href="${siteUrl || 'https://www.hivenectar.earth'}/board.html" style="color:#C8A96E;">View on Board →</a>
+                <a href="${siteUrl || window.location.origin}/board.html" style="color:#C8A96E;">View on Board →</a>
               </p>
             </div>`,
           );

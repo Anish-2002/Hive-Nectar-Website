@@ -48,7 +48,9 @@ export async function handleContactSubmit(e) {
         const notifyEnabled = await getConfig('notify_contact');
         if (notifyEnabled !== 'false') {
             const notificationEmail = await getConfig('notification_email') || 'follydevs@gmail.com';
-            const siteUrl = await getConfig('site_url') || 'https://www.hivenectar.earth';
+            // Origin-derived: the admin link in the notification points at the
+            // domain the inquiry was submitted from.
+            const siteUrl = window.location.origin;
             await sendEmail(
                 notificationEmail,
                 `Contact Form: ${formData.category} from ${formData.user_name}`,

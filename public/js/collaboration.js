@@ -10,10 +10,20 @@ export let hasCollabAccess = false; // only collective tier+
 
 export async function initCollab() {
   // Check tier — only collective (3+) can use collaboration
+  const { data: authData } = await supabase.auth.getUser();
+  const uid = authData?.user?.id;
+  if (!uid) {
+    // No session yet: do not query profiles with id=eq.undefined (PostgREST 400).
+    hasCollabAccess = false;
+    updatePartnerUI([]);
+    showInviteButton();
+    markInviteLocked(true);
+    return;
+  }
   const { data: profile } = await supabase
     .from('profiles')
     .select('member_tier')
-    .eq('id', (await supabase.auth.getUser()).data?.user?.id)
+    .eq('id', uid)
     .single();
 
   hasCollabAccess = (profile?.member_tier || 0) >= 3;

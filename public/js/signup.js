@@ -1,4 +1,4 @@
-﻿import { supabase } from './supabase-config.js';
+import { supabase } from './supabase-config.js';
 import { showToast, Loader } from './app.js';
 import { getConfig, sendEmail } from './config.js';
 
@@ -8,7 +8,9 @@ async function triggerWelcomeEmail(userId, email, firstName) {
   // Fetch sender name from config (changeable via Supabase without code edit)
   const senderName = await getConfig('sender_name') || 'The Meadow';
   const subject = await getConfig('welcome_email_subject') || 'Welcome to The Meadow!';
-  const siteUrl = await getConfig('site_url') || 'https://www.hivenectar.earth';
+  // Origin-derived: links inside the welcome email follow the domain the
+  // visitor actually signed up on. Nothing to edit when a domain is added.
+  const siteUrl = window.location.origin;
 
   await sendEmail(
     email,
@@ -64,7 +66,12 @@ export async function handleSignup(e) {
       email: rawEmail,
       password,
       options: {
-        data: { first_name: firstName, last_name: lastName, username }
+        data: { first_name: firstName, last_name: lastName, username },
+        // Send the confirmation link back to the origin that signed up. Every
+        // brand domain and subdomain is allow-listed in Supabase Auth, and an
+        // unlisted host falls back to the project Site URL rather than
+        // handing the token to a foreign origin.
+        emailRedirectTo: `${window.location.origin}/login.html`
       }
     });
     if (authError) throw authError;

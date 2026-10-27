@@ -29,5 +29,13 @@ dist-ssr
 .env.*.local
 *.key
 *.pem
+
+# python + local build artefacts (never ship these to the public repo)
 __pycache__/
 *.pyc
+.build-verify/
+verification/__pycache__/
+
+# local design previews and supabase CLI link state
+visual/
+supabase/.temp/

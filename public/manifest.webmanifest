@@ -1,0 +1,24 @@
+{
+  "id": "/profile.html",
+  "name": "The Meadow - My Profile",
+  "short_name": "Meadow",
+  "description": "Your nectar, meadow rank and tasks, as an app.",
+  "start_url": "/profile.html?src=pwa",
+  "scope": "/profile.html",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#FFF9F0",
+  "theme_color": "#3F6B4F",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My Profile", "short_name": "Profile", "url": "/profile.html" }
+  ]
+}

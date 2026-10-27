@@ -21,6 +21,19 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       data-shell-css="font-awesome"
     />
+    <!--
+      Profile PWA. The manifest scope is /profile.html, so only that page is
+      installable and only that page is ever served from the worker's cache.
+      Declared on the shell because the legacy documents are mounted at runtime
+      and only their stylesheets are injected into <head>.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#3F6B4F" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Meadow" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>The Meadow</title>
   </head>
   <body>

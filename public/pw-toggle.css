@@ -1,0 +1,47 @@
+/* Eye toggle for password fields (login.html / join.html).
+ *
+ * The legacy pages position the leading Font Awesome icon with
+ *   .page-login .form-field .input-wrapper i { position:absolute; left:16px; }
+ * so the icon inside the button must be reset explicitly (higher specificity),
+ * otherwise the eye lands on top of the envelope/lock glyph.
+ */
+
+.input-wrapper.has-pw-toggle input { padding-right: 52px; }
+
+.input-wrapper .pw-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--fg-muted, #6b6252);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.input-wrapper .pw-toggle:hover { background: rgba(0, 0, 0, 0.05); }
+
+.input-wrapper .pw-toggle:focus-visible {
+  outline: 2px solid var(--gold, #b8860b);
+  outline-offset: 2px;
+}
+
+.input-wrapper .pw-toggle i,
+.page-login .form-field .input-wrapper .pw-toggle i,
+.page-join .form-field .input-wrapper .pw-toggle i {
+  position: static;
+  left: auto;
+  top: auto;
+  transform: none;
+  color: inherit;
+  font-size: 15px;
+}
