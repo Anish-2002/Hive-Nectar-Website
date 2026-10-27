@@ -1,0 +1,676 @@
+/* ==========================================================================
+   The Meadow — five stacked panels (27.10.2026, local only)
+   Layout follows the client wireframe: one cream page, five olive panels,
+   each holding a row of cream cards. Card style follows the design board:
+   thin green border, dark-green icon tile, centred title + one-line hint.
+   Everything is scoped to body.page-the-meadow and prefixed .mw-.
+   ========================================================================== */
+
+body.mw-page .mw-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vw, 26px);
+  max-width: 940px;
+  margin: clamp(18px, 3vw, 34px) auto clamp(40px, 6vw, 72px);
+}
+
+body.mw-page .mw-panel {
+  background: #FDFCF8;
+  border: 1px solid #DDE1D0;
+  border-radius: 24px;
+  padding: clamp(22px, 3vw, 38px) clamp(16px, 3vw, 40px) clamp(20px, 2.6vw, 32px);
+  box-shadow: 0 1px 2px rgba(50, 70, 50, 0.06), 0 8px 24px rgba(50, 70, 50, 0.05);
+}
+
+/* panel 1 uses the PollenPop hero: dark green banner, cream type */
+body.mw-page .mw-panel--intro {
+  background: linear-gradient(135deg, #3E5A44 0%, #2E4A37 100%);
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(46, 74, 55, 0.18), 0 18px 40px rgba(46, 74, 55, 0.16);
+}
+
+body.mw-page .mw-panel--intro .mw-panel-label,
+body.mw-page .mw-panel--intro .mw-cardrow-title {
+  color: #F6F4EC !important;
+}
+
+body.mw-page .mw-panel--intro .mw-intro p,
+body.mw-page .mw-panel--intro .mw-cardrow-note {
+  color: rgba(246, 244, 236, 0.9);
+}
+
+/* ------------------------------------------------------------- panel label */
+body.mw-page .mw-panel-label {
+  margin: 0 0 clamp(14px, 2vw, 22px);
+  text-align: center;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #3E5A44 !important;
+}
+
+/* ------------------------------------------------------------ intro panel */
+body.mw-page .mw-panel--intro .mw-panel-label {
+  font-size: 0.82rem;
+  letter-spacing: 0.3em;
+}
+
+body.mw-page .mw-intro {
+  max-width: 60ch;
+  margin: 0 auto;
+  text-align: center;
+}
+
+body.mw-page .mw-intro p {
+  margin: 0 0 10px;
+  font-size: clamp(0.84rem, 0.95vw, 0.94rem);
+  line-height: 1.62;
+  color: #34402F;
+}
+
+body.mw-page .mw-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: clamp(16px, 2.4vw, 24px) 0 clamp(22px, 3vw, 30px);
+}
+
+body.mw-page .mw-actions .btn {
+  background: #F6F4EC !important;
+  color: #2E4A37 !important;
+  border-radius: 999px;
+  padding: 11px 24px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 8px 20px rgba(20, 32, 22, 0.28);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.mw-page .mw-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(46, 74, 55, 0.28);
+}
+
+body.mw-page .mw-login {
+  font-size: 0.82rem;
+  color: rgba(246, 244, 236, 0.86);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+body.mw-page .mw-cardrow-title {
+  margin: 0 0 4px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #2E4A37 !important;
+}
+
+body.mw-page .mw-cardrow-note {
+  margin: 0 0 clamp(14px, 2vw, 20px);
+  text-align: center;
+  font-size: 0.78rem;
+  color: #4A5540;
+}
+
+/* -------------------------------------------------------------- card rows */
+body.mw-page .mw-cardrow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 16px);
+}
+
+body.mw-page .mw-card {
+  flex: 0 1 196px;
+  min-width: 150px;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px 14px;
+  background: #F1F3E9;
+  border: 1px solid #DDE1D0;
+  border-radius: 18px;
+  text-align: center;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+body.mw-page .mw-card:hover {
+  transform: translateY(-3px);
+  border-color: #3E5A44;
+  box-shadow: 0 10px 22px rgba(46, 60, 40, 0.14);
+}
+
+body.mw-page .mw-card:focus-visible {
+  outline: 3px solid rgba(46, 74, 55, 0.5);
+  outline-offset: 2px;
+}
+
+body.mw-page .mw-card .mw-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(150deg, #3E5A44, #2E4A37);
+  color: #F3F0DE;
+  font-size: 1rem;
+  box-shadow: 0 6px 14px rgba(46, 74, 55, 0.26);
+}
+
+body.mw-page .mw-card strong {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #2E4A37;
+}
+
+body.mw-page .mw-card em {
+  font-style: normal;
+  font-size: 0.76rem;
+  line-height: 1.38;
+  color: #5E6A57;
+}
+
+body.mw-page .mw-card.is-empty {
+  border-style: dashed;
+  border-color: #C9D0C0;
+  background: rgba(246, 244, 236, 0.7);
+}
+
+body.mw-page .mw-card.is-empty .mw-icon {
+  background: linear-gradient(150deg, #6C7C63, #55654E);
+  box-shadow: none;
+}
+
+body.page-the-meadow a.mw-card {
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------- support */
+body.mw-page .mw-support {
+  max-width: 940px;
+  margin: clamp(8px, 2vw, 18px) auto 0;
+}
+
+body.mw-page .mw-support .resource-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+body.mw-page .mw-support .resource-card {
+  flex: 0 1 460px;
+  max-width: 460px;
+}
+
+body.mw-page .mw-support .section-head h2 {
+  color: #2E4A37 !important;
+}
+
+body.mw-page .mw-support .section-head p {
+  color: #4A5540 !important;
+}
+
+/* -------------------------------------------------------------- modal skin */
+body.page-the-meadow .hive-modal {
+  background: rgba(38, 52, 38, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+body.page-the-meadow .hive-modal-content {
+  background: #FBF9F0;
+  border: 1.5px solid rgba(46, 74, 55, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(30, 45, 30, 0.35);
+  padding: 30px 30px 26px;
+}
+
+body.page-the-meadow .hive-modal-content h2 {
+  font-size: 1.18rem;
+  color: #2E4A37 !important;
+  margin: 0 34px 12px 0;
+  line-height: 1.3;
+}
+
+body.page-the-meadow .hive-modal-content h2 i {
+  color: #3E5A44;
+}
+
+body.page-the-meadow .hive-modal-content h4 {
+  color: #2E4A37 !important;
+  font-size: 0.95rem;
+}
+
+body.page-the-meadow .hive-modal-content p,
+body.page-the-meadow .hive-modal-content li {
+  font-size: 0.9rem;
+  line-height: 1.68;
+  color: #46564B;
+}
+
+body.page-the-meadow .hive-modal-content p {
+  margin: 0 0 11px;
+}
+
+body.page-the-meadow .hive-modal-content p:last-child {
+  margin-bottom: 0;
+}
+
+body.page-the-meadow .hive-modal-content ul {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+body.page-the-meadow .hive-modal-content li {
+  margin-bottom: 8px;
+}
+
+body.page-the-meadow .hive-modal-content .btn {
+  background: #2E4A37;
+  color: #F6F3E4;
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 0.86rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.page-the-meadow .hive-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(46, 74, 55, 0.25);
+  background: #F1F3E9;
+  color: #2E4A37;
+  font-size: 1.1rem;
+  cursor: pointer;
+  float: none;
+}
+
+body.mw-page .mw-quote {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #2E4A37;
+  border-left: 3px solid #C7BB92;
+  padding-left: 12px;
+  margin: 0 0 14px;
+}
+
+body.mw-page .mw-soon {
+  margin: 0 0 8px;
+}
+
+body.mw-page .mw-soon-note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #6A786C;
+}
+
+/* -------------------------------------------------------------- responsive */
+@media (max-width: 720px) {
+  body.mw-page .mw-card {
+    flex: 0 1 calc(50% - 8px);
+    max-width: none;
+    padding: 14px 10px 12px;
+  }
+
+  body.mw-page .mw-card strong {
+    font-size: 0.86rem;
+  }
+
+  body.mw-page .mw-intro p {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 430px) {
+  body.mw-page .mw-panel {
+    padding: 20px 14px 18px;
+  }
+
+  body.mw-page .mw-card {
+    flex: 0 1 calc(50% - 6px);
+    max-width: none;
+    padding: 12px 8px 11px;
+    gap: 6px;
+  }
+
+  body.mw-page .mw-card .mw-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 0.88rem;
+  }
+
+  body.mw-page .mw-card strong {
+    font-size: 0.8rem;
+  }
+
+  body.mw-page .mw-card em {
+    font-size: 0.72rem;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   PollenPop — same panel system, product-specific blocks (.pp2-*)
+   ========================================================================== */
+
+body.mw-page .pp2-hero-art {
+  display: flex;
+  justify-content: center;
+  margin: 4px auto clamp(14px, 2vw, 22px);
+}
+
+body.mw-page .pp2-hero-art svg {
+  width: clamp(170px, 21vw, 240px);
+  height: auto;
+  filter: drop-shadow(0 16px 28px rgba(16, 30, 18, 0.28));
+}
+
+body.mw-page .pp2-jars {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 16px);
+}
+
+body.mw-page .pp2-jar {
+  flex: 0 1 calc(25% - 12px);
+  max-width: 190px;
+  margin: 0;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: #F1F3E9;
+  border: 1px solid #DDE1D0;
+  border-radius: 18px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+body.mw-page .pp2-jar:hover {
+  transform: translateY(-3px);
+  border-color: #3E5A44;
+  box-shadow: 0 10px 22px rgba(46, 60, 40, 0.14);
+}
+
+body.mw-page .pp2-jar svg {
+  width: 100%;
+  max-width: 88px;
+  height: auto;
+}
+
+body.mw-page .pp2-jar figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+
+body.mw-page .pp2-jar b {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2E4A37;
+}
+
+body.mw-page .pp2-jar span {
+  font-size: 0.7rem;
+  color: #626C65;
+}
+
+body.mw-page .pp2-steps-title {
+  margin: clamp(20px, 2.6vw, 28px) 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2E4A37 !important;
+}
+
+body.mw-page .pp2-steps {
+  list-style: none;
+  margin: clamp(18px, 2.4vw, 26px) auto 0;
+  padding: 0;
+  max-width: 620px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+body.mw-page .pp2-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #F1F3E9;
+  border: 1px solid #DDE1D0;
+  border-radius: 14px;
+}
+
+body.mw-page .pp2-step i {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #3E5A44;
+  color: #F6F4EC;
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+body.mw-page .pp2-step p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #2E4A37;
+}
+
+body.mw-page .pp2-sub {
+  margin-top: clamp(20px, 2.6vw, 30px);
+  padding: clamp(16px, 2.2vw, 26px);
+  background: #F1F3E9;
+  border: 1px solid #DDE1D0;
+  border-radius: 18px;
+}
+
+body.mw-page .pp2-sub h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  color: #2E4A37;
+}
+
+body.mw-page .pp2-sub h3 i {
+  color: #3E5A44;
+  margin-right: 8px;
+}
+
+body.mw-page .pp2-sub p {
+  margin: 0 0 10px;
+  font-size: 0.87rem;
+  line-height: 1.62;
+  color: #46564B;
+}
+
+body.mw-page .pp2-sub p:last-child {
+  margin-bottom: 0;
+}
+
+body.mw-page .pp2-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(12px, 1.8vw, 20px);
+  align-items: start;
+}
+
+body.mw-page .pp2-two .pp2-sub {
+  margin-top: 0;
+}
+
+body.mw-page .pp2-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+body.mw-page .pp2-list li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #46564B;
+  margin-bottom: 8px;
+}
+
+body.mw-page .pp2-list li i {
+  color: #3E5A44;
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+
+body.mw-page .pp2-note {
+  font-size: 0.78rem;
+  color: #626C65;
+}
+
+body.mw-page .pp2-note i {
+  margin-right: 6px;
+}
+
+body.mw-page .pp2-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 520px;
+  margin: clamp(14px, 2vw, 20px) auto 0;
+}
+
+body.mw-page .pp2-form input {
+  flex: 1 1 260px;
+  min-width: 0;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(246, 244, 236, 0.35);
+  background: rgba(246, 244, 236, 0.94);
+  color: #2E4A37;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+body.mw-page .pp2-form input::placeholder {
+  color: #7C8A7A;
+}
+
+body.mw-page .pp2-form input:focus {
+  outline: none;
+  border-color: #F6F4EC;
+  box-shadow: 0 0 0 3px rgba(246, 244, 236, 0.35);
+}
+
+body.mw-page .pp2-form button {
+  border: none;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 12px 22px;
+  background: #F6F4EC;
+  color: #2E4A37;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+body.mw-page .pp2-form button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+body.mw-page .pp2-form button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+body.mw-page .pp2-status {
+  min-height: 1.2em;
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+body.mw-page .pp2-status.ok {
+  color: #E4EBDD;
+}
+
+body.mw-page .pp2-status.err {
+  color: #F6C9B4;
+}
+
+body.mw-page .mw-panel--intro .pp2-status.ok,
+body.mw-page .mw-panel--intro .pp2-status.err {
+  color: #F6F4EC;
+}
+
+@media (max-width: 720px) {
+  body.mw-page .pp2-jar {
+    flex: 0 1 calc(25% - 8px);
+    max-width: none;
+    padding: 10px 6px 9px;
+  }
+
+  body.mw-page .pp2-jar b {
+    font-size: 0.72rem;
+  }
+
+  body.mw-page .pp2-jar span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  body.mw-page .pp2-jar {
+    flex: 0 1 calc(50% - 8px);
+    padding: 12px 8px 10px;
+  }
+
+  body.mw-page .pp2-jar span {
+    display: block;
+  }
+
+  body.mw-page .pp2-step {
+    padding: 10px 12px;
+  }
+}

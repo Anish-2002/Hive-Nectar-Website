@@ -85,9 +85,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" />
   <link rel="stylesheet" href="meadow-theme.css" />
+  <link rel="stylesheet" href="meadow-blocks.css" />
 <script src="js/emoji.js"></script>
 </head>
-<body class="page-the-meadow" data-theme="classic">
+<body class="page-the-meadow mw-page" data-theme="classic">
 
 <header class="header" data-testid="main-header">
   <a href="the-meadow.html" class="logo-area" data-testid="logo-link">
@@ -108,53 +109,145 @@
 </header>
 
 <main class="wrap">
-  <!-- Hero – Position Statement -->
-  <section class="hero-card" data-testid="hero-section">
-    <h1>The Meadow</h1>
-    <p>Built for the space between corporate sustainability and everyday behaviour.</p>
-    <br>
-    <p>Work, family, kids, chores, deadlines, responsibilities. These endless loops exhaust us, making it hard to keep up, stay calm, and recognise ourselves.</p>
-    <br>
-    <p>The Meadow is a living system, designed around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>
-    <a href="join.html" class="btn" style="margin-top: 24px;" data-testid="hero-cta">
-      <i class="fas fa-seedling"></i> Join The Meadow
-    </a>
-    <div style="margin-top: 12px;">
-      <a href="login.html" style="color: rgba(255,255,255,0.9); font-weight: 600; text-decoration: underline; font-size: .9rem;">
-        Already a member? Click to login
-      </a>
-    </div>
-  </section>
+  <div class="mw-stack">
 
-  <!-- Explore The Hive — square cards → modals -->
-  <div class="section-head">
-    <h2><i class="fas fa-map-signs"></i> Explore The Hive</h2>
-    <p>Tap a card to read more — every story, in full.</p>
-  </div>
-  <div class="hive-grid" id="hiveGrid"></div>
+    <section class="mw-panel mw-panel--intro" data-testid="hero-section" aria-labelledby="mwTitle">
+      <h1 class="mw-panel-label" id="mwTitle">The Meadow</h1>
+      <div class="mw-intro">
+        <p>Built for the space between corporate sustainability and everyday behaviour.</p>
+        <p>Work, family, kids, chores, deadlines, responsibilities. These endless loops exhaust us, making it hard to keep up, stay calm, and recognise ourselves.</p>
+        <p>The Meadow is a living system, designed around small, low-effort daily activities and gentle prompts that help strengthen meaningful attachment to family, values, identity, community, place, and yourself.</p>
+      </div>
+      <div class="mw-actions">
+        <a href="join.html" class="btn" data-testid="hero-cta"><i class="fas fa-seedling"></i> Join The Meadow</a>
+        <a href="login.html" class="mw-login">Already a member? Click to login</a>
+      </div>
+      <h2 class="mw-cardrow-title">Explore The Hive</h2>
+      <p class="mw-cardrow-note">Tap a card to read more — every story, in full.</p>
+      <div class="mw-cardrow">
+        <button type="button" class="mw-card" data-card="exists" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-seedling"></i></span>
+          <strong>What Exists Here</strong>
+          <em>PollenPop, Nectar, Honey, Themes</em>
+        </button>
+        <button type="button" class="mw-card" data-card="benefits" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-gift"></i></span>
+          <strong>Member Benefits</strong>
+          <em>What you get when you join</em>
+        </button>
+      </div>
+    </section>
 
-  <div class="divider"></div>
+    <section class="mw-panel" aria-labelledby="mwAbout">
+      <h2 class="mw-panel-label" id="mwAbout">About</h2>
+      <div class="mw-cardrow">
+        <button type="button" class="mw-card" data-card="background" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-user-check"></i></span>
+          <strong>Background</strong>
+          <em>The story that started it all</em>
+        </button>
+        <button type="button" class="mw-card" data-card="whystarted" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-question-circle"></i></span>
+          <strong>Why she started</strong>
+          <em>The space between corporate &amp; everyday</em>
+        </button>
+        <button type="button" class="mw-card" data-card="guides" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-compass"></i></span>
+          <strong>What guides her</strong>
+          <em>Coherence over performance</em>
+        </button>
+      </div>
+    </section>
 
-  <!-- FAQ-style accordions -->
-  <div class="section-head">
-    <h2><i class="fas fa-compass"></i> Quick Guide</h2>
-    <p>Expand each section for the full picture</p>
-  </div>
-  <div id="accordionWrap"></div>
+    <section class="mw-panel" aria-labelledby="mwEco">
+      <h2 class="mw-panel-label" id="mwEco">The Ecosystem</h2>
+      <div class="mw-cardrow">
+        <button type="button" class="mw-card" data-card="pollenpop" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-flask"></i></span>
+          <strong>PollenPop</strong>
+          <em>The first product from The Meadow</em>
+        </button>
+        <button type="button" class="mw-card is-empty" data-card="impactline" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
+          <strong>ImpactLine</strong>
+          <em>Not written yet</em>
+        </button>
+        <button type="button" class="mw-card is-empty" data-card="timecharm" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-clock"></i></span>
+          <strong>TimeCharm</strong>
+          <em>Not written yet</em>
+        </button>
+        <button type="button" class="mw-card is-empty" data-card="shardsediment" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-layer-group"></i></span>
+          <strong>ShardSediment</strong>
+          <em>Not written yet</em>
+        </button>
+      </div>
+    </section>
 
-  <div class="divider"></div>
+    <section class="mw-panel" aria-labelledby="mwApproach">
+      <h2 class="mw-panel-label" id="mwApproach">Our Approach</h2>
+      <div class="mw-cardrow">
+        <button type="button" class="mw-card" data-card="different" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-ban"></i></span>
+          <strong>What's different</strong>
+          <em>The design rules are simple</em>
+        </button>
+        <button type="button" class="mw-card" data-card="credibility" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></span>
+          <strong>Credibility &amp; norms</strong>
+          <em>Why behaviour quietly resets</em>
+        </button>
+        <button type="button" class="mw-card" data-card="designvalues" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-dice-d6"></i></span>
+          <strong>Design values</strong>
+          <em>Coherence over performance</em>
+        </button>
+      </div>
+    </section>
 
-  <!-- More To Explore -->
-  <div class="section-head">
-    <h2><i class="fas fa-th-large"></i> More To Explore</h2>
-  </div>
-  <div class="resource-grid">
-    <a href="information-and-links.html" class="resource-card">
-      <div class="resource-icon"><i class="fas fa-external-link-alt"></i></div>
-      <h4>Information and External Links</h4>
-      <p>Access reference materials, external resources, archive content, and explore the journey dashboard.</p>
-      <span class="resource-link">View Links <i class="fas fa-arrow-right"></i></span>
-    </a>
+    <section class="mw-panel" aria-labelledby="mwLinks">
+      <h2 class="mw-panel-label" id="mwLinks">External Links</h2>
+      <div class="mw-cardrow">
+        <button type="button" class="mw-card is-empty" data-card="substack" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-pen-nib"></i></span>
+          <strong>Substack</strong>
+          <em>Not written yet</em>
+        </button>
+        <button type="button" class="mw-card is-empty" data-card="linkedin" aria-haspopup="dialog">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-linkedin-in"></i></span>
+          <strong>LinkedIn</strong>
+          <em>Not written yet</em>
+        </button>
+        <a class="mw-card mw-card--link" href="pollenpop.html">
+          <span class="mw-icon" aria-hidden="true"><i class="fas fa-flask"></i></span>
+          <strong>PollenPop trial</strong>
+          <em>Open the PollenPop page</em>
+        </a>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="mw-support" aria-labelledby="mwGuide">
+      <div class="section-head">
+        <h2 id="mwGuide"><i class="fas fa-compass"></i> Quick Guide</h2>
+        <p>Expand each section for the full picture</p>
+      </div>
+      <div id="accordionWrap"></div>
+
+      <div class="section-head" style="margin-top:44px">
+        <h2><i class="fas fa-th-large"></i> More To Explore</h2>
+      </div>
+      <div class="resource-grid">
+        <a href="information-and-links.html" class="resource-card">
+          <div class="resource-icon"><i class="fas fa-external-link-alt"></i></div>
+          <h4>Information and External Links</h4>
+          <p>Access reference materials, external resources, archive content, and explore the journey dashboard.</p>
+          <span class="resource-link">View Links <i class="fas fa-arrow-right"></i></span>
+        </a>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -343,16 +436,40 @@
     },
   ];
 
-  // ── Render hive cards ──
-  const grid = document.getElementById('hiveGrid');
-  grid.innerHTML = hiveCards.map((c, i) => `
-    <div class="hive-card" onclick="openHiveModal(${i})" role="button" tabindex="0"
-         onkeydown="if(event.key==='Enter'||event.key===' '){openHiveModal(${i});event.preventDefault();}">
-      <span class="hive-open"><i class="fas fa-expand"></i></span>
-      <div class="hive-icon"><i class="fas ${c.icon}"></i></div>
-      <h4>${c.title}</h4>
-      <div class="hive-hint">${c.hint}</div>
-    </div>`).join('');
+  // ── Cards: every card opens the same modal, keyed by data-card ──
+  const CARD_MAP = {
+    exists: hiveCards[0].html,
+    benefits: hiveCards[7].html,
+    background: hiveCards[3].html,
+    whystarted: hiveCards[1].html,
+    guides: `<p class="mw-quote">What guides her is coherence over performance: the design values the system was built from.</p>` + hiveCards[5].html,
+    pollenpop: hiveCards[6].html,
+    different: hiveCards[2].html,
+    credibility: hiveCards[4].html,
+    designvalues: hiveCards[5].html,
+    impactline: null,
+    timecharm: null,
+    shardsediment: null,
+    substack: null,
+    linkedin: null,
+  };
+  const CARD_LABELS = {};
+  document.querySelectorAll('.mw-card[data-card]').forEach(function (el) {
+    CARD_LABELS[el.dataset.card] = el.querySelector('strong').textContent.trim();
+  });
+
+  function placeholderHtml(key) {
+    const name = CARD_LABELS[key] || 'This section';
+    return `<h2>${name}</h2>
+      <p class="mw-soon">This section is reserved. There is no written content for it yet, so nothing has been invented here.</p>
+      <p class="mw-soon-note">Send the copy and it will be dropped straight into this card.</p>`;
+  }
+
+  document.querySelectorAll('.mw-card[data-card]').forEach(function (el) {
+    el.addEventListener('click', function () { openHiveModal(el.dataset.card); });
+  });
+
+  window.openCard = function (key) { openHiveModal(key); };
 
   // ── Render accordions ──
   const accWrap = document.getElementById('accordionWrap');
@@ -368,9 +485,9 @@
 
   // ── Modal + accordion functions (exposed globally) ──
   window.hiveCards = hiveCards;
-  window.openHiveModal = function (i) {
-    const card = hiveCards[i];
-    if (!card) return;
+  window.openHiveModal = function (key) {
+    const html = CARD_MAP[key] || placeholderHtml(key);
+    if (!html) return;
     let modal = document.getElementById('hiveModal');
     if (!modal) {
       modal = document.createElement('div');
@@ -382,7 +499,7 @@
       </div>`;
       document.body.appendChild(modal);
     }
-    modal.querySelector('.hive-modal-body').innerHTML = card.html;
+    modal.querySelector('.hive-modal-body').innerHTML = html;
     requestAnimationFrame(() => modal.classList.add('open'));
     document.body.style.overflow = 'hidden';
   };

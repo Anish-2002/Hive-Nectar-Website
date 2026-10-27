@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -10,9 +10,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" />
   <link rel="stylesheet" href="meadow-theme.css" />
+  <link rel="stylesheet" href="meadow-blocks.css" />
 <script src="js/emoji.js"></script>
 </head>
-<body class="page-pollenpop" data-theme="classic">
+<body class="page-pollenpop mw-page" data-theme="classic">
 
 <header class="header">
   <a href="the-meadow.html" class="logo-area" style="text-decoration: none; color: inherit;">
@@ -35,80 +36,374 @@
 </header>
 
 <main class="wrap">
-  <section class="hero-card">
-    <h1>PollenPop</h1>
-    <p>PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>
-  </section>
+  <div class="mw-stack">
 
-  <div class="grid-main">
-    <div class="main-column">
-      <!-- How it Works -->
-      <section class="card">
-        <h2><i class="fas fa-cogs" style="color: var(--primary); margin-right: 8px;"></i> How it Works</h2>
-        <div style="margin-top: 16px;">
-          <p>The tasks inside are small and practical. They are designed to be achievable, repeatable, and visible.</p>
-          <p style="margin-top: 16px;">Every element in this space reflects a simple truth: humans are part of nature. Each task belongs to one of five core themes, representing five dimensions of a resilient and sustainable everyday life, such as planting herbs, shortening your shower, and finding new uses for things you no longer need.</p>
-          <p style="margin-top: 16px;">Each theme evolves through stages that echo nature's own cycles. This is not a challenge or a competition. It is a seed. One you can plant, tend, and let grow into your own way of operating.</p>
-        </div>
-      </section>
+    <!-- ============================ 1 · HERO ============================ -->
+    <section class="mw-panel mw-panel--intro">
+      <h1 class="mw-panel-label">The PollenPop</h1>
+      <div class="pp2-hero-art">
+        <svg viewBox="0 0 176 190" role="img" aria-label="The PollenPop jar jar">
+          <defs>
+            <linearGradient id="heroJar" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="heroJarc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#heroJar)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#heroJarc)">
+          <circle cx="46" cy="148" r="11" fill="#3E5A44" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#3E5A44" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          <circle cx="130" cy="128" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="108" r="11" fill="#3E5A44" />
+          <circle cx="74" cy="108" r="11" fill="#C98B6B" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#3E5A44" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+      </div>
+      <div class="mw-intro">
+        <p>PollenPop is the first commercial product released from The Meadow. It is not the only entry point; you may encounter The Meadow through other small digital products before arriving here.</p>
+      </div>
+      <div class="mw-actions">
+        <a href="login.html" class="btn"><i class="fas fa-right-to-bracket"></i> Login to Pollen Pop</a>
+        <a href="the-meadow.html" class="mw-login">New to The Meadow? Join The Meadow</a>
+      </div>
+    </section>
 
-      <!-- What You Receive -->
-      <section class="card">
-        <h2><i class="fas fa-gift" style="color: var(--primary); margin-right: 8px;"></i> What You Receive</h2>
-        <div style="margin-top: 16px;">
-          <h4>The Physical Experience</h4>
+    <!-- ============================ 2 · THE JARS ======================== -->
+    <section class="mw-panel" aria-labelledby="ppJars">
+      <h2 class="mw-panel-label" id="ppJars">The Jars</h2>
+      <p class="mw-cardrow-note">Placeholder product shots — final photography comes from the design team.</p>
+      <div class="pp2-jars">
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="PollenPop jar">
+          <defs>
+            <linearGradient id="jpollenpop" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jpollenpopc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jpollenpop)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jpollenpopc)">
+          <circle cx="46" cy="148" r="11" fill="#3E5A44" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#3E5A44" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          <circle cx="130" cy="128" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="108" r="11" fill="#3E5A44" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#3E5A44" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>PollenPop</b><span>Core jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Creating jar">
+          <defs>
+            <linearGradient id="jcreating" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jcreatingc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jcreating)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jcreatingc)">
+          <circle cx="46" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#C98B6B" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Creating</b><span>Theme jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Connecting jar">
+          <defs>
+            <linearGradient id="jconnecting" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jconnectingc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jconnecting)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jconnectingc)">
+          <circle cx="46" cy="148" r="11" fill="#8FA584" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#8FA584" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#8FA584" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Connecting</b><span>Theme jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Honey jar">
+          <defs>
+            <linearGradient id="jhoney" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jhoneyc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jhoney)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jhoneyc)">
+          <circle cx="46" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          <circle cx="130" cy="128" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="108" r="11" fill="#C98B6B" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#C98B6B" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Honey</b><span>Core jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Nectar jar">
+          <defs>
+            <linearGradient id="jnectar" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jnectarc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jnectar)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jnectarc)">
+          <circle cx="46" cy="148" r="11" fill="#B79A52" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#B79A52" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          <circle cx="130" cy="128" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="108" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#B79A52" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Nectar</b><span>Core jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Innovating jar">
+          <defs>
+            <linearGradient id="jinnovating" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jinnovatingc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jinnovating)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jinnovatingc)">
+          <circle cx="46" cy="148" r="11" fill="#B79A52" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#B79A52" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#B79A52" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Innovating</b><span>Theme jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Reflecting jar">
+          <defs>
+            <linearGradient id="jreflecting" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jreflectingc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jreflecting)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jreflectingc)">
+          <circle cx="46" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#A9BC9C" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#A9BC9C" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Reflecting</b><span>Theme jar</span></figcaption>
+        </figure>
+        <figure class="pp2-jar">
+          <svg viewBox="0 0 176 190" role="img" aria-label="Acting jar">
+          <defs>
+            <linearGradient id="jacting" x1="0" y1="0" x2="0.25" y2="1">
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96" />
+              <stop offset="0.55" stop-color="#FAFAF2" stop-opacity="0.74" />
+              <stop offset="1" stop-color="#D8E1C9" stop-opacity="0.9" />
+            </linearGradient>
+            <clipPath id="jactingc">
+              <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" />
+            </clipPath>
+          </defs>
+          <ellipse cx="88" cy="179" rx="56" ry="7" fill="#2E4A37" opacity="0.1" />
+          <path d="M38 78C38 56 53 48 61 45L115 45C123 48 138 56 138 78L138 152C138 166 127 175 113 175L63 175C49 175 38 166 38 152Z" fill="url(#jacting)" stroke="#C3CEB6" stroke-width="1.5" />
+          <g clip-path="url(#jactingc)">
+          <circle cx="46" cy="148" r="11" fill="#6F8A6A" />
+          <circle cx="74" cy="148" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="148" r="11" fill="#B79A52" />
+          <circle cx="130" cy="148" r="11" fill="#A9BC9C" />
+          <circle cx="46" cy="128" r="11" fill="#6F8A6A" />
+          <circle cx="74" cy="128" r="11" fill="#C98B6B" />
+          <circle cx="102" cy="128" r="11" fill="#B79A52" />
+          </g>
+          <rect x="57" y="36" width="62" height="11" rx="5" fill="#E7ECDC" stroke="#C3CEB6" stroke-width="1" />
+          <rect x="48" y="18" width="80" height="20" rx="9" fill="#6F8A6A" opacity="0.9" />
+          <rect x="53" y="22" width="70" height="5" rx="2.5" fill="#FFFFFF" opacity="0.45" />
+          <ellipse cx="53" cy="106" rx="5" ry="26" fill="#FFFFFF" opacity="0.55" />
+        </svg>
+          <figcaption><b>Acting</b><span>Theme jar</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ========================== 3 · HOW IT WORKS ====================== -->
+    <section class="mw-panel" aria-labelledby="ppHow">
+      <h2 class="mw-panel-label" id="ppHow">How it Works — Step by Step</h2>
+      <div class="mw-intro">
+        <p>The tasks inside are small and practical. They are designed to be achievable, repeatable, and visible.</p>
+        <p>Every element in this space reflects a simple truth: humans are part of nature. Each task belongs to one of five core themes, representing five dimensions of a resilient and sustainable everyday life, such as planting herbs, shortening your shower, and finding new uses for things you no longer need.</p>
+        <p>Each theme evolves through stages that echo nature's own cycles. This is not a challenge or a competition. It is a seed. One you can plant, tend, and let grow into your own way of operating.</p>
+      </div>
+      <h3 class="pp2-steps-title">Step-by-Step</h3>
+      <ol class="pp2-steps">
+          <li class="pp2-step"><i>1</i><p>Join The Meadow</p></li>
+          <li class="pp2-step"><i>2</i><p>Choose your reference theme(s) (optional)</p></li>
+          <li class="pp2-step"><i>3</i><p>Pick a task</p></li>
+          <li class="pp2-step"><i>4</i><p>Complete the action</p></li>
+          <li class="pp2-step"><i>5</i><p>Share evidence</p></li>
+          <li class="pp2-step"><i>6</i><p>Collect Nectar</p></li>
+          <li class="pp2-step"><i>7</i><p>Repeat</p></li>
+      </ol>
+
+      <div class="pp2-sub">
+        <h3><i class="fas fa-exchange-alt" aria-hidden="true"></i> Nectar &rarr; Bloom</h3>
+        <p>In a Meadow ecosystem, pollinators carry nectar back to the nest. This is the smallest unit of effort before it becomes the Meadow's most valuable resource: <strong>Bloom</strong>.</p>
+        <p>The Meadow works the same way. Every completed task generates Nectar. Over time, Nectar consolidates into Bloom.</p>
+        <p>Bloom represents your stored effort, your established routines, and the collective energy of The Meadow. It does not expire. It reflects your growth, and the more consistent your habits become, the steadier and more predictable your Bloom also becomes.</p>
+      </div>
+    </section>
+
+    <!-- ========================= 4 · WHAT YOU RECEIVE =================== -->
+    <section class="mw-panel" aria-labelledby="ppReceive">
+      <h2 class="mw-panel-label" id="ppReceive">What You Receive</h2>
+      <div class="pp2-two">
+        <div class="pp2-sub">
+          <h3>The Physical Experience</h3>
           <p>A jar with handcrafted tokens and a small prompt card. Each token reflects one of the themes. The prompt card is a quiet reminder of what this journey means to you, and to us.</p>
           <p>The connection between objects and meaning may not always be obvious. You can interpret them, or not. Over time, they become a visual anchor you don't have to think about.</p>
-          
-          <h4 style="margin-top: 20px;">The Digital Experience</h4>
-          <ul style="list-style: none; padding-left: 0;">
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A themed task library with embedded growth stages</li>
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> Nectar tracking</li>
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A personal reflection space</li>
-            <li><i class="fas fa-check-circle" style="color: var(--success); margin-right: 10px;"></i> A communication board for updates, notices, and optional conversation. This is also where we display real-time reference metrics from established global monitoring organisations. Total Honey earned across The Meadow is converted into indicative real-world comparisons.</li>
+        </div>
+        <div class="pp2-sub">
+          <h3>The Digital Experience</h3>
+          <ul class="pp2-list">
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i> A themed task library with embedded growth stages</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i> Nectar tracking</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i> A personal reflection space</li>
+            <li><i class="fas fa-check-circle" aria-hidden="true"></i> A communication board for updates, notices, and optional conversation. This is also where we display real-time reference metrics from established global monitoring organisations. Total Honey earned across The Meadow is converted into indicative real-world comparisons.</li>
           </ul>
           <p>Together, the digital structure holds the logic while physical tokens hold the memory.</p>
-          <p class="tiny muted" style="margin-top: 16px;"><i class="fas fa-info-circle"></i> Note: Data displayed for awareness only. The Meadow does not generate or control these measurements.</p>
+          <p class="pp2-note"><i class="fas fa-info-circle" aria-hidden="true"></i> Note: Data displayed for awareness only. The Meadow does not generate or control these measurements.</p>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Step-by-Step -->
-      <section class="card">
-        <h2><i class="fas fa-list-ol" style="color: var(--primary); margin-right: 8px;"></i> Step-by-Step</h2>
-        <ol style="margin-top: 16px; padding-left: 1.5rem;">
-          <li>Join The Meadow</li>
-          <li>Choose your reference theme(s) (optional)</li>
-          <li>Pick a task</li>
-          <li>Complete the action</li>
-          <li>Share evidence</li>
-          <li>Collect Nectar</li>
-          <li>Repeat</li>
-        </ol>
-      </section>
-    </div>
+    <!-- ========================== 5 · REQUEST ACCESS ==================== -->
+    <section class="mw-panel mw-panel--intro" aria-labelledby="ppAccess">
+      <h2 class="mw-panel-label" id="ppAccess">Early Access — Request Access</h2>
+      <div class="mw-intro">
+        <p>The first PollenPop jar is a visible record of the decision to begin. As you participate, show up consistently, and grow, that contribution becomes layered and visible inside the jar itself.</p>
+      </div>
+      <form class="pp2-form" id="ppAccessForm" novalidate>
+        <label class="sr-only" for="ppAccessEmail">Email address</label>
+        <input id="ppAccessEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" required />
+        <button type="submit" id="ppAccessSubmit">Request Access</button>
+      </form>
+      <p class="pp2-status" id="ppAccessStatus" role="status" aria-live="polite"></p>
+      <div class="mw-actions" style="margin-bottom:0">
+        <a href="login.html" class="btn"><i class="fas fa-right-to-bracket"></i> Login to Pollen Pop</a>
+        <a href="the-meadow.html" class="mw-login">New to The Meadow? Join The Meadow</a>
+      </div>
+    </section>
 
-    <aside class="side-column">
-      <!-- Nectar -> Honey -->
-      <section class="card highlight-card">
-        <h3><i class="fas fa-exchange-alt" style="margin-right: 8px;"></i> Nectar → Bloom</h3>
-        <div style="margin-top: 12px;">
-          <p>In a Meadow ecosystem, pollinators carry nectar back to the nest. This is the smallest unit of effort before it becomes the Meadow's most valuable resource: <strong>Bloom</strong>.</p>
-          <p style="margin-top: 12px;">The Meadow works the same way. Every completed task generates Nectar. Over time, Nectar consolidates into Bloom.</p>
-          <p style="margin-top: 12px;">Bloom represents your stored effort, your established routines, and the collective energy of The Meadow. It does not expire. It reflects your growth, and the more consistent your habits become, the steadier and more predictable your Bloom also becomes.</p>
-        </div>
-      </section>
-
-      <!-- Early Access -->
-      <section class="card">
-        <h3><i class="fas fa-clock" style="color: var(--primary); margin-right: 8px;"></i> Early Access</h3>
-        <p style="margin: 16px 0;">The first PollenPop jar is a visible record of the decision to begin. As you participate, show up consistently, and grow, that contribution becomes layered and visible inside the jar itself.</p>
-        <a href="login.html" class="btn">Login to Pollen Pop</a>
-        <div style="text-align: center; margin-top: 15px;">
-          <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 5px;">New to The Meadow?</p>
-          <a href="the-meadow.html" style="color: var(--cta); font-weight: 700; text-decoration: underline; font-size: 0.9rem;">Join The Meadow</a>
-        </div>
-      </section>
-    </aside>
   </div>
 </main>
 
@@ -118,6 +413,48 @@
   </div>
   <p>&copy; 2025 The Meadow. All rights reserved.</p>
 </footer>
+
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+
+  const form = document.getElementById('ppAccessForm');
+  const input = document.getElementById('ppAccessEmail');
+  const btn = document.getElementById('ppAccessSubmit');
+  const status = document.getElementById('ppAccessStatus');
+
+  const say = (msg, ok) => {
+    status.textContent = msg;
+    status.className = 'pp2-status ' + (ok ? 'ok' : 'err');
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = (input.value || '').trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(email)) {
+      say('Please enter a valid email address.', false);
+      input.focus();
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    const { error } = await supabase.from('contact_inquiries').insert([{
+      user_name: 'PollenPop access request',
+      user_email: email,
+      category: 'PollenPop Access',
+      message: 'Requested early access from the PollenPop page.'
+    }]);
+    if (error) {
+      say('Something went wrong. Please try again, or use the Contact page.', false);
+      btn.disabled = false;
+      btn.textContent = 'Request Access';
+      return;
+    }
+    form.reset();
+    btn.textContent = 'Request sent';
+    say('Thank you. Your email is on the list and we will be in touch when the next jars are released.', true);
+  });
+</script>
+
 
 <script type="module" src="js/app.js"></script>
 </body>
