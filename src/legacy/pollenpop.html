@@ -433,12 +433,9 @@
 
     <!-- Jar detail modal — same interaction pattern as the token popup on the profile page -->
     <div class="pp2-modal" id="ppJarModal" hidden>
-      <div class="pp2-modal-card" role="dialog" aria-modal="true" aria-labelledby="ppJarTitle">
+      <div class="pp2-modal-card" role="dialog" aria-modal="true" aria-label="Jar">
         <button type="button" class="pp2-modal-close" id="ppJarClose" aria-label="Close">&times;</button>
         <div class="pp2-modal-art"><div class="pp2-modal-disc" id="ppJarArt"></div></div>
-        <span class="pp2-modal-chip" id="ppJarChip">Core jar</span>
-        <h2 class="pp2-modal-title" id="ppJarTitle">Jar</h2>
-        <p class="pp2-modal-desc" id="ppJarDesc">What is inside this jar, and how a member earns one, is being written by the design team.</p>
       </div>
     </div>
 
@@ -489,18 +486,13 @@
   // Jar detail popup — mirrors the reveal popup used for tokens on the profile page.
   const jarModal = document.getElementById('ppJarModal');
   const jarArt = document.getElementById('ppJarArt');
-  const jarChip = document.getElementById('ppJarChip');
-  const jarTitle = document.getElementById('ppJarTitle');
   const jarClose = document.getElementById('ppJarClose');
 
+  // The popup shows the jar artwork only — it fills the card, no copy.
   const openJar = (fig) => {
     const svg = fig.querySelector('svg');
-    const name = (fig.querySelector('figcaption b') || {}).textContent || 'Jar';
-    const kind = (fig.querySelector('figcaption span') || {}).textContent || 'Core jar';
     jarArt.innerHTML = '';
     if (svg) jarArt.appendChild(svg.cloneNode(true));
-    jarChip.textContent = kind.trim();
-    jarTitle.textContent = name.trim();
     jarModal.hidden = false;
     document.body.classList.add('pp2-modal-open');
     jarClose.focus();

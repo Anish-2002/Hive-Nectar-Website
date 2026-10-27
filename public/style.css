@@ -9,7 +9,7 @@
 
 /* --- CSS VARIABLES (only non-color, structural) --- */
 :root {
-  --page-max: min(1680px, 92vw);
+  --page-max: min(1680px, 85vw);
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 20px;
@@ -44,7 +44,7 @@ a:hover { color: var(--primary); }
 .bold { font-weight: 700; }
 
 /* --- LAYOUT (unchanged) --- */
-.wrap { flex:1; width:100%; max-width:min(1760px, 92vw); margin:0 auto; padding:32px clamp(16px, 2.6vw, 48px); }
+.wrap { flex:1; width:100%; max-width:min(1760px, 85vw); margin:0 auto; padding:32px clamp(16px, 2.6vw, 48px); }
 .grid-main { display:grid; grid-template-columns:2fr 1fr; gap:32px; width:100%; }
 .grid-container { display:grid; grid-template-columns:1fr 320px; gap:32px; }
 .main-column, .main-content { min-width:0; }
@@ -371,7 +371,7 @@ button[style*="background: var(--honey-gradient)"],
 .page-contact .faq-teaser .btn { background:rgb(63, 71, 45); color:var(--primary-dark); }
 
 /* --- FAQ page --- */
-.page-faq .faq-container { max-width:800px; margin:0 auto; }
+.page-faq .faq-container { max-width:none; margin:0 auto; }
 .page-faq .faq-section { margin-bottom:40px; }
 .page-faq .faq-section-title { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--border); }
 .page-faq .faq-section-title i { color:var(--primary); }

@@ -30,7 +30,7 @@ body.page-profile .tl a:hover{color:var(--ink)}
 body.page-profile .me{display:flex;align-items:center;gap:8px;color:var(--muted)}
 body.page-profile .av{border-radius:50%;background:var(--gold);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none;border:1px solid var(--sage3)}
 body.page-profile .av.sg{background:var(--sage2)}
-body.page-profile .wrap{max-width:min(1680px, 92vw);margin:0 auto;padding:0 24px}
+body.page-profile .wrap{max-width:min(1680px, 85vw);margin:0 auto;padding:0 24px}
 body.page-profile .crumb{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 18px;font-size:13px}
 body.page-profile .crumb nav{display:flex;align-items:center;gap:10px;color:var(--muted)}
 body.page-profile .crumb nav b{font-weight:500;color:var(--ink)}
@@ -372,7 +372,7 @@ body.page-profile{
 }
 
 /* ---- shell ---- */
-body.page-profile .wrap{max-width:min(1680px, 92vw);margin:0 auto;padding:0 20px 64px;width:100%}
+body.page-profile .wrap{max-width:min(1680px, 85vw);margin:0 auto;padding:0 20px 64px;width:100%}
 body.page-profile .header.topbar{margin:0;gap:14px}
 body.page-profile .logo-area{display:flex;align-items:center;gap:10px;text-decoration:none}
 body.page-profile .topbar .me{margin-left:auto;position:relative;cursor:pointer;display:flex;align-items:center;
@@ -622,7 +622,7 @@ body.page-profile .post.flash{animation:pm-flash 2s ease-out}
 }
 
 /* 3. breathing room ------------------------------------------------------- */
-body.page-profile .wrap{max-width:min(1680px, 92vw);padding:0 24px 80px}
+body.page-profile .wrap{max-width:min(1680px, 85vw);padding:0 24px 80px}
 body.page-profile .stats{gap:18px;margin:26px 0}
 body.page-profile .cols{gap:26px;padding:24px 0 72px}
 body.page-profile .feed{gap:20px}
