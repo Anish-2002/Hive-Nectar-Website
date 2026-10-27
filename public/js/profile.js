@@ -3647,16 +3647,18 @@ export async function initProfile() {
         window.loadCompletedTasks = openCompletedModal;
         window.loadPendingSigmaTasks = openPendingSigmaModal;
 
-        const desktopMissions = document.getElementById('desktopMissionsBtn');
-        if (desktopMissions) desktopMissions.addEventListener('click', () => openMissionsModal());
-        const desktopAchievements = document.getElementById('desktopAchievementsBtn');
-        if (desktopAchievements) desktopAchievements.addEventListener('click', () => loadAchievementsModal());
-        const desktopCompleted = document.getElementById('completedTasksSection');
-        if (desktopCompleted) desktopCompleted.addEventListener('click', () => openCompletedModal());
-        const desktopPending = document.getElementById('pendingSigmaSection');
-        if (desktopPending) desktopPending.addEventListener('click', () => openPendingSigmaModal());
-        const desktopSigmaBtn = document.getElementById('addSigmaBtnDesktop');
-        if (desktopSigmaBtn) desktopSigmaBtn.addEventListener('click', () => openSigmaModal());
+        // These sidebar entries are anchors with href="#". Without preventDefault the
+        // click bubbles to the router, which re-renders the view and wipes the sheet
+        // the handler just opened (the "loader spins, nothing happens" bug).
+        const onNavClick = (el, fn) => {
+            if (!el) return;
+            el.addEventListener('click', (e) => { e.preventDefault(); fn(); });
+        };
+        onNavClick(document.getElementById('desktopMissionsBtn'), openMissionsModal);
+        onNavClick(document.getElementById('desktopAchievementsBtn'), loadAchievementsModal);
+        onNavClick(document.getElementById('completedTasksSection'), openCompletedModal);
+        onNavClick(document.getElementById('pendingSigmaSection'), openPendingSigmaModal);
+        onNavClick(document.getElementById('addSigmaBtnDesktop'), openSigmaModal);
 
         // #mobileMissionsBtn carries the "Tasks Reflection" label and the pending
         // reflection badge — it must open the reflection list, not Daily Tasks.
