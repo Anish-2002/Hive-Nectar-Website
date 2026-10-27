@@ -74,7 +74,7 @@ function injectStyles() {
     padding: 22px 20px 18px; box-shadow: 0 14px 44px rgba(60,40,10,.16);
     border: 1px solid rgba(200,169,110,.35);
   }
-  #pwaGate img.gate-logo { width: 54px; height: 54px; object-fit: contain; display: block; margin: 0 auto 10px; }
+  #pwaGate img.gate-logo { width: 64px; height: 64px; border-radius: 14px; display: block; margin: 0 auto 12px; }
   #pwaGate h2 { margin: 0 0 4px; font: 800 20px/1.25 Inter, system-ui, sans-serif; color: #2b2118; text-align: center; }
   #pwaGate p.gate-sub { margin: 0 0 16px; font-size: 13px; color: #6b6252; text-align: center; }
   #pwaGate label { display: block; font-size: 12.5px; font-weight: 700; color: #4a4033; margin: 12px 0 5px; }
@@ -101,7 +101,7 @@ function injectStyles() {
   #pwaGate .gate-err.on { display: block; }
   #pwaGate button[type=submit] {
     width: 100%; margin-top: 16px; padding: 13px; border: 0; border-radius: 12px;
-    background: #3f6b4f; color: #fff; font: 800 14.5px/1 Inter, system-ui, sans-serif;
+    background: #3f6b4f; color: #fff !important; font: 800 14.5px/1 Inter, system-ui, sans-serif;
     cursor: pointer;
   }
   #pwaGate button[type=submit]:disabled { opacity: .6; cursor: default; }
@@ -224,7 +224,7 @@ function showSignIn() {
   gate.setAttribute('aria-label', 'Sign in to The Meadow');
   gate.innerHTML = `
     <div class="gate-card">
-      <img class="gate-logo" src="newlogo.webp" alt="The Meadow">
+      <img class="gate-logo" src="icons/icon-192.png" alt="The Meadow" width="64" height="64">
       <h2>Sign in to The Meadow</h2>
       <p class="gate-sub">You stay signed in on this device.</p>
       <form id="pwaGateForm" novalidate>
