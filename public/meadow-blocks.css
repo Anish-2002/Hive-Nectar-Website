@@ -385,14 +385,42 @@ body.mw-page .mw-soon-note {
    PollenPop — same panel system, product-specific blocks (.pp2-*)
    ========================================================================== */
 
+body.mw-page .pp2-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: clamp(18px, 3vw, 46px);
+  align-items: center;
+  text-align: left;
+}
+
+body.mw-page .pp2-hero-copy {
+  min-width: 0;
+}
+
+body.mw-page .pp2-hero .mw-panel-label {
+  text-align: left;
+}
+
+body.mw-page .pp2-hero .mw-intro,
+body.mw-page .pp2-hero .mw-actions {
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  max-width: 52ch;
+}
+
+body.mw-page .pp2-hero .mw-actions {
+  justify-content: flex-start;
+}
+
 body.mw-page .pp2-hero-art {
   display: flex;
   justify-content: center;
-  margin: 4px auto clamp(14px, 2vw, 22px);
+  margin: 0;
 }
 
 body.mw-page .pp2-hero-art svg {
-  width: clamp(170px, 21vw, 240px);
+  width: clamp(180px, 24vw, 300px);
   height: auto;
   filter: drop-shadow(0 16px 28px rgba(16, 30, 18, 0.28));
 }
@@ -402,6 +430,7 @@ body.mw-page .pp2-jars {
   flex-wrap: wrap;
   justify-content: center;
   gap: clamp(10px, 1.4vw, 16px);
+  perspective: 1100px;
 }
 
 body.mw-page .pp2-jar {
@@ -419,10 +448,39 @@ body.mw-page .pp2-jar {
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+body.mw-page .pp2-jar {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+body.mw-page .pp2-jar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 62%);
+  transform: translateX(-120%);
+  transition: transform 0.75s ease;
+  pointer-events: none;
+}
+
 body.mw-page .pp2-jar:hover {
-  transform: translateY(-3px);
-  border-color: #3E5A44;
-  box-shadow: 0 10px 22px rgba(46, 60, 40, 0.14);
+  transform: translateY(-8px) rotateX(4deg) rotateY(4deg);
+  border-color: #B7C3AA;
+  box-shadow: 0 20px 38px -16px rgba(46, 60, 40, 0.38), 0 0 0 1px rgba(199, 168, 108, 0.18);
+}
+
+body.mw-page .pp2-jar:hover::after {
+  transform: translateX(120%);
+}
+
+body.mw-page .pp2-jar:hover svg {
+  transform: scale(1.05);
+}
+
+body.mw-page .pp2-jar svg {
+  transition: transform 0.35s ease;
 }
 
 body.mw-page .pp2-jar svg {
@@ -449,6 +507,60 @@ body.mw-page .pp2-jar span {
   color: #626C65;
 }
 
+/* The Jars — same light card surface as the panels below */
+body.mw-page .mw-panel--jars {
+  background: #FDFCF8;
+  border-color: #DDE1D0;
+  box-shadow: 0 26px 60px -40px rgba(46, 60, 40, 0.34);
+  padding-top: clamp(26px, 3.4vw, 46px);
+  padding-bottom: clamp(26px, 3.4vw, 46px);
+}
+
+body.mw-page .mw-panel--jars .pp2-jars-title {
+  font-size: clamp(1.15rem, 2.1vw, 1.75rem);
+  letter-spacing: 0.22em;
+  color: #2E4A37 !important;
+}
+
+body.mw-page .mw-panel--jars .mw-cardrow-note {
+  color: #626C65 !important;
+  margin-bottom: clamp(16px, 2.4vw, 26px);
+}
+
+body.mw-page .mw-panel--jars .pp2-tagline {
+  background: #F1F3E9;
+  border: 1px solid #DDE1D0;
+  color: #2E4A37;
+}
+
+body.mw-page .mw-panel--jars .pp2-jar {
+  flex: 0 1 calc(25% - 14px);
+  max-width: 220px;
+  background: #FFFFFF;
+  border-color: #DDE1D0;
+  box-shadow: 0 2px 0 rgba(46, 60, 40, 0.03);
+}
+
+body.mw-page .mw-panel--jars .pp2-jar b {
+  color: #2E4A37;
+  font-size: 0.88rem;
+}
+
+body.mw-page .mw-panel--jars .pp2-jar span {
+  color: #626C65;
+}
+
+body.mw-page .mw-panel--jars .pp2-jar svg {
+  max-width: clamp(104px, 13vw, 152px);
+  filter: drop-shadow(0 10px 16px rgba(46, 60, 40, 0.16));
+}
+
+body.mw-page .mw-panel--jars .pp2-jar:hover {
+  background: #FFFFFF;
+  border-color: #B7C3AA;
+  box-shadow: 0 20px 38px -16px rgba(46, 60, 40, 0.28), 0 0 0 1px rgba(199, 168, 108, 0.18);
+}
+
 body.mw-page .pp2-steps-title {
   margin: clamp(20px, 2.6vw, 28px) 0 0;
   text-align: center;
@@ -459,22 +571,37 @@ body.mw-page .pp2-steps-title {
 
 body.mw-page .pp2-steps {
   list-style: none;
-  margin: clamp(18px, 2.4vw, 26px) auto 0;
-  padding: 0;
-  max-width: 620px;
-  display: grid;
-  grid-template-columns: 1fr;
+  margin: clamp(16px, 2.2vw, 22px) 0 0;
+  padding: 2px 2px 8px;
+  display: flex;
   gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
 }
 
 body.mw-page .pp2-step {
+  flex: 1 1 0;
+  min-width: 108px;
+  scroll-snap-align: start;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 8px;
+  padding: 12px 12px 14px;
   background: #F1F3E9;
   border: 1px solid #DDE1D0;
   border-radius: 14px;
+  min-height: 96px;
+}
+
+body.mw-page .pp2-step-text {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #7C8A7A;
+  border-bottom: 1px dashed #C3CEB6;
+  padding-bottom: 3px;
+  width: 100%;
 }
 
 body.mw-page .pp2-step i {
@@ -644,6 +771,41 @@ body.mw-page .mw-panel--intro .pp2-status.err {
   color: #F6F4EC;
 }
 
+body.mw-page .mw-cardrow--2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+@media (max-width: 860px) {
+  body.mw-page .pp2-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: clamp(14px, 3vw, 24px);
+  }
+
+  body.mw-page .pp2-hero-copy {
+    order: 2;
+  }
+
+  body.mw-page .pp2-hero-art {
+    order: 1;
+  }
+
+  body.mw-page .pp2-hero .mw-panel-label,
+  body.mw-page .pp2-hero .mw-intro,
+  body.mw-page .pp2-hero .mw-actions {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  body.mw-page .pp2-hero .mw-actions {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 720px) {
   body.mw-page .pp2-jar {
     flex: 0 1 calc(25% - 8px);
@@ -661,6 +823,24 @@ body.mw-page .mw-panel--intro .pp2-status.err {
 }
 
 @media (max-width: 480px) {
+  body.mw-page .mw-cardrow--2 {
+    grid-template-columns: 1fr;
+    max-width: 340px;
+  }
+
+  body.mw-page .pp2-step {
+    flex: 0 0 46%;
+    min-height: 84px;
+  }
+
+  body.mw-page .mw-panel--jars .pp2-jar {
+    max-width: none;
+  }
+
+  body.mw-page .mw-panel--jars .pp2-jar svg {
+    max-width: 108px;
+  }
+
   body.mw-page .pp2-jar {
     flex: 0 1 calc(50% - 8px);
     padding: 12px 8px 10px;
@@ -672,5 +852,178 @@ body.mw-page .mw-panel--intro .pp2-status.err {
 
   body.mw-page .pp2-step {
     padding: 10px 12px;
+  }
+}
+
+/* First screen = the page's main view: intro row + the jars wall.
+   Everything after it scrolls normally. */
+body.mw-page .pp2-stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(10px, 1.3vw, 16px);
+  height: calc(100svh - 150px);
+  min-height: 560px;
+}
+
+body.mw-page .pp2-stage > .pp2-hero {
+  padding: 14px clamp(18px, 2.4vw, 30px);
+  gap: clamp(10px, 1.4vw, 18px);
+}
+
+body.mw-page .pp2-stage > .pp2-hero .mw-panel-label {
+  margin-bottom: 4px;
+}
+
+body.mw-page .pp2-stage > .mw-panel--jars {
+  padding: 12px clamp(14px, 2vw, 22px);
+}
+
+body.mw-page .pp2-stage .pp2-jars-title {
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  margin: 0 0 2px;
+}
+
+body.mw-page .pp2-stage .pp2-tagline {
+  margin: 0 auto clamp(6px, 0.9vw, 10px);
+  padding: 8px 14px;
+  font-size: clamp(0.78rem, 0.92vw, 0.9rem);
+}
+
+body.mw-page .pp2-stage .mw-cardrow-note {
+  margin: 0 0 clamp(8px, 1.2vw, 14px);
+  font-size: 0.68rem;
+}
+
+body.mw-page .pp2-stage .pp2-hero .mw-intro {
+  margin-top: 6px;
+}
+
+body.mw-page .pp2-stage .pp2-hero .mw-intro p {
+  font-size: clamp(0.82rem, 0.95vw, 0.92rem);
+  line-height: 1.5;
+}
+
+body.mw-page .pp2-stage .pp2-hero .mw-actions {
+  margin-top: clamp(8px, 1.2vw, 14px);
+}
+
+body.mw-page .pp2-stage .pp2-hero-art svg {
+  width: auto;
+  height: clamp(96px, 10vw, 124px);
+}
+
+body.mw-page .pp2-stage > .pp2-hero {
+  flex: 0 0 auto;
+}
+
+body.mw-page .pp2-stage > .mw-panel--jars {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+body.mw-page .pp2-stage .pp2-jars {
+  display: grid;
+  align-content: stretch;
+  height: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: clamp(8px, 1vw, 14px);
+  align-items: stretch;
+  min-height: 0;
+}
+
+body.mw-page .pp2-stage .pp2-jar {
+  flex: none;
+  max-width: none;
+  min-height: 0;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 8px 9px;
+}
+
+body.mw-page .pp2-stage .pp2-jar svg {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: auto;
+  height: 100%;
+  max-height: 168px;
+  max-width: 100%;
+}
+
+body.mw-page .pp2-stage .pp2-jar figcaption b {
+  font-size: 0.8rem;
+}
+
+body.mw-page .pp2-stage .pp2-jar figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+body.mw-page .pp2-stage .pp2-jar figcaption span {
+  font-size: 0.62rem;
+  opacity: 0.78;
+}
+
+body.mw-page .pp2-tagline {
+  margin: 4px auto clamp(12px, 1.6vw, 18px);
+  padding: clamp(10px, 1.2vw, 14px) clamp(14px, 2vw, 22px);
+  max-width: 760px;
+  background: #F7F3E6;
+  border-radius: 12px;
+  color: #2E4A37;
+  font-size: clamp(0.86rem, 1.05vw, 1rem);
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  body.mw-page .pp2-stage {
+    height: auto;
+    min-height: 0;
+  }
+
+  body.mw-page .pp2-stage > .pp2-hero {
+    flex-direction: column;
+  }
+
+  body.mw-page .pp2-stage .pp2-hero-art {
+    order: 2;
+  }
+
+  body.mw-page .pp2-stage .pp2-jars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: auto;
+  }
+
+  body.mw-page .pp2-stage .pp2-jar svg {
+    height: clamp(96px, 14vw, 132px);
+  }
+}
+
+@media (max-width: 560px) {
+  body.mw-page .pp2-stage .pp2-jars {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* jars stay a two-up showcase on phones — never shrink to four tiny tiles */
+@media (max-width: 560px) {
+  body.mw-page .pp2-jar,
+  body.mw-page .mw-panel--jars .pp2-jar {
+    flex: 0 1 calc(50% - 10px);
+    max-width: none;
+  }
+
+  body.mw-page .mw-panel--jars .pp2-jar svg {
+    max-width: 116px;
+  }
+
+  body.mw-page .mw-panel--jars .pp2-jar span {
+    display: block;
   }
 }
